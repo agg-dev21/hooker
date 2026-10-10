@@ -2857,7 +2857,7 @@ MonoBehaviour:
   arenaMinX: -13
   arenaMaxX: 66
   startDelay: 1.5
-  restTime: 0.8
+  restTime: 0.5
   healthBarRoot: {fileID: 1683544917}
   sceneAfterDeath: Level_1_Sail
   sceneAfterDeathDelay: 2
@@ -2885,11 +2885,11 @@ MonoBehaviour:
   tentaclePoseTime: 0.1
   tentaclePoseScale: {x: 1.3, y: 0.85}
   tentacleAnimTrigger: Tentacle
-  tentacleLength: 14
+  tentacleLength: 18
   tentacleTipLength: 2
   tentacleThickness: 1.6
   tentacleHeight: 2
-  tentacleExtendSpeed: 50
+  tentacleExtendSpeed: 70
   tentacleHoldTime: 0.3
   tentacleRetractSpeed: 30
   tentacleBodyDamage: 6
@@ -2927,7 +2927,7 @@ MonoBehaviour:
   leapPoseScale: {x: 1.2, y: 0.7}
   leapAnimTrigger: Leap
   leapHeight: 7
-  leapSpeed: 18
+  leapSpeed: 22
   leapMinTime: 0.6
   leapMaxTime: 2.5
   leapLandOffset: 0
@@ -2965,10 +2965,10 @@ MonoBehaviour:
   spikesPoseTime: 0.1
   spikesPoseScale: {x: 0.85, y: 1.25}
   spikesAnimTrigger: Spikes
-  spikeCount: 6
+  spikeCount: 8
   spikeStartDistance: 2
   spikeSpacing: 3
-  spikeInterval: 0.15
+  spikeInterval: 0.1
   spikeWidth: 2.1
   spikeHeight: 5.7
   spikeRiseSpeed: 30
@@ -3025,8 +3025,8 @@ MonoBehaviour:
   punchPreferChance: 0.5
   usePhase2: 1
   phase2AtHealth: 0.5
-  randomSpikeInterval: 1.2
-  randomSpikesPerWave: 2
+  randomSpikeInterval: 0.9
+  randomSpikesPerWave: 3
   randomSpikeMinGap: 3
   crumblePieces: 16
   crumbleForce: 6
@@ -3045,7 +3045,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f472946da460bf1429391a8a1fc59e69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  maxHealth: 300
+  maxHealth: 400
   invincibleTime: 0.1
   flashOnHit: 0
   flashColor: {r: 1, g: 1, b: 1, a: 1}

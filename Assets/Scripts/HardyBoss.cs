@@ -24,7 +24,7 @@ public class HardyBoss : MonoBehaviour
 
     [Header("Fight Flow")]
     [SerializeField] float startDelay = 1.5f; // delay before the first attack
-    [SerializeField] float restTime = 0.8f;   // pause between attacks
+    [SerializeField] float restTime = 0.5f;   // pause between attacks
     [SerializeField] GameObject healthBarRoot; // hidden when the boss dies
     [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = fade to this scene
     [SerializeField] float sceneAfterDeathDelay = 2f; // seconds to watch him crumble before the fade starts
@@ -57,11 +57,11 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float tentaclePoseTime = 0.1f;            // how long the pose lasts before the attack
     [SerializeField] Vector2 tentaclePoseScale = new Vector2(1.3f, 0.85f); // pose: a bit wider and lower
     [SerializeField] string tentacleAnimTrigger = "Tentacle";
-    [SerializeField] float tentacleLength = 14f;
+    [SerializeField] float tentacleLength = 18f;
     [SerializeField] float tentacleTipLength = 2f;
     [SerializeField] float tentacleThickness = 0.8f;
     [SerializeField] float tentacleHeight = 1f;       // height above the ground
-    [SerializeField] float tentacleExtendSpeed = 50f;
+    [SerializeField] float tentacleExtendSpeed = 70f;
     [SerializeField] float tentacleHoldTime = 0.3f;
     [SerializeField] float tentacleRetractSpeed = 30f;
     [SerializeField] int tentacleBodyDamage = 6;
@@ -84,7 +84,7 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] Vector2 leapPoseScale = new Vector2(1.2f, 0.7f); // pose: crouches down
     [SerializeField] string leapAnimTrigger = "Leap";
     [SerializeField] float leapHeight = 7f;
-    [SerializeField] float leapSpeed = 18f;          // sideways speed through the air: longer jumps take longer (and spin more)
+    [SerializeField] float leapSpeed = 22f;          // sideways speed through the air: longer jumps take longer (and spin more)
     [SerializeField] float leapMinTime = 0.6f;       // even a short jump lasts at least this long
     [SerializeField] float leapMaxTime = 2.5f;       // even a very long jump lasts at most this long
     [SerializeField] float leapLandOffset = 0f;       // 0 = lands right where the player was when he jumped
@@ -116,10 +116,10 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float spikesPoseTime = 0.1f;
     [SerializeField] Vector2 spikesPoseScale = new Vector2(0.85f, 1.25f); // pose: stands up tall
     [SerializeField] string spikesAnimTrigger = "Spikes";
-    [SerializeField] int spikeCount = 6;
+    [SerializeField] int spikeCount = 8;
     [SerializeField] float spikeStartDistance = 2f;   // distance from the boss to the first spike
     [SerializeField] float spikeSpacing = 2.2f;
-    [SerializeField] float spikeInterval = 0.15f;     // time between one spike and the next
+    [SerializeField] float spikeInterval = 0.1f;     // time between one spike and the next
     [SerializeField] float spikeWidth = 1f;
     [SerializeField] float spikeHeight = 3f;
     [SerializeField] float spikeRiseSpeed = 30f;
@@ -157,9 +157,11 @@ public class HardyBoss : MonoBehaviour
     [Header("Phase 2 (random spikes)")]
     [SerializeField] bool usePhase2 = true;
     [SerializeField, Range(0f, 1f)] float phase2AtHealth = 0.5f; // starts when his health drops to this part of the max (0.5 = half)
-    [SerializeField] float randomSpikeInterval = 1.2f;  // seconds between random spike waves
-    [SerializeField] int randomSpikesPerWave = 2;
+    [SerializeField] float randomSpikeInterval = 0.9f;  // seconds between random spike waves
+    [SerializeField] int randomSpikesPerWave = 3;
     [SerializeField] float randomSpikeMinGap = 3f;      // spikes in one wave are at least this far apart
+    [SerializeField] float phase2SpeedMultiplier = 1.3f; // in phase 2 he walks this much faster
+    [SerializeField] float phase2RestMultiplier = 0.6f;  // in phase 2 his rest between attacks is this much shorter
 
     [Header("Death (placeholder: crumbles)")]
     [SerializeField] int crumblePieces = 16;
@@ -229,7 +231,8 @@ public class HardyBoss : MonoBehaviour
     {
         // Stay planted on the ground so punches cannot knock it into the air (except while leaping/rolling).
         // While walking, also step toward the player.
-        if (!movingSelf) rb.MovePosition(new Vector2(ClampX(rb.position.x + walkDir * walkSpeed * Time.fixedDeltaTime), GroundCenterY));
+        float speed = phase2 ? walkSpeed * phase2SpeedMultiplier : walkSpeed;
+        if (!movingSelf) rb.MovePosition(new Vector2(ClampX(rb.position.x + walkDir * speed * Time.fixedDeltaTime), GroundCenterY));
     }
 
     // ---------------- Sprite animation ----------------
@@ -321,7 +324,7 @@ public class HardyBoss : MonoBehaviour
             // Player still close after a punch: punch again almost right away. Otherwise rest (and walk) as normal.
             bool stillClose = player && Mathf.Abs(player.position.x - rb.position.x) <= punchTriggerDistance;
             if (attack == 3 && stillClose) yield return new WaitForSeconds(punchRestTime);
-            else yield return WalkPhase(restTime);
+            else yield return WalkPhase(phase2 ? restTime * phase2RestMultiplier : restTime);
         }
     }
 

@@ -867,7 +867,7 @@ public static class TutorialRoomBuilder
         GameObject hardy = MakeBox("Hardy", null, map, new Vector2(6f, deckTop + 2f), new Vector2(3f, 4f), new Color(0.1f, 0.08f, 0.15f));
         var rb = hardy.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
-        AddHealth(hardy, 300);
+        AddHealth(hardy, 400);
         var hardyHealth = new SerializedObject(hardy.GetComponent<Health>());
         hardyHealth.FindProperty("flashOnHit").boolValue = false; // no hit flash on Hardy
         hardyHealth.ApplyModifiedPropertiesWithoutUndo();
