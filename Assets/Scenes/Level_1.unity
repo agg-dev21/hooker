@@ -1884,7 +1884,7 @@ MonoBehaviour:
   warnFlashSpeed: 8
   outTime: 0.8
   extendSpeed: 40
-  damage: 1
+  damage: 5
   knockback: 10
   knockbackUp: 0.5
   gooColor: {r: 0.08, g: 0.05, b: 0.12, a: 1}

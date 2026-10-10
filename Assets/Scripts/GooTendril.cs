@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Venom-style goo tentacle. Shoots out of a wall/ceiling/floor on a timer.
 // It flashes first (warning), then extends. Touching it deals damage and knockback.
-// Needs a SpriteRenderer and a BoxCollider2D (Is Trigger ON). The object's position is where it comes out from.
+// Solid collider stops the player from passing through. Needs a SpriteRenderer and BoxCollider2D.
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class GooTendril : MonoBehaviour
 {
@@ -20,7 +20,7 @@ public class GooTendril : MonoBehaviour
     [SerializeField] float extendSpeed = 40f;
 
     [Header("Damage")]
-    [SerializeField] int damage = 1;
+    [SerializeField] int damage = 10;
     [SerializeField] float knockback = 10f;
     [SerializeField] float knockbackUp = 0.5f; // upward part of the knockback (fraction of knockback)
 
@@ -41,8 +41,14 @@ public class GooTendril : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<BoxCollider2D>();
-        col.isTrigger = true;
+        col.isTrigger = false;
         col.size = Vector2.one;
+
+        var rb = GetComponent<Rigidbody2D>();
+        if (!rb) rb = gameObject.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        rb.interpolation = RigidbodyInterpolation2D.None;
+
         direction = direction.normalized;
         basePos = transform.position;
         transform.right = direction; // length runs along the direction
@@ -84,15 +90,38 @@ public class GooTendril : MonoBehaviour
         sr.enabled = l > 0.01f;
     }
 
-    void OnTriggerStay2D(Collider2D other)
+    void OnCollisionEnter2D(Collision2D collision) => HitPlayer(collision);
+    void OnCollisionStay2D(Collision2D collision) => HitPlayer(collision);
+
+    void HitPlayer(Collision2D collision)
     {
+        GameObject other = collision.gameObject;
         if (!other.TryGetComponent(out PlayerController2D _) || !other.TryGetComponent(out Health health)) return;
 
         int before = health.CurrentHealth;
         health.TakeDamage(damage);
 
         // Knock back only if the damage landed (it does not while dashing)
-        if (health.CurrentHealth < before && other.attachedRigidbody)
-            other.attachedRigidbody.linearVelocity = direction * knockback + Vector2.up * knockback * knockbackUp;
+        if (health.CurrentHealth < before && collision.rigidbody)
+            collision.rigidbody.linearVelocity = KnockbackFor(other.transform.position);
+    }
+
+    Vector2 KnockbackFor(Vector2 playerPos)
+    {
+        Vector2 push;
+        bool horizontalTendril = Mathf.Abs(direction.y) < 0.5f;
+
+        if (horizontalTendril)
+        {
+            push = direction * knockback;
+        }
+        else
+        {
+            Vector2 perpendicular = new Vector2(-direction.y, direction.x);
+            float side = Vector2.Dot(playerPos - (Vector2)basePos, perpendicular) >= 0f ? 1f : -1f;
+            push = perpendicular * side * knockback;
+        }
+
+        return push + Vector2.up * knockback * knockbackUp;
     }
 }
