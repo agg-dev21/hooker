@@ -38,7 +38,9 @@ public class DamageZone : MonoBehaviour
         if (other.attachedRigidbody)
         {
             float dir = Mathf.Sign(other.transform.position.x - transform.position.x);
-            other.attachedRigidbody.linearVelocity = new Vector2(dir, knockbackUp).normalized * knockback;
+            Vector2 push = new Vector2(dir, knockbackUp).normalized * knockback;
+            Rigidbody2D prb = other.attachedRigidbody;
+            prb.linearVelocity = new Vector2(push.x, Mathf.Max(prb.linearVelocity.y, push.y)); // never cancels a jump in progress
         }
         if (burns) Burn.Apply(other.gameObject, burnDamage, burnDuration, burnTickInterval);
     }

@@ -2,14 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// HARDY: the Level 1 boss (Venom-style). Three attacks in random order (never the same one twice in a row):
+// HARDY: the Level 1 boss (Venom-style). Attacks in random order (never the same one twice in a row):
 // 1) Tentacle Lash: a tentacle shoots along the ground toward the player. Body = less damage, tip = more.
-// 2) Leap + Roll: jumps high and lands near the player (shockwave AOE), then rolls at the player.
+// 2) Jump Slam: jumps high, spins in the air and slams down near the player (shockwave AOE).
+//    Optional: Roll After Landing makes him also roll along the ground at the player.
 // 3) Spikes: spikes burst out of the ground one after another toward the player.
+// 4) Punch: only when the player is close, his goo arm becomes a blade and swings in front of him.
+// Phase 2 (at half health): spikes also keep erupting at random spots all over the deck.
 // No warning flash: before each attack the boss strikes a pose. Attacks with art play their sprite frames;
 // attacks without art yet use a placeholder (the box changes shape). Between attacks he walks toward the player.
 // On death he crumbles into pieces.
-// Every value is in the Inspector. Touch damage is the separate ContactDamage script and does not burn.
+// Every value is in the Inspector. Touching him does no damage by default (Touch Hurts), only his attacks do.
 // Needs: SpriteRenderer, BoxCollider2D (solid), Rigidbody2D (Kinematic), Health.
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D), typeof(Health))]
 public class HardyBoss : MonoBehaviour
@@ -21,7 +24,7 @@ public class HardyBoss : MonoBehaviour
 
     [Header("Fight Flow")]
     [SerializeField] float startDelay = 1.5f; // delay before the first attack
-    [SerializeField] float restTime = 1.2f;   // pause between attacks
+    [SerializeField] float restTime = 0.8f;   // pause between attacks
     [SerializeField] GameObject healthBarRoot; // hidden when the boss dies
     [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = fade to this scene
     [SerializeField] float sceneAfterDeathDelay = 2f; // seconds to watch him crumble before the fade starts
@@ -34,17 +37,18 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float walkFps = 8f;
 
     [Header("Touch")]
-    [SerializeField] bool blocksPlayer = false;    // OFF: the player can jump over / pass through him (touching still hurts)
-    [SerializeField] int touchDamage = 10;         // no fire
+    [SerializeField] bool blocksPlayer = false;    // OFF: the player can jump over / pass through him
+    [SerializeField] bool touchHurts = false;      // OFF: touching him does no damage, only his attacks hurt
+    [SerializeField] int touchDamage = 10;         // only used when Touch Hurts is ON (no fire)
     [SerializeField] float touchKnockback = 8f;
 
     [Header("Walking (between attacks)")]
     [SerializeField] bool walkBetweenAttacks = true;
-    [SerializeField] float walkSpeed = 2.5f;
+    [SerializeField] float walkSpeed = 6f;
     [SerializeField] float walkStopDistance = 6f;  // stops walking when this close to the player
 
     [Header("Fire (used by attacks that burn)")]
-    [SerializeField] int burnDamage = 5;
+    [SerializeField] int burnDamage = 2;
     [SerializeField] float burnTickInterval = 1f;
     [SerializeField] float burnDuration = 3f;
 
@@ -60,12 +64,14 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float tentacleExtendSpeed = 50f;
     [SerializeField] float tentacleHoldTime = 0.3f;
     [SerializeField] float tentacleRetractSpeed = 30f;
-    [SerializeField] int tentacleBodyDamage = 10;
-    [SerializeField] int tentacleTipDamage = 20;
+    [SerializeField] int tentacleBodyDamage = 6;
+    [SerializeField] int tentacleTipDamage = 10;
     [SerializeField] float tentacleKnockback = 10f;
     [SerializeField] bool tentacleBurns = true;
     [SerializeField] Color tentacleColor = new Color(0.08f, 0.05f, 0.12f);
     [SerializeField] Color tentacleTipColor = new Color(0.15f, 0.08f, 0.2f);
+    [SerializeField] Sprite[] tentaclePoseFrames;     // if set, this plays instead of the box pose (last frame is held during the attack)
+    [SerializeField] float tentaclePoseFps = 14f;
     [SerializeField] Sprite[] tentacleFxFrames;       // if set, the tentacle plays this animation (drawn growing to the left)
     [SerializeField] float tentacleFxFps = 18f;
     [SerializeField] int tentacleHitFirstFrame = 6;   // frames (counting from 0) during which the tentacle can hurt
@@ -78,22 +84,32 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] Vector2 leapPoseScale = new Vector2(1.2f, 0.7f); // pose: crouches down
     [SerializeField] string leapAnimTrigger = "Leap";
     [SerializeField] float leapHeight = 7f;
-    [SerializeField] float leapDuration = 1f;
-    [SerializeField] float leapLandOffset = 3f;       // how far from the player it lands
-    [SerializeField] float landingRadius = 3.5f;
-    [SerializeField] int landingDamage = 20;
+    [SerializeField] float leapSpeed = 18f;          // sideways speed through the air: longer jumps take longer (and spin more)
+    [SerializeField] float leapMinTime = 0.6f;       // even a short jump lasts at least this long
+    [SerializeField] float leapMaxTime = 2.5f;       // even a very long jump lasts at most this long
+    [SerializeField] float leapLandOffset = 0f;       // 0 = lands right where the player was when he jumped
+    [SerializeField] float landingRadius = 7f;
+    [SerializeField] int landingDamage = 12;
     [SerializeField] float landingKnockback = 12f;
     [SerializeField] bool landingBurns = true;
     [SerializeField] Color shockwaveColor = new Color(1f, 0.45f, 0.1f, 0.5f);
     [SerializeField] float shockwaveShowTime = 0.2f;
+    [SerializeField] bool rollAfterLanding = false;   // ON: after the slam he also rolls along the ground at the player
     [SerializeField] float rollPoseTime = 0.1f;
     [SerializeField] Vector2 rollPoseScale = new Vector2(0.8f, 0.8f); // pose: curls into a ball
     [SerializeField] string rollAnimTrigger = "Roll";
     [SerializeField] float rollSpeed = 14f;
     [SerializeField] float rollDistance = 12f;
-    [SerializeField] int rollDamage = 20;
+    [SerializeField] int rollDamage = 10;
     [SerializeField] float rollKnockback = 12f;
     [SerializeField] bool rollBurns = true;
+    [SerializeField] Sprite[] jumpSlamFrames;         // if set: wind-up, then spin frames loop for the whole jump and roll, then landing
+    [SerializeField] float jumpSlamFps = 12f;
+    [SerializeField] int jumpWindupFrames = 4;        // first frames: wind-up before the jump (played once)
+    [SerializeField] int jumpSpinFirstFrame = 4;      // spin frames (counting from 0) that loop while in the air and rolling
+    [SerializeField] int jumpSpinFrameCount = 3;
+    [SerializeField] int jumpLandFrame = 7;           // shown when he lands and when the roll ends
+    [SerializeField] float jumpLandHoldTime = 0.25f;  // how long the landing frame stays
 
     [Header("3) Spikes")]
     [SerializeField] bool useSpikes = true;
@@ -108,7 +124,7 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float spikeHeight = 3f;
     [SerializeField] float spikeRiseSpeed = 30f;
     [SerializeField] float spikeUpTime = 0.4f;
-    [SerializeField] int spikeDamage = 20;
+    [SerializeField] int spikeDamage = 8;
     [SerializeField] float spikeKnockback = 10f;
     [SerializeField] bool spikesBurn = true;
     [SerializeField] Color spikeColor = new Color(0.1f, 0.05f, 0.15f);   // only used when there is no spike art
@@ -120,6 +136,30 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] int spikeHitFirstFrame = 4;       // frames (counting from 0) during which the spike can hurt
     [SerializeField] int spikeHitLastFrame = 10;
     [SerializeField] float spikeFxScale = 1f;
+
+    [Header("4) Punch (close range)")]
+    [SerializeField] bool usePunch = true;
+    [SerializeField] float punchTriggerDistance = 7f;  // only used when the player is at most this far away
+    [SerializeField] Sprite[] punchFrames;
+    [SerializeField] float punchFps = 12f;
+    [SerializeField] int punchHitFirstFrame = 3;       // frames (counting from 0) during which the blade can hurt
+    [SerializeField] int punchHitLastFrame = 3;
+    [SerializeField] float punchRange = 3.5f;          // how far in front of him the blade reaches
+    [SerializeField] float punchHitHeight = 4f;        // how tall the hit area is (from the ground up)
+    [SerializeField] int punchDamage = 8;
+    [SerializeField] float punchKnockback = 12f;
+    [SerializeField] bool punchBurns = false;
+    [SerializeField] float punchPlaceholderTime = 0.4f; // without art: how long the swing lasts
+    [SerializeField] float punchRestTime = 0.2f;        // pause after a punch while the player is still close (spam punch)
+    [SerializeField, Range(0f, 1f)] float punchAlwaysAboveHealth = 0.3f; // above this part of his max health, a close player ALWAYS gets punched
+    [SerializeField, Range(0f, 1f)] float punchPreferChance = 0.5f; // below it: chance he still picks the punch when the player is close
+
+    [Header("Phase 2 (random spikes)")]
+    [SerializeField] bool usePhase2 = true;
+    [SerializeField, Range(0f, 1f)] float phase2AtHealth = 0.5f; // starts when his health drops to this part of the max (0.5 = half)
+    [SerializeField] float randomSpikeInterval = 1.2f;  // seconds between random spike waves
+    [SerializeField] int randomSpikesPerWave = 2;
+    [SerializeField] float randomSpikeMinGap = 3f;      // spikes in one wave are at least this far apart
 
     [Header("Death (placeholder: crumbles)")]
     [SerializeField] int crumblePieces = 16;
@@ -143,6 +183,7 @@ public class HardyBoss : MonoBehaviour
     bool animLoop;
     float animTime;
     bool HasArt => walkFrames != null && walkFrames.Length > 0;
+    bool phase2;
     int lastAttack = -1;
     readonly List<GameObject> spawned = new List<GameObject>();
 
@@ -163,11 +204,15 @@ public class HardyBoss : MonoBehaviour
         PlayerController2D pc = FindFirstObjectByType<PlayerController2D>();
         if (pc) player = pc.transform;
 
+        // Touch damage now comes only from the optional TouchHitbox below, never from ContactDamage
+        if (TryGetComponent(out ContactDamage contact)) contact.enabled = false;
+
+        // The body does not push the player, so the player can jump over or pass through him
         if (!blocksPlayer && pc)
-        {
-            // The body no longer pushes the player; a trigger hitbox the same size deals touch damage instead
             foreach (Collider2D c in pc.GetComponentsInChildren<Collider2D>()) Physics2D.IgnoreCollision(c, body);
-            if (TryGetComponent(out ContactDamage contact)) contact.enabled = false;
+
+        if (touchHurts)
+        {
             var touch = new GameObject("TouchHitbox");
             touch.transform.SetParent(transform, false);
             var touchCol = touch.AddComponent<BoxCollider2D>();
@@ -190,6 +235,12 @@ public class HardyBoss : MonoBehaviour
     // ---------------- Sprite animation ----------------
     void Update()
     {
+        if (usePhase2 && !phase2 && health.CurrentHealth > 0 && health.CurrentHealth <= health.MaxHealth * phase2AtHealth)
+        {
+            phase2 = true;
+            StartCoroutine(RandomSpikes());
+        }
+
         if (!sr || animFrames == null || animFrames.Length == 0) return;
         animTime += Time.deltaTime;
         int i = Mathf.FloorToInt(animTime * animFps);
@@ -250,17 +301,27 @@ public class HardyBoss : MonoBehaviour
             if (useTentacle) options.Add(0);
             if (useLeap) options.Add(1);
             if (useSpikes) options.Add(2);
-            if (options.Count > 1) options.Remove(lastAttack); // never the same attack twice in a row
+            bool playerClose = usePunch && player && Mathf.Abs(player.position.x - rb.position.x) <= punchTriggerDistance;
+            bool healthy = health.CurrentHealth > health.MaxHealth * punchAlwaysAboveHealth;
+            if (playerClose) options.Add(3);
+            if (options.Count > 1 && !(playerClose && healthy)) options.Remove(lastAttack); // never the same attack twice in a row
             if (options.Count == 0 || !player) { yield return null; continue; }
 
-            int attack = options[Random.Range(0, options.Count)];
+            // Close and still healthy: always punch. Otherwise punch sometimes, or any attack at random.
+            int attack = playerClose && healthy ? 3
+                : options.Contains(3) && Random.value < punchPreferChance ? 3
+                : options[Random.Range(0, options.Count)];
             lastAttack = attack;
 
             if (attack == 0) yield return TentacleLash();
             else if (attack == 1) yield return LeapAndRoll();
-            else yield return Spikes();
+            else if (attack == 2) yield return Spikes();
+            else yield return Punch();
 
-            yield return WalkPhase(restTime);
+            // Player still close after a punch: punch again almost right away. Otherwise rest (and walk) as normal.
+            bool stillClose = player && Mathf.Abs(player.position.x - rb.position.x) <= punchTriggerDistance;
+            if (attack == 3 && stillClose) yield return new WaitForSeconds(punchRestTime);
+            else yield return WalkPhase(restTime);
         }
     }
 
@@ -284,7 +345,13 @@ public class HardyBoss : MonoBehaviour
     IEnumerator TentacleLash()
     {
         Face(DirToPlayer);
-        yield return Pose(tentaclePoseScale, tentaclePoseTime, tentacleAnimTrigger);
+        if (tentaclePoseFrames != null && tentaclePoseFrames.Length > 0)
+        {
+            // Play the pose once, then hold its last frame while the tentacle is out
+            Play(tentaclePoseFrames, tentaclePoseFps, false);
+            yield return new WaitForSeconds(tentaclePoseFrames.Length / Mathf.Max(tentaclePoseFps, 0.01f));
+        }
+        else yield return Pose(tentaclePoseScale, tentaclePoseTime, tentacleAnimTrigger);
 
         float dir = DirToPlayer;
         Face(dir);
@@ -369,16 +436,41 @@ public class HardyBoss : MonoBehaviour
     }
 
     // ---------------- 2) Leap + Roll ----------------
+    // Parts of the jump slam sheet (empty if there is no art)
+    Sprite[] JumpPart(int first, int count)
+    {
+        if (jumpSlamFrames == null || jumpSlamFrames.Length == 0) return null;
+        first = Mathf.Clamp(first, 0, jumpSlamFrames.Length - 1);
+        count = Mathf.Clamp(count, 1, jumpSlamFrames.Length - first);
+        var part = new Sprite[count];
+        System.Array.Copy(jumpSlamFrames, first, part, 0, count);
+        return part;
+    }
+
     IEnumerator LeapAndRoll()
     {
         Face(DirToPlayer);
-        yield return Pose(leapPoseScale, leapPoseTime, leapAnimTrigger);
-        SetPose(Vector2.one);
+        Sprite[] windup = JumpPart(0, jumpWindupFrames);
+        Sprite[] spin = JumpPart(jumpSpinFirstFrame, jumpSpinFrameCount);
+        Sprite[] land = JumpPart(jumpLandFrame, 1);
+        if (windup != null)
+        {
+            Play(windup, jumpSlamFps, false);
+            yield return new WaitForSeconds(windup.Length / Mathf.Max(jumpSlamFps, 0.01f));
+            Play(spin, jumpSlamFps, true); // keeps spinning as long as the jump lasts
+        }
+        else
+        {
+            yield return Pose(leapPoseScale, leapPoseTime, leapAnimTrigger);
+            SetPose(Vector2.one);
+        }
 
-        // Land a little short of the player, inside the arena
+        // Aim at the player's spot when he jumps (the player can still move away while he is in the air)
         float targetX = ClampX(player.position.x - DirToPlayer * leapLandOffset);
         Vector2 from = rb.position;
         Vector2 to = new Vector2(targetX, GroundCenterY);
+        // Air time depends on how far he jumps, so the spin frames repeat more on long jumps
+        float leapDuration = Mathf.Clamp(Mathf.Abs(to.x - from.x) / Mathf.Max(leapSpeed, 0.01f), leapMinTime, leapMaxTime);
 
         movingSelf = true;
         float t = 0f;
@@ -401,10 +493,28 @@ public class HardyBoss : MonoBehaviour
         wave.transform.localScale = new Vector3(landingRadius * 2f, landingRadius, 1f);
         StartCoroutine(RemoveAfter(wave, shockwaveShowTime));
 
+        // No roll: show the landing frame, then the attack is over
+        if (!rollAfterLanding)
+        {
+            if (land != null)
+            {
+                Play(land, 1f, true);
+                yield return new WaitForSeconds(jumpLandHoldTime);
+            }
+            PlayIdle();
+            yield break;
+        }
+
         // Roll toward the player
         float dir = DirToPlayer;
         Face(dir);
-        yield return Pose(rollPoseScale, rollPoseTime, rollAnimTrigger);
+        if (land != null)
+        {
+            Play(land, 1f, true);
+            yield return new WaitForSeconds(jumpLandHoldTime);
+            Play(spin, jumpSlamFps, true); // keeps spinning as long as the roll lasts
+        }
+        else yield return Pose(rollPoseScale, rollPoseTime, rollAnimTrigger);
 
         GameObject rollZone = MakePiece("RollHitbox", Color.clear, true);
         rollZone.GetComponent<DamageZone>().Setup(rollDamage, rollKnockback, rollBurns, burnDamage, burnDuration, burnTickInterval);
@@ -427,6 +537,12 @@ public class HardyBoss : MonoBehaviour
         body.isTrigger = false;
         Remove(rollZone);
         SetPose(Vector2.one);
+        if (land != null)
+        {
+            Play(land, 1f, true);
+            yield return new WaitForSeconds(jumpLandHoldTime);
+        }
+        PlayIdle();
     }
 
     // ---------------- 3) Spikes ----------------
@@ -513,6 +629,64 @@ public class HardyBoss : MonoBehaviour
         Remove(hit);
     }
 
+    // ---------------- Phase 2: random spikes all over the deck ----------------
+    IEnumerator RandomSpikes()
+    {
+        while (true)
+        {
+            var used = new List<float>();
+            for (int i = 0; i < randomSpikesPerWave; i++)
+            {
+                // Pick a spot that is not too close to the others in this wave
+                float x = 0f;
+                for (int tries = 0; tries < 10; tries++)
+                {
+                    x = Random.Range(arenaMinX + 1f, arenaMaxX - 1f);
+                    bool clear = true;
+                    foreach (float u in used) if (Mathf.Abs(u - x) < randomSpikeMinGap) { clear = false; break; }
+                    if (clear) break;
+                }
+                used.Add(x);
+                StartCoroutine(OneSpike(x));
+            }
+            yield return new WaitForSeconds(randomSpikeInterval);
+        }
+    }
+
+    // ---------------- 4) Punch ----------------
+    // The hit area is a box in front of him: Punch Range wide, Punch Hit Height tall, standing on the ground.
+    IEnumerator Punch()
+    {
+        float dir = DirToPlayer;
+        Face(dir);
+
+        GameObject hit = MakePiece("PunchHitbox", Color.clear, true);
+        var zone = hit.GetComponent<DamageZone>();
+        zone.Setup(punchDamage, punchKnockback, punchBurns, burnDamage, burnDuration, burnTickInterval);
+        float centerX = rb.position.x + dir * (HalfSize.x + punchRange * 0.5f);
+        SetBox(hit, new Vector2(centerX, groundY + punchHitHeight * 0.5f), new Vector2(punchRange, punchHitHeight));
+
+        if (punchFrames != null && punchFrames.Length > 0)
+        {
+            Play(punchFrames, punchFps, false);
+            float fps = Mathf.Max(punchFps, 0.01f);
+            for (int i = 0; i < punchFrames.Length; i++)
+            {
+                zone.Active = i >= punchHitFirstFrame && i <= punchHitLastFrame;
+                yield return new WaitForSeconds(1f / fps);
+            }
+        }
+        else
+        {
+            // No art yet: the hit area is simply active for a moment
+            zone.Active = true;
+            yield return new WaitForSeconds(punchPlaceholderTime);
+        }
+
+        Remove(hit);
+        PlayIdle();
+    }
+
     // ---------------- Helpers ----------------
     void HitCircle(Vector2 center, float radius, int damage, float knockback, bool burns)
     {
@@ -527,7 +701,9 @@ public class HardyBoss : MonoBehaviour
             if (hit.attachedRigidbody)
             {
                 float dir = Mathf.Sign(hit.transform.position.x - center.x);
-                hit.attachedRigidbody.linearVelocity = new Vector2(dir, 0.6f).normalized * knockback;
+                Vector2 push = new Vector2(dir, 0.6f).normalized * knockback;
+                Rigidbody2D prb = hit.attachedRigidbody;
+                prb.linearVelocity = new Vector2(push.x, Mathf.Max(prb.linearVelocity.y, push.y)); // never cancels a jump in progress
             }
             if (burns) Burn.Apply(hit.gameObject, burnDamage, burnDuration, burnTickInterval);
         }

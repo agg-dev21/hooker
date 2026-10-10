@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   speed: 8
-  damage: 5
+  damage: 8
   lifetime: 4
   groundLayer:
     serializedVersion: 2

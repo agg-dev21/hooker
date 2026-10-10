@@ -1825,7 +1825,7 @@ MonoBehaviour:
   acceleration: 70
   deceleration: 80
   airControl: 1
-  jumpForce: 14
+  jumpForce: 23.6
   jumpCutMultiplier: 0.4
   coyoteTime: 0.1
   jumpBufferTime: 0.12
@@ -1886,8 +1886,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
   punchPoint: {fileID: 2066183231}
   punchRadius: 1.5
-  punchDamage: 1
-  punchCooldown: 0.12
+  punchDamage: 4
+  punchCooldown: 0.2
   punchKnockback: 0.3
   hookLine: {fileID: 15359840}
   hookRange: 12
@@ -1915,10 +1915,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376bd9221049ccb43b16b9e21e78fe05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
-  punchDistance: 1.6
-  punchRadius: 0.8
-  punchDamage: 1
-  punchCooldown: 0.12
+  punchDistance: 2.4
+  punchRadius: 1
+  punchDamage: 4
+  punchCooldown: 0.2
   punchKnockback: 0.3
   hookLine: {fileID: 15359840}
   hookRange: 12

@@ -9,11 +9,15 @@ using UnityEngine.InputSystem;
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Punch (Left Click)")]
-    [SerializeField] float punchDistance = 1.6f;  // how far from the player (toward the mouse) the punch lands
-    [SerializeField] float punchRadius = 0.8f;
-    [SerializeField] int punchDamage = 1;
-    [SerializeField] float punchCooldown = 0.12f;
+    [SerializeField] float punchDistance = 2.4f;  // how far from the player (toward the mouse) the punch lands
+    [SerializeField] float punchRadius = 1f;
+    [SerializeField] int punchDamage = 4;
+    [SerializeField] float punchCooldown = 0.2f;
     [SerializeField] float punchKnockback = 0.3f; // how far the enemy gets pushed back
+    [SerializeField] bool punchTowardMouse = false; // OFF: punch in the direction the player faces. ON: toward the mouse
+    [SerializeField] bool showPunchEffect = true;   // a quick flash where the punch lands
+    [SerializeField] Color punchEffectColor = new Color(1f, 1f, 1f, 0.6f);
+    [SerializeField] float punchEffectTime = 0.08f;
 
     [Header("Hook (Right Click)")]
     [SerializeField] LineRenderer hookLine;
@@ -24,8 +28,8 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] float mediumRange = 8f;        // closer than this = medium range, farther = long range
     [SerializeField] float mediumRangeSpeed = 64f;  // hook speed at medium range (slower)
     [SerializeField] float longRangeSpeed = 85f;    // hook speed at long range (faster)
-    [SerializeField] int mediumRangeDamage = 2;
-    [SerializeField] int longRangeDamage = 3;       // more damage when hit from far away
+    [SerializeField] int mediumRangeDamage = 6;
+    [SerializeField] int longRangeDamage = 10;       // more damage when hit from far away
     [SerializeField] float returnSpeed = 100f;      // speed of the hook returning
     [SerializeField] float hookCooldown = 0.6f;
     [SerializeField] float pullSpeed = 31.5f;
@@ -199,14 +203,33 @@ public class PlayerCombat : MonoBehaviour
     }
 
     // ---------------- PUNCH ----------------
+    static Sprite flashSprite;
+
+    // A quick see-through square where the punch lands, so you can tell where it hit
+    IEnumerator PunchFlash(Vector2 center)
+    {
+        if (!flashSprite)
+            flashSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
+        var go = new GameObject("PunchFlash");
+        go.transform.position = center;
+        go.transform.localScale = Vector3.one * punchRadius * 2f;
+        var flashSr = go.AddComponent<SpriteRenderer>();
+        flashSr.sprite = flashSprite;
+        flashSr.color = punchEffectColor;
+        flashSr.sortingOrder = 50;
+        yield return new WaitForSeconds(punchEffectTime);
+        Destroy(go);
+    }
+
     void Punch()
     {
         punchTimer = punchCooldown;
         HashSet<Health> alreadyHit = new HashSet<Health>(); // hit each enemy only once per punch
 
-        // Punch goes toward the mouse
-        Vector2 dir = GetMouseDirection();
+        // Punch goes the way the player faces (or toward the mouse if Punch Toward Mouse is on)
+        Vector2 dir = punchTowardMouse ? GetMouseDirection() : new Vector2(Facing, 0f);
         Vector2 punchCenter = (Vector2)transform.position + dir * punchDistance;
+        if (showPunchEffect) StartCoroutine(PunchFlash(punchCenter));
 
         foreach (Collider2D hit in Physics2D.OverlapCircleAll(punchCenter, punchRadius))
         {

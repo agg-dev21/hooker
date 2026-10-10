@@ -230,7 +230,7 @@ public static class TutorialRoomBuilder
         FillTiles(map, tile, 0, 0, 11, 5, true); // solid block from y 0 to the top of the screen: corridor is 3 tall
 
         GameObject dummy = MakeBox("PunchDummy", parent, map, new Vector2(4.5f, -1.55f), new Vector2(1f, 2.9f), PunchDummyColor);
-        AddHealth(dummy, 5);
+        AddHealth(dummy, 8);
     }
 
     // Room 5: a high ledge with a hook dummy (Health 6) that can be pulled down
@@ -240,7 +240,7 @@ public static class TutorialRoomBuilder
         FillTiles(map, tile, 3, 2, 5, 1, true); // ledge top at y 3, 6 tiles above the floor
 
         GameObject dummy = MakeBox("HookDummy", parent, map, new Vector2(5.5f, 4f), new Vector2(1f, 2f), HookDummyColor);
-        AddHealth(dummy, 6);
+        AddHealth(dummy, 20);
         var rb = dummy.AddComponent<Rigidbody2D>(); // Dynamic, so the hook can pull it
         rb.gravityScale = 3f;
         rb.freezeRotation = true;
@@ -251,7 +251,7 @@ public static class TutorialRoomBuilder
     {
         TileBase tile = FirstTile(map);
         GameObject shooter = MakeBox("ShooterDummy", parent, map, ShooterFloorPosition, new Vector2(1f, 2f), ShooterColor); // on the floor, same level as the player
-        AddHealth(shooter, 3);
+        AddHealth(shooter, 8);
         var es = shooter.AddComponent<EnemyShooter>();
         var so = new SerializedObject(es);
         so.FindProperty("projectilePrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>(ProjectilePrefab);
@@ -485,9 +485,9 @@ public static class TutorialRoomBuilder
 
     // Hazard damage in Level 1 (the player has 100 health). Change these and rebuild, or edit each object.
     const int TendrilDamage = 1;
-    const int BarrelDamage = 25;
+    const int BarrelDamage = 20;
     const int CannonTouchDamage = 5;
-    const int CannonBallDamage = 5;
+    const int CannonBallDamage = 8;
     const string CannonBallPrefab = "Assets/Prefabs/CannonBall.prefab";
     static readonly Color CrateColor = new Color(0.6f, 0.4f, 0.2f);
     static readonly Color CannonColor = new Color(0.25f, 0.25f, 0.25f);
@@ -730,19 +730,21 @@ public static class TutorialRoomBuilder
     // Low railings and invisible edges, nothing else on it (room for the boss later).
     // You start next to the hatch you climbed out of. The screen fades in from black (ScreenFade).
 
-    // Deck camera: same zoom as Level_1, follows the player left/right only, never shows past the railings
+    // Deck camera: a bit wider than Level_1, follows the player left/right only, never shows past the railings
+    const float DeckCameraSize = 9f;
     static void SetDeckCamera(Transform player)
     {
         Camera cam = Object.FindFirstObjectByType<Camera>();
-        cam.orthographicSize = L1HalfHeight;
-        cam.transform.position = new Vector3(DeckLeft + 1 + L1HalfWidth, L1FirstFloorCenterY, cam.transform.position.z);
+        cam.orthographicSize = DeckCameraSize;
+        float deckBottom = L1FirstFloorCenterY - L1HalfHeight;
+        cam.transform.position = new Vector3(DeckLeft + 0.67f + DeckCameraSize * 16f / 9f, deckBottom + DeckCameraSize, cam.transform.position.z);
         if (!cam.TryGetComponent(out CameraFollow2D follow)) follow = cam.gameObject.AddComponent<CameraFollow2D>();
         follow.enabled = true;
         var so = new SerializedObject(follow);
         so.FindProperty("target").objectReferenceValue = player;
         so.FindProperty("useBounds").boolValue = true;
         so.FindProperty("minBounds").vector2Value = new Vector2(DeckLeft + 0.67f, L1FirstFloorCenterY - L1HalfHeight);
-        so.FindProperty("maxBounds").vector2Value = new Vector2(DeckRight + 0.33f, L1FirstFloorCenterY + L1HalfHeight); // one screen tall: never moves up/down
+        so.FindProperty("maxBounds").vector2Value = new Vector2(DeckRight + 0.33f, deckBottom + DeckCameraSize * 2f); // one screen tall: never moves up/down
         so.FindProperty("lockToFloors").boolValue = false;
         so.ApplyModifiedPropertiesWithoutUndo();
     }
@@ -862,16 +864,14 @@ public static class TutorialRoomBuilder
         const float deckTop = -5f;
 
         // Hardy: dark box 3 wide, 4 tall, on the right side of the deck
-        GameObject hardy = MakeBox("Hardy", null, map, new Vector2(50f, deckTop + 2f), new Vector2(3f, 4f), new Color(0.1f, 0.08f, 0.15f));
+        GameObject hardy = MakeBox("Hardy", null, map, new Vector2(6f, deckTop + 2f), new Vector2(3f, 4f), new Color(0.1f, 0.08f, 0.15f));
         var rb = hardy.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
-        AddHealth(hardy, 60);
+        AddHealth(hardy, 300);
         var hardyHealth = new SerializedObject(hardy.GetComponent<Health>());
         hardyHealth.FindProperty("flashOnHit").boolValue = false; // no hit flash on Hardy
         hardyHealth.ApplyModifiedPropertiesWithoutUndo();
-        var hardyTouch = new SerializedObject(hardy.AddComponent<ContactDamage>()); // touch damage, no fire
-        hardyTouch.FindProperty("damage").intValue = 10;
-        hardyTouch.ApplyModifiedPropertiesWithoutUndo();
+        // No ContactDamage: touching Hardy does not hurt (see Touch Hurts on HardyBoss)
         var boss = hardy.AddComponent<HardyBoss>();
 
         // Boss health bar, top middle of the screen
@@ -1132,7 +1132,7 @@ public static class TutorialRoomBuilder
         for (int i = 0; i < count; i++)
         {
             GameObject crate = MakeBox("Crate_" + (i + 1), stack, map, new Vector2(x, floorTop + 1f + i * 2f), new Vector2(1.98f, 1.98f), CrateColor);
-            AddHealth(crate, 2);
+            AddHealth(crate, 8);
             var rb = crate.AddComponent<Rigidbody2D>();
             rb.gravityScale = 3f;
             rb.mass = 20f;

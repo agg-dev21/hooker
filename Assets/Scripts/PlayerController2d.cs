@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -12,11 +13,11 @@ public class PlayerController2D : MonoBehaviour
 
     [Header("Jump")]
     // Hollow Knight style: while jump is held you rise at a steady speed (Jump Force) for up to Max Jump Hold Time.
-    // Let go (or run out of time) and the rise is cut, then gravity takes over. Tap = small hop, hold = about 6 tiles.
+    // Let go (or run out of time) and the rise is cut, then gravity takes over. Tap = small hop, hold = about 8.5 tiles.
     [SerializeField] float gravity = 5f;         // player's gravity (higher = snappier jumps and falls)
-    [SerializeField] float jumpForce = 14f;      // steady rising speed while jump is held
-    [SerializeField] float maxJumpHoldTime = 0.3f;  // how long holding jump keeps you rising
-    [SerializeField] float minJumpHoldTime = 0.08f; // even a quick tap rises at least this long
+    [SerializeField] float jumpForce = 23.6f;    // steady rising speed while jump is held
+    [SerializeField] float maxJumpHoldTime = 0.12f; // how long you hold Space for the full jump (held jump: about 8.5 tiles)
+    [SerializeField] float minJumpHoldTime = 0.05f; // even a quick tap rises at least this long
     [SerializeField, Range(0f, 1f)] float jumpCutMultiplier = 0.4f;    // when the rise ends early, speed is cut to this
     [SerializeField] float coyoteTime = 0.1f;
     [SerializeField] float jumpBufferTime = 0.12f;
@@ -27,6 +28,7 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] float dashSpeed = 22f;
     [SerializeField] float dashDuration = 0.18f;   // distance = speed x duration (about 4 tiles)
     [SerializeField] float dashCooldown = 0.4f;
+    [SerializeField] bool dashThroughEnemies = true; // pass through enemies (cannons, chasers, shooters, bosses) while dashing
 
     [Header("Ground Check")]
     [SerializeField] Transform groundCheck;
@@ -45,6 +47,7 @@ public class PlayerController2D : MonoBehaviour
     float coyoteCounter;
     float jumpBufferCounter;
     bool isDashing;
+    readonly List<Collider2D> passedThrough = new List<Collider2D>(); // enemies we are currently allowed to pass through
     float dashTimer;
     float dashCooldownTimer;
 
@@ -97,6 +100,8 @@ public class PlayerController2D : MonoBehaviour
 
     void FixedUpdate()
     {
+        if (!isDashing) RestorePassedThrough();
+
         if (isDashing)
         {
             dashTimer -= Time.fixedDeltaTime;
@@ -180,6 +185,51 @@ public class PlayerController2D : MonoBehaviour
 
         // Player can't take damage during a dash
         if (health) health.MakeInvulnerable(dashDuration);
+
+        if (dashThroughEnemies) IgnoreEnemiesOnDashPath();
+    }
+
+    // Enemies = anything with an enemy script (chaser, shooter/cannon, boss, touch damage).
+    // Walls, crates, breakable walls and tutorial dummies stay solid.
+    static bool IsEnemy(Collider2D c)
+    {
+        return c.GetComponentInParent<EnemyChase>() || c.GetComponentInParent<EnemyShooter>()
+            || c.GetComponentInParent<HardyBoss>() || c.GetComponentInParent<ContactDamage>();
+    }
+
+    // Stop colliding with every enemy along the dash
+    void IgnoreEnemiesOnDashPath()
+    {
+        float distance = dashSpeed * dashDuration;
+        Vector2 center = (Vector2)transform.position + Vector2.right * FacingDirection * distance * 0.5f;
+        Vector2 size = new Vector2(distance + 2f, 3f);
+        Collider2D[] mine = GetComponentsInChildren<Collider2D>();
+        foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, size, 0f))
+        {
+            if (hit.isTrigger || hit.transform.IsChildOf(transform) || passedThrough.Contains(hit) || !IsEnemy(hit)) continue;
+            if (mine.Length > 0 && Physics2D.GetIgnoreCollision(mine[0], hit)) continue; // already passable (like Hardy): leave it alone
+            foreach (Collider2D c in mine) Physics2D.IgnoreCollision(c, hit, true);
+            passedThrough.Add(hit);
+        }
+    }
+
+    // After the dash: become solid to those enemies again once we are no longer inside them
+    void RestorePassedThrough()
+    {
+        if (passedThrough.Count == 0) return;
+        Collider2D[] mine = GetComponentsInChildren<Collider2D>();
+        for (int i = passedThrough.Count - 1; i >= 0; i--)
+        {
+            Collider2D other = passedThrough[i];
+            bool inside = false;
+            if (other)
+                foreach (Collider2D c in mine)
+                    if (c.Distance(other).isOverlapped) { inside = true; break; }
+            if (inside) continue;
+
+            if (other) foreach (Collider2D c in mine) Physics2D.IgnoreCollision(c, other, false);
+            passedThrough.RemoveAt(i);
+        }
     }
 
     void EndDash()
