@@ -9,7 +9,7 @@ using UnityEngine.InputSystem;
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Punch (Left Click)")]
-    [SerializeField] float punchDistance = 2.4f;  // how far from the player (toward the mouse) the punch lands
+    [SerializeField] float punchDistance = 2.4f;  // how far in front of the player the punch lands
     [SerializeField] float punchRadius = 1f;
     [SerializeField] int punchDamage = 4;
     [SerializeField] float punchCooldown = 0.2f;
@@ -35,6 +35,7 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] float pullSpeed = 31.5f;
     [SerializeField] float pullStopDistance = 1.2f; // pulled enemy stops this close to the player
     [SerializeField] LayerMask groundLayer;         // hook returns when it hits these layers (walls)
+    [SerializeField] float ringClearance = 2.5f;    // ring launch: how high the player's feet go above the floor above the ring
 
     [Header("Hook: Z + Arrow Keys")]
     [SerializeField] float maxZHold = 0.6f;        // holding Z with no arrow: wait this long for an arrow, then fire forward
@@ -51,6 +52,7 @@ public class PlayerCombat : MonoBehaviour
     float zReleaseTime = -1f; // time since Z was released (-1 = still held)
     float arrowHeldTime = -1f;
     Vector2 lastArrowAim;     // remembered in case the arrow is only tapped
+    float riseGravity = 1f;   // player's normal gravity scale while rising (used for the ring launch)
 
     int Facing => controller ? controller.FacingDirection : 1;
 
@@ -58,6 +60,21 @@ public class PlayerCombat : MonoBehaviour
     {
         controller = GetComponent<PlayerController2D>();
         if (hookLine) hookLine.enabled = false;
+
+        // Ground Layer left as "Nothing" in the Inspector: use the "Ground" layer automatically.
+        // Without it the hook goes through walls and the ring climb can't find the floor above.
+        if (groundLayer.value == 0)
+        {
+            groundLayer = LayerMask.GetMask("Ground");
+            if (groundLayer.value == 0)
+                Debug.LogWarning("PlayerCombat: no 'Ground' layer found. Set Ground Layer in the Inspector.", this);
+        }
+    }
+
+    // Read the gravity in Start (not Awake): PlayerController2D sets the player's gravity in its own Awake
+    void Start()
+    {
+        if (TryGetComponent(out Rigidbody2D body)) riseGravity = body.gravityScale;
     }
 
     void Update()
@@ -284,38 +301,47 @@ public class PlayerCombat : MonoBehaviour
             yield return null;
         }
 
-        // Hit a ring: pull the player to the ring, then launch upward
+        // Hit a ring: pull the player into the ring, then launch them up through the hole
         if (anchor)
         {
             Rigidbody2D myRb = GetComponent<Rigidbody2D>();
+            Collider2D myCol = GetComponent<Collider2D>();
             if (controller) controller.enabled = false; // disable movement while being pulled
-            myRb.gravityScale = 0f;
+
+            // Kinematic while pulling: the player slides into the hole without snagging on the ceiling edge
+            myRb.linearVelocity = Vector2.zero;
+            myRb.bodyType = RigidbodyType2D.Kinematic;
 
             Vector2 point = anchor.transform.position;
-            float t = 0f;
-            while (t < 1.5f)
-            {
-                Vector2 toRing = point - myRb.position;
-                if (toRing.magnitude <= 0.3f) break;
-
-                myRb.linearVelocity = toRing.normalized * pullSpeed;
-                tip = point;
-                DrawLine(tip);
-
-                t += Time.fixedDeltaTime;
-                yield return new WaitForFixedUpdate();
-            }
+            yield return MoveKinematic(myRb, point, 2f);
 
             // This ring leads to the next scene: hang on the ring, fade to black, load the scene
             if (!string.IsNullOrEmpty(anchor.NextScene))
             {
+                myRb.bodyType = RigidbodyType2D.Dynamic;
                 myRb.linearVelocity = Vector2.zero;
                 if (hookLine) hookLine.enabled = false;
                 ScreenFade.FadeToScene(anchor.NextScene);
                 yield break;
             }
 
-            myRb.linearVelocity = new Vector2(0f, anchor.LaunchSpeed);
+            if (hookLine) hookLine.enabled = false;
+
+            // Launch straight up, high enough to clear the floor above by ringClearance.
+            // The player steers onto the floor themselves (A / D) - no automatic sideways drag.
+            float launch = anchor.LaunchSpeed;
+            if (myCol && FindFloorAbove(point, out float floorTop))
+            {
+                float feet = point.y - myCol.bounds.extents.y;
+                float rise = floorTop + ringClearance - feet;
+                float g = Mathf.Abs(Physics2D.gravity.y) * riseGravity;
+                if (rise > 0f) launch = Mathf.Max(launch, Mathf.Sqrt(2f * g * rise));
+            }
+
+            myRb.bodyType = RigidbodyType2D.Dynamic;
+            myRb.gravityScale = riseGravity;
+            myRb.linearVelocity = new Vector2(0f, launch);
+
             if (controller) controller.enabled = true; // the controller restores gravity itself
         }
 
@@ -370,6 +396,40 @@ public class PlayerCombat : MonoBehaviour
 
         if (hookLine) hookLine.enabled = false;
         hookOut = false;
+    }
+
+    // Moves a kinematic body to a point at pullSpeed (gives up after maxTime seconds)
+    IEnumerator MoveKinematic(Rigidbody2D body, Vector2 target, float maxTime)
+    {
+        float t = 0f;
+        while (t < maxTime && Vector2.Distance(body.position, target) > 0.05f)
+        {
+            body.MovePosition(Vector2.MoveTowards(body.position, target, pullSpeed * Time.fixedDeltaTime));
+            if (hookLine && hookLine.enabled) DrawLine(target);
+            t += Time.fixedDeltaTime;
+            yield return new WaitForFixedUpdate();
+        }
+    }
+
+    // Finds the top of the floor beside the hole a ring sits in (the floor the player climbs onto)
+    bool FindFloorAbove(Vector2 ring, out float floorTop)
+    {
+        floorTop = float.MinValue;
+        if (groundLayer.value == 0) return false;
+
+        foreach (float side in new[] { -1f, 1f })
+        {
+            // Distance from the ring to the hole edge on this side
+            RaycastHit2D edge = Physics2D.Raycast(ring, Vector2.right * side, 5f, groundLayer);
+            if (!edge) continue;
+
+            // Look down onto the floor just past the edge
+            Vector2 from = new Vector2(ring.x + side * (edge.distance + 0.3f), ring.y + 6f);
+            if (Physics2D.OverlapPoint(from, groundLayer)) continue; // inside a wall
+            RaycastHit2D floor = Physics2D.Raycast(from, Vector2.down, 8f, groundLayer);
+            if (floor && floor.point.y > ring.y) floorTop = Mathf.Max(floorTop, floor.point.y);
+        }
+        return floorTop > float.MinValue;
     }
 
     // Direction from the player to the mouse
