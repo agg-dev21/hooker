@@ -1,7 +1,7 @@
 using UnityEngine;
 
-// Ek hitbox (Collider2D Is Trigger ON). Player isme aaye toh damage, dhakka, aur chaho toh aag.
-// Boss apne attacks ke liye ye khud bana ke values set karta hai, par akele bhi kisi object pe laga sakte ho.
+// A hitbox (Collider2D with Is Trigger ON). When the player is inside it: damage, knockback, and optional fire.
+// Bosses create these for their attacks and set the values, but you can also put one on any object.
 public class DamageZone : MonoBehaviour
 {
     [SerializeField] int damage = 1;
@@ -33,7 +33,7 @@ public class DamageZone : MonoBehaviour
 
         int before = health.CurrentHealth;
         health.TakeDamage(damage);
-        if (health.CurrentHealth >= before) return; // dash ya invincible: kuch nahi laga
+        if (health.CurrentHealth >= before) return; // dashing or invincible: nothing landed
 
         if (other.attachedRigidbody)
         {

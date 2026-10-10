@@ -3,15 +3,15 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Boat pe lagao (ek Collider2D Is Trigger ON chahiye).
-// Player boat pe aaya: boat player ko leke right mein chalti hai, screen black hota hai, agla scene load.
+// Put this on the boat (it needs a Collider2D with Is Trigger ON).
+// When the player steps on, the boat sails right carrying them, the screen fades to black, and the next scene loads.
 public class BoatExit : MonoBehaviour
 {
     [SerializeField] string nextScene = "Level_1";
     [SerializeField] float sailSpeed = 6f;
-    [SerializeField] float sailTime = 3f;  // kitni der chale
-    [SerializeField] float fadeTime = 1f;  // aakhri itne second mein black ho
-    [SerializeField] Image fadeImage;      // poore screen ki kaali Image (alpha 0 se shuru)
+    [SerializeField] float sailTime = 3f;  // how long it sails
+    [SerializeField] float fadeTime = 1f;  // fades to black over the last this many seconds
+    [SerializeField] Image fadeImage;      // full-screen black Image (starts at alpha 0)
 
     bool sailing;
 
@@ -25,7 +25,7 @@ public class BoatExit : MonoBehaviour
     {
         sailing = true;
 
-        // Player ab khud nahi chalega, boat ke saath chalega
+        // The player stops moving on their own and rides the boat
         player.enabled = false;
         if (player.TryGetComponent(out PlayerCombat combat)) combat.enabled = false;
         if (player.TryGetComponent(out Rigidbody2D rb))

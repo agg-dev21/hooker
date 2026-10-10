@@ -1,18 +1,18 @@
 using System.Collections;
 using UnityEngine;
 
-// Barrel: player chhoota hai toh fuse jalta hai (chamakta hai), thodi der baad BOOM.
-// Paas mein jiske paas Health hai (player, crates) sabko damage. Player ko dhakka bhi.
-// Object pe SpriteRenderer + Collider2D (solid) chahiye.
+// Barrel: when the player touches it, the fuse lights (it flashes), and a moment later it explodes.
+// Damages everything nearby that has Health (player, crates) and knocks the player back.
+// Needs a SpriteRenderer and a solid Collider2D.
 public class ExplodingBarrel : MonoBehaviour
 {
-    [SerializeField] float fuseTime = 0.8f;     // chhoone ke baad kitni der mein phate
+    [SerializeField] float fuseTime = 0.8f;     // seconds from touch to explosion
     [SerializeField] float radius = 3f;
     [SerializeField] int damage = 3;
     [SerializeField] float knockback = 14f;
-    [SerializeField] float knockbackUp = 0.5f;    // dhakke mein upar kitna
+    [SerializeField] float knockbackUp = 0.5f;    // how much of the knockback goes upward
     [SerializeField] float fuseFlashSpeed = 10f;
-    [SerializeField] float boomShowTime = 0.15f;  // orange flash kitni der dikhe
+    [SerializeField] float boomShowTime = 0.15f;  // how long the orange blast stays visible
     [SerializeField] Color flashColor = Color.white;
     [SerializeField] Color boomColor = new Color(1f, 0.55f, 0.1f);
 
@@ -54,7 +54,7 @@ public class ExplodingBarrel : MonoBehaviour
 
             health.TakeDamage(damage);
 
-            // Player ko barrel se door uchhalo
+            // Launch the player away from the barrel
             if (hit.TryGetComponent(out PlayerController2D _) && hit.attachedRigidbody)
             {
                 Vector2 away = ((Vector2)hit.transform.position - (Vector2)transform.position).normalized;
@@ -62,7 +62,7 @@ public class ExplodingBarrel : MonoBehaviour
             }
         }
 
-        // Simple boom: bada orange flash, phir gayab
+        // Simple blast: big orange flash, then gone
         foreach (Collider2D c in GetComponents<Collider2D>()) c.enabled = false;
         if (sr) sr.color = boomColor;
         transform.localScale = Vector3.one * radius * 2f;

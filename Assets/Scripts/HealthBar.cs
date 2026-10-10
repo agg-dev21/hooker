@@ -3,8 +3,8 @@ using UnityEngine.UI;
 
 public class HealthBar : MonoBehaviour
 {
-    [SerializeField] Health target; // kiski health dikhani hai
-    [SerializeField] Image fill;    // jo bar bharti aur khaali hoti hai
+    [SerializeField] Health target; // whose health to show
+    [SerializeField] Image fill;    // the bar image that fills and empties
 
     void Update()
     {

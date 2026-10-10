@@ -7,14 +7,14 @@ public class Checkpoint : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (activated) return; // ek hi baar chale
+        if (activated) return; // only activate once
 
         if (other.TryGetComponent(out PlayerRespawn player))
         {
             player.SetRespawnPoint(transform.position);
             activated = true;
 
-            // Color badlo taaki pata chale active ho gaya
+            // Change color to show it is active
             if (TryGetComponent(out SpriteRenderer sr))
                 sr.color = activeColor;
         }

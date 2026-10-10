@@ -3,8 +3,8 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-// Screen ko black karke naya scene load karta hai, phir naye scene mein black se wapas dikhata hai.
-// Scene mein kuch lagana nahi padta: bas ScreenFade.FadeToScene("SceneName") call karo.
+// Fades the screen to black, loads a new scene, then fades back in from black.
+// Nothing needs to be in the scene: just call ScreenFade.FadeToScene("SceneName").
 public class ScreenFade : MonoBehaviour
 {
     static ScreenFade instance;
@@ -12,10 +12,10 @@ public class ScreenFade : MonoBehaviour
 
     public static void FadeToScene(string sceneName, float fadeOutTime = 0.6f, float fadeInTime = 0.6f)
     {
-        if (instance) return; // pehle se fade ho raha hai
+        if (instance) return; // already fading
 
         var go = new GameObject("ScreenFade");
-        DontDestroyOnLoad(go); // scene badalne pe bhi rehta hai, taaki naye scene mein fade in ho
+        DontDestroyOnLoad(go); // survives the scene change so it can fade in on the new scene
         instance = go.AddComponent<ScreenFade>();
         instance.StartCoroutine(instance.Run(sceneName, fadeOutTime, fadeInTime));
     }
@@ -24,7 +24,7 @@ public class ScreenFade : MonoBehaviour
     {
         var canvas = gameObject.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-        canvas.sortingOrder = 1000; // sab UI ke upar
+        canvas.sortingOrder = 1000; // above all other UI
 
         var imgGo = new GameObject("Black", typeof(RectTransform), typeof(Image));
         imgGo.transform.SetParent(transform, false);
@@ -42,7 +42,7 @@ public class ScreenFade : MonoBehaviour
     {
         yield return Fade(0f, 1f, fadeOutTime);
         SceneManager.LoadScene(sceneName);
-        yield return null; // naya scene load hone do
+        yield return null; // let the new scene load
         yield return Fade(1f, 0f, fadeInTime);
 
         instance = null;

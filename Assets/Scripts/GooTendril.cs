@@ -1,28 +1,28 @@
 using UnityEngine;
 
-// Venom jaisa goo tentacle. Deewar/chhat se timer pe bahar nikalta hai.
-// Pehle chamakta hai (warning), phir lamba nikalta hai, chhoo liya toh damage + dhakka.
-// Object pe SpriteRenderer + BoxCollider2D (Is Trigger ON) chahiye. Object ki position = jahan se nikalta hai.
+// Venom-style goo tentacle. Shoots out of a wall/ceiling/floor on a timer.
+// It flashes first (warning), then extends. Touching it deals damage and knockback.
+// Needs a SpriteRenderer and a BoxCollider2D (Is Trigger ON). The object's position is where it comes out from.
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class GooTendril : MonoBehaviour
 {
-    [SerializeField] Vector2 direction = Vector2.down; // kis taraf nikle
+    [SerializeField] Vector2 direction = Vector2.down; // direction it extends
     [SerializeField] float length = 8f;
     [SerializeField] float thickness = 0.6f;
 
     [Header("Timing")]
-    [SerializeField] float startDelay = 0f;  // alag alag tendrils ko alag time pe chalane ke liye
-    [SerializeField] float restTime = 1.5f;  // andar chupa rehta hai
-    [SerializeField] float warnTime = 0.6f;  // chamakta hai
-    [SerializeField] float warnPeek = 0.4f;  // warning mein kitna bahar jhaanke
+    [SerializeField] float startDelay = 0f;  // offset so different tendrils fire at different times
+    [SerializeField] float restTime = 1.5f;  // time spent hidden
+    [SerializeField] float warnTime = 0.6f;  // time spent flashing (warning)
+    [SerializeField] float warnPeek = 0.4f;  // how far it pokes out during the warning
     [SerializeField] float warnFlashSpeed = 8f;
-    [SerializeField] float outTime = 0.8f;   // bahar rehta hai
+    [SerializeField] float outTime = 0.8f;   // time spent extended
     [SerializeField] float extendSpeed = 40f;
 
     [Header("Damage")]
     [SerializeField] int damage = 1;
     [SerializeField] float knockback = 10f;
-    [SerializeField] float knockbackUp = 0.5f; // dhakke mein upar kitna (knockback ka hissa)
+    [SerializeField] float knockbackUp = 0.5f; // upward part of the knockback (fraction of knockback)
 
     [Header("Colors")]
     [SerializeField] Color gooColor = new Color(0.08f, 0.05f, 0.12f);
@@ -45,7 +45,7 @@ public class GooTendril : MonoBehaviour
         col.size = Vector2.one;
         direction = direction.normalized;
         basePos = transform.position;
-        transform.right = direction; // lambai direction ki taraf
+        transform.right = direction; // length runs along the direction
         timer = -startDelay;
         SetLength(0f);
     }
@@ -61,7 +61,7 @@ public class GooTendril : MonoBehaviour
                 if (timer >= restTime) { state = State.Warn; timer = 0f; }
                 break;
             case State.Warn:
-                target = warnPeek; // chhota sa bahar jhaankta hai
+                target = warnPeek; // pokes out a little
                 if (timer >= warnTime) { state = State.Out; timer = 0f; }
                 break;
             case State.Out:
@@ -91,7 +91,7 @@ public class GooTendril : MonoBehaviour
         int before = health.CurrentHealth;
         health.TakeDamage(damage);
 
-        // Damage sach mein laga (dash ke time nahi lagta), tabhi dhakka
+        // Knock back only if the damage landed (it does not while dashing)
         if (health.CurrentHealth < before && other.attachedRigidbody)
             other.attachedRigidbody.linearVelocity = direction * knockback + Vector2.up * knockback * knockbackUp;
     }

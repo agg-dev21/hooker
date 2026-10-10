@@ -4,9 +4,9 @@ public class EnemyShooter : MonoBehaviour
 {
     [SerializeField] Projectile projectilePrefab;
     [SerializeField] Transform firePoint;
-    [SerializeField] float range = 8f;        // player itna paas ho tabhi shoot kare
-    [SerializeField] float fireRate = 1.5f;   // har goli ke beech itne second
-    [SerializeField] bool aimAtPlayer = true; // false = sirf seedha left/right
+    [SerializeField] float range = 8f;        // only shoot when the player is this close
+    [SerializeField] float fireRate = 1.5f;   // seconds between shots
+    [SerializeField] bool aimAtPlayer = true; // false = shoot straight left/right only
 
     Transform player;
     float timer;
@@ -23,15 +23,15 @@ public class EnemyShooter : MonoBehaviour
         if (!player) return;
 
         float distance = Vector2.Distance(transform.position, player.position);
-        if (distance > range) return; // player door hai, kuch mat karo
+        if (distance > range) return; // player is too far, do nothing
 
-        // Player ki taraf mudo
+        // Turn to face the player
         float dirX = Mathf.Sign(player.position.x - transform.position.x);
         Vector3 s = transform.localScale;
         s.x = Mathf.Abs(s.x) * dirX;
         transform.localScale = s;
 
-        // Timer khatam, toh goli chalao
+        // Timer done: shoot
         timer -= Time.deltaTime;
         if (timer <= 0f)
         {
@@ -49,7 +49,7 @@ public class EnemyShooter : MonoBehaviour
         p.Launch(dir);
     }
 
-    // Scene mein range ka red circle dikhata hai
+    // Shows the range as a red circle in the Scene view
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

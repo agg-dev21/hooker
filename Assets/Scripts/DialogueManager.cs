@@ -4,7 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Ek line: kaun bol raha hai, aur kya bol raha hai
+// One line: who is speaking and what they say
 [Serializable]
 public class DialogueLine
 {
@@ -12,15 +12,15 @@ public class DialogueLine
     [TextArea(2, 5)] public string text;
 }
 
-// Scene mein sirf EK DialogueManager hona chahiye. Ye dialogue box dikhata hai.
-// E dabao = agli line. Last line ke baad box band.
+// There should be only ONE DialogueManager in a scene. It shows the dialogue box.
+// Press E for the next line. The box closes after the last line.
 public class DialogueManager : MonoBehaviour
 {
     public static DialogueManager Instance { get; private set; }
 
-    [SerializeField] GameObject panel;     // poora dialogue box
-    [SerializeField] TMP_Text speakerText; // bolne wale ka naam
-    [SerializeField] TMP_Text bodyText;    // dialogue ka text
+    [SerializeField] GameObject panel;     // the whole dialogue box
+    [SerializeField] TMP_Text speakerText; // speaker's name
+    [SerializeField] TMP_Text bodyText;    // dialogue text
 
     public bool IsOpen { get; private set; }
 

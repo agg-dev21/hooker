@@ -445,10 +445,11 @@ public static class TutorialRoomBuilder
     const float L1HalfHeight = 7.5f;          // camera zoomed out 1.5x compared to the tutorial
     static float L1HalfWidth => L1HalfHeight * 16f / 9f; // about 13.3
     const float L1FirstFloorCenterY = 0.5f;   // so floors line up with whole tiles
-    const int WallLeft = -14, WallRight = 39;  // wall tile columns (inside is x -13 to 39, 2 screens wide)
+    const int WallLeft = -14, WallRight = 66;  // wall tile columns (inside is x -13 to 66, 3 screens wide)
     const int FloorSpacing = 15;               // one screen per floor
     const int Floors = 4;                   // floors 0..3. The ring in the top ceiling leads to the deck scene.
     const string DeckSceneName = "Level_1_Deck";
+    const int DeckLeft = -14, DeckRight = 66; // deck railing columns: 3 screens long (inside x -13 to 66)
     const int FloorInside = 13;             // open space from floor to ceiling
     static readonly Color RingColor = new Color(1f, 0.85f, 0.1f);
     static readonly Color CrateColor = new Color(0.6f, 0.4f, 0.2f);
@@ -459,7 +460,7 @@ public static class TutorialRoomBuilder
     // Top of the floor you stand on, on floor k (0 = bottom floor, 4 = deck)
     static int FloorTop(int k) => -6 + k * FloorSpacing;
     // Left x of the 3-wide hole that leads up onto floor k (k = 1..4)
-    static int HoleX(int k) => k % 2 == 1 ? 35 : -12;
+    static int HoleX(int k) => k % 2 == 1 ? 62 : -12;
 
     [MenuItem("Tools/Build Level 1")]
     static void BuildLevel1()
@@ -532,7 +533,7 @@ public static class TutorialRoomBuilder
         }
 
 
-        // ---- Obstacles (no enemies). Each floor is 2 screens wide (x -13 to 39). ----
+        // ---- Obstacles (no enemies). Each floor is 3 screens wide (x -13 to 66). ----
         // Floor 1 (start left, hole up on the right):
         // small pit, big pit (jump + dash), crate stack, ceiling tendril, barrel next to a crate stack, two more tendrils
         int t = FloorTop(0);
@@ -578,7 +579,7 @@ public static class TutorialRoomBuilder
         MakeBarrel("Barrel_F3", obstacles, map, new Vector2(19.5f, t + 0.6f));
         MakeCrateStack("CrateStack_F3", obstacles, map, 22f, t, 3);
         FillTiles(map, null, 26, t - 2, 4, 2, false);     // second gap
-        MakeCannon("Cannon_F3", obstacles, map, new Vector2(38.5f, t + 1f));
+        MakeCannon("Cannon_F3", obstacles, map, new Vector2(WallRight - 0.5f, t + 1f));
 
         // Floor 4 (arrive right, hole up on the left):
         // gap (falls to floor 3), crate stack, barrels under a tendril, sideways tendril sweeping the floor near the hole,
@@ -592,7 +593,34 @@ public static class TutorialRoomBuilder
         FillTiles(map, tile, -8, t + 3, 3, FloorInside - 3, true); // low beam
         MakeTendril("Tendril_F4b", obstacles, map, new Vector2(-13f, t + 1f), Vector2.right, 10f, 0.5f); // sweeps the floor
         MakeCannon("Cannon_F4_Left", obstacles, map, new Vector2(-12.5f, t + 6f));
-        MakeCannon("Cannon_F4_Right", obstacles, map, new Vector2(38.5f, t + 8f));
+        MakeCannon("Cannon_F4_Right", obstacles, map, new Vector2(WallRight - 0.5f, t + 8f));
+
+        // ---- Secret rooms: outside the ship, one per floor, reached through a visible but hard-to-reach door ----
+        var secrets = new GameObject("SecretRooms").transform;
+
+        // Floor 1: door on a small ledge high on the left wall, reached by hooking a small ring in the corner
+        t = FloorTop(0);
+        FillTiles(map, tile, -13, t + 8, 2, 1, true); // ledge
+        GameObject cornerRing = MakeBox("SecretRing_F1", secrets, map, new Vector2(-11.5f, t + 11.5f), new Vector2(0.4f, 0.4f), RingColor);
+        Object.DestroyImmediate(cornerRing.GetComponent<BoxCollider2D>());
+        var cornerCol = cornerRing.AddComponent<CircleCollider2D>();
+        cornerCol.radius = 1.5f;
+        cornerCol.isTrigger = true;
+        var cornerHook = new SerializedObject(cornerRing.AddComponent<HookPoint>());
+        cornerHook.FindProperty("launchSpeed").floatValue = 2f; // just drop onto the ledge
+        cornerHook.ApplyModifiedPropertiesWithoutUndo();
+        MakeOutsideRoom(0, secrets, map, tile, new Vector2(-12.4f, t + 10.1f));
+
+        // Floor 2: door on the 1-tile strip between the hole down and the right wall (miss and you fall)
+        MakeOutsideRoom(1, secrets, map, tile, new Vector2(WallRight - 0.5f, FloorTop(1) + 1.1f));
+
+        // Floor 3: door on a high ledge in the right corner, reached by jumping off the cannon
+        t = FloorTop(2);
+        FillTiles(map, tile, 62, t + 4, 3, 1, true); // ledge
+        MakeOutsideRoom(2, secrets, map, tile, new Vector2(63.5f, t + 6.1f));
+
+        // Floor 4: door at the bottom of the left wall, right where the sideways tendril comes out
+        MakeOutsideRoom(3, secrets, map, tile, new Vector2(-12.4f, FloorTop(3) + 1.1f));
 
         RebuildColliders(map);
 
@@ -614,7 +642,7 @@ public static class TutorialRoomBuilder
             so.FindProperty("target").objectReferenceValue = player.transform;
             so.FindProperty("useBounds").boolValue = true;
             so.FindProperty("minBounds").vector2Value = new Vector2(-L1HalfWidth, L1FirstFloorCenterY - L1HalfHeight);
-            so.FindProperty("maxBounds").vector2Value = new Vector2(3f * L1HalfWidth, L1FirstFloorCenterY - L1HalfHeight + Floors * FloorSpacing);
+            so.FindProperty("maxBounds").vector2Value = new Vector2(5f * L1HalfWidth, L1FirstFloorCenterY - L1HalfHeight + Floors * FloorSpacing);
             so.FindProperty("lockToFloors").boolValue = true;
             so.FindProperty("floorHeight").floatValue = FloorSpacing;
             so.FindProperty("firstFloorCenterY").floatValue = L1FirstFloorCenterY;
@@ -629,7 +657,7 @@ public static class TutorialRoomBuilder
     }
 
     // ---------------- LEVEL 1 DECK (boss arena, no boss yet) ----------------
-    // Big flat open-air deck, 2 screens wide, same zoom as Level_1. The camera scrolls left/right only.
+    // Big flat open-air deck, 3 screens long. Fixed camera zoomed out so the whole deck fits on screen.
     // Low railings and invisible edges, nothing else on it (room for the boss later).
     // You start next to the hatch you climbed out of. The screen fades in from black (ScreenFade).
 
@@ -664,7 +692,7 @@ public static class TutorialRoomBuilder
         TileBase tile = FirstTile(map) ?? AssetDatabase.LoadAssetAtPath<TileBase>(FallbackTile);
         map.ClearAllTiles();
 
-        int left = WallLeft, right = WallRight; // railing columns, same width as a Level_1 floor (2 screens)
+        int left = DeckLeft, right = DeckRight; // railing columns
         int deckRow = -7;                 // deck is 2 rows: -7 and -6, top at -5
         int deckTop = deckRow + 2;
         FillTiles(map, tile, left, deckRow, right - left + 1, 2, true);
@@ -679,8 +707,8 @@ public static class TutorialRoomBuilder
         {
             var edge = new GameObject("DeckEdge");
             edge.transform.SetParent(structure);
-            edge.transform.position = new Vector3(x, 5f, 0f);
-            edge.AddComponent<BoxCollider2D>().size = new Vector2(1f, 30f);
+            edge.transform.position = new Vector3(x, 15f, 0f);
+            edge.AddComponent<BoxCollider2D>().size = new Vector2(1f, 50f);
         }
 
         // Hatch you climbed out of (just a mark on the deck, no collider)
@@ -696,21 +724,12 @@ public static class TutorialRoomBuilder
             feet = (capsule.size.y * 0.5f - capsule.offset.y) * player.transform.lossyScale.y;
         player.transform.position = new Vector3(-10.5f, deckTop + feet + 0.05f, 0f);
 
-        // Camera: same zoom as Level_1, follows you left/right, never moves up/down
+        // Camera: fixed, zoomed out so the whole deck (railing to railing) fits, deck at the bottom of the screen
         Camera cam = Object.FindFirstObjectByType<Camera>();
-        cam.transform.position = new Vector3(0f, L1FirstFloorCenterY, cam.transform.position.z);
-        cam.orthographicSize = L1HalfHeight;
-        if (cam.TryGetComponent(out CameraFollow2D follow))
-        {
-            follow.enabled = true;
-            var so = new SerializedObject(follow);
-            so.FindProperty("target").objectReferenceValue = player.transform;
-            so.FindProperty("useBounds").boolValue = true;
-            so.FindProperty("minBounds").vector2Value = new Vector2(-L1HalfWidth, L1FirstFloorCenterY - L1HalfHeight);
-            so.FindProperty("maxBounds").vector2Value = new Vector2(3f * L1HalfWidth, L1FirstFloorCenterY + L1HalfHeight); // exactly one screen tall: no up/down
-            so.FindProperty("lockToFloors").boolValue = false;
-            so.ApplyModifiedPropertiesWithoutUndo();
-        }
+        float deckHalfWidth = (right + 1 - left) * 0.5f;
+        cam.orthographicSize = deckHalfWidth * 9f / 16f;
+        cam.transform.position = new Vector3((left + right + 1) * 0.5f, deckRow + cam.orthographicSize, cam.transform.position.z);
+        if (cam.TryGetComponent(out CameraFollow2D follow)) follow.enabled = false;
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -747,7 +766,7 @@ public static class TutorialRoomBuilder
         const float deckTop = -5f;
 
         // Hardy: dark box 3 wide, 4 tall, on the right side of the deck
-        GameObject hardy = MakeBox("Hardy", null, map, new Vector2(30f, deckTop + 2f), new Vector2(3f, 4f), new Color(0.1f, 0.08f, 0.15f));
+        GameObject hardy = MakeBox("Hardy", null, map, new Vector2(50f, deckTop + 2f), new Vector2(3f, 4f), new Color(0.1f, 0.08f, 0.15f));
         var rb = hardy.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
         AddHealth(hardy, 60);
@@ -809,8 +828,8 @@ public static class TutorialRoomBuilder
         // Boss settings that depend on this deck
         var bossSo = new SerializedObject(boss);
         bossSo.FindProperty("groundY").floatValue = deckTop;
-        bossSo.FindProperty("arenaMinX").floatValue = WallLeft + 1;
-        bossSo.FindProperty("arenaMaxX").floatValue = WallRight;
+        bossSo.FindProperty("arenaMinX").floatValue = DeckLeft + 1;
+        bossSo.FindProperty("arenaMaxX").floatValue = DeckRight;
         bossSo.FindProperty("healthBarRoot").objectReferenceValue = barRoot;
         bossSo.ApplyModifiedPropertiesWithoutUndo();
 
@@ -818,6 +837,57 @@ public static class TutorialRoomBuilder
         EditorSceneManager.SaveScene(scene);
         Selection.activeGameObject = hardy;
         EditorUtility.DisplayDialog("Add Hardy", "Hardy is on the deck!\n\nClick Hardy and look at the HardyBoss component to change any attack value.", "OK");
+    }
+
+    // A secret room outside the ship (x -50 to -24), at the same height as floor k, one screen big.
+    // The main camera never goes there. The entrance door (at doorPos, in the level) brings you in and the
+    // camera switches to the room; the exit door inside brings you back. An empty chest sits in the middle.
+    static void MakeOutsideRoom(int k, Transform parent, Tilemap map, TileBase tile, Vector2 doorPos)
+    {
+        const int left = -50, right = -24;
+        int t = FloorTop(k);
+        var room = new GameObject("SecretRoom_F" + (k + 1)).transform;
+        room.SetParent(parent);
+        Color doorColor = new Color(0.3f, 0.18f, 0.08f);
+
+        // Room shell: floor, ceiling, side walls
+        FillTiles(map, tile, left, t - 1, right - left + 1, 1, true);
+        FillTiles(map, tile, left, t + FloorInside, right - left + 1, 1, true);
+        FillTiles(map, tile, left, t - 1, 1, FloorInside + 2, true);
+        FillTiles(map, tile, right, t - 1, 1, FloorInside + 2, true);
+
+        // Chest in the middle
+        GameObject chest = MakeBox("Chest", room, map, new Vector2((left + right + 1) * 0.5f, t + 0.5f), new Vector2(1.5f, 1f), new Color(0.75f, 0.55f, 0.15f));
+        var chestCol = chest.GetComponent<BoxCollider2D>();
+        chestCol.isTrigger = true;
+        chestCol.size = new Vector2(2f, 2.5f);
+        chest.AddComponent<Chest>();
+
+        // Where you appear inside the room, and where you appear back in the level
+        var inside = new GameObject("RoomSpawn").transform;
+        inside.SetParent(room);
+        inside.position = new Vector2(right - 4.5f, t + 1.1f);
+        var back = new GameObject("ReturnSpawn").transform;
+        back.SetParent(room);
+        back.position = doorPos;
+
+        // Entrance door in the level
+        GameObject entrance = MakeBox("SecretDoor_F" + (k + 1), room, map, doorPos, new Vector2(0.9f, 2.2f), doorColor);
+        entrance.GetComponent<BoxCollider2D>().isTrigger = true;
+        var enter = new SerializedObject(entrance.AddComponent<SecretDoor>());
+        enter.FindProperty("destination").objectReferenceValue = inside;
+        enter.FindProperty("entersRoom").boolValue = true;
+        enter.FindProperty("roomMin").vector2Value = new Vector2(left, t - 1);
+        enter.FindProperty("roomMax").vector2Value = new Vector2(right + 1, t + FloorInside + 1);
+        enter.ApplyModifiedPropertiesWithoutUndo();
+
+        // Exit door inside the room
+        GameObject exitDoor = MakeBox("ExitDoor", room, map, new Vector2(right - 2.5f, t + 1.1f), new Vector2(0.9f, 2.2f), doorColor);
+        exitDoor.GetComponent<BoxCollider2D>().isTrigger = true;
+        var exit = new SerializedObject(exitDoor.AddComponent<SecretDoor>());
+        exit.FindProperty("destination").objectReferenceValue = back;
+        exit.FindProperty("entersRoom").boolValue = false;
+        exit.ApplyModifiedPropertiesWithoutUndo();
     }
 
     // A pile of big cargo crates stacked on top of each other (too tall to jump over).

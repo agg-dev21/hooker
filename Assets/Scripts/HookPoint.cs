@@ -1,11 +1,11 @@
 using UnityEngine;
 
-// Hook ring. Right click pe hook isse lage toh player khud ring tak khinch jaata hai.
-// Object pe ek Collider2D chahiye (Is Trigger ON).
+// Hook ring. When the hook (right click) hits it, the player is pulled to the ring.
+// Needs a Collider2D (Is Trigger ON).
 public class HookPoint : MonoBehaviour
 {
-    [SerializeField] float launchSpeed = 10f; // ring tak pahunch ke player ko upar kitna uchhale
-    [SerializeField] string nextScene;        // bhara hai toh: ring tak pahunch ke screen black, ye scene load
+    [SerializeField] float launchSpeed = 10f; // how hard the player is launched upward after reaching the ring
+    [SerializeField] string nextScene;        // if filled: on reaching the ring the screen fades to black and this scene loads
 
     public float LaunchSpeed => launchSpeed;
     public string NextScene => nextScene;

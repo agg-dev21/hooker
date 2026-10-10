@@ -8,7 +8,7 @@ public class PlayerRespawn : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        respawnPoint = transform.position; // start position = pehla respawn point
+        respawnPoint = transform.position; // starting position is the first respawn point
     }
 
     public void SetRespawnPoint(Vector3 point)
@@ -18,7 +18,7 @@ public class PlayerRespawn : MonoBehaviour
 
     public void Respawn()
     {
-        rb.linearVelocity = Vector2.zero; // girne ki speed band karo
+        rb.linearVelocity = Vector2.zero; // stop any falling speed
         transform.position = respawnPoint;
     }
 }

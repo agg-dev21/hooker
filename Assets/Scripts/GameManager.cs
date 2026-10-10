@@ -24,7 +24,7 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
-        // Esc se pause
+        // Esc to pause
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
             TogglePause();
     }
@@ -33,18 +33,18 @@ public class GameManager : MonoBehaviour
     {
         won = true;
         if (winPanel) winPanel.SetActive(true);
-        Time.timeScale = 0f; // game ruk jaye
+        Time.timeScale = 0f; // freeze the game
     }
 
     public void TogglePause()
     {
-        if (won) return; // jeet gaye toh pause nahi
+        if (won) return; // no pausing after winning
         paused = !paused;
         if (pausePanel) pausePanel.SetActive(paused);
         Time.timeScale = paused ? 0f : 1f;
     }
 
-    // Ye functions buttons se call honge
+    // These functions are called by UI buttons
     public void Restart()
     {
         Time.timeScale = 1f;

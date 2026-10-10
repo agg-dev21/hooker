@@ -1,14 +1,14 @@
 using UnityEngine;
 
-// Aag: thodi thodi der mein damage. Kisi bhi Health wale object pe lag sakti hai.
-// Khud lagane ki zaroorat nahi: Burn.Apply(object, ...) call karo, ye apne aap add ho jaata hai.
-// Dobara lagi toh time reset hota hai (stack nahi hoti).
+// Fire: deals damage every few moments. Works on any object with Health.
+// No need to add it by hand: call Burn.Apply(object, ...) and it adds itself.
+// Getting burned again resets the timer (burns do not stack).
 public class Burn : MonoBehaviour
 {
     [SerializeField] int tickDamage = 1;
     [SerializeField] float tickInterval = 1f;
     [SerializeField] float duration = 3f;
-    [SerializeField] bool showTint = true;   // jalte waqt orange rang (flash nahi, seedha rang)
+    [SerializeField] bool showTint = true;   // orange tint while burning (steady, no flashing)
     [SerializeField] Color burnColor = new Color(1f, 0.6f, 0.35f);
 
     Health health;
@@ -33,7 +33,7 @@ public class Burn : MonoBehaviour
 
     public void Ignite(int damage, float time, float interval)
     {
-        if (timeLeft <= 0f) tickTimer = interval; // naya burn: pehla tick 1 interval baad
+        if (timeLeft <= 0f) tickTimer = interval; // new burn: first tick happens one interval later
         tickDamage = damage;
         duration = time;
         tickInterval = interval;
@@ -52,7 +52,7 @@ public class Burn : MonoBehaviour
             if (health) health.TakeDamage(tickDamage);
         }
 
-        // Jalte waqt orange rang, khatam hone pe normal
+        // Orange while burning, back to normal when it ends
         if (sr && showTint) sr.color = timeLeft > 0f ? burnColor : normalColor;
     }
 }

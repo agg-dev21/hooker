@@ -22,9 +22,9 @@ public class CameraFollow2D : MonoBehaviour
     [SerializeField] Vector2 maxBounds;
 
     [Header("Floors (optional)")]
-    [SerializeField] bool lockToFloors;            // ON: camera sirf us floor ko dikhata hai jis pe player hai
-    [SerializeField] float floorHeight = 10f;       // ek floor kitna uncha (ek screen)
-    [SerializeField] float firstFloorCenterY = 0f;  // sabse neeche wale floor ka center
+    [SerializeField] bool lockToFloors;            // ON: the camera only shows the floor the player is on
+    [SerializeField] float floorHeight = 10f;       // height of one floor (one screen)
+    [SerializeField] float firstFloorCenterY = 0f;  // center of the bottom floor
 
     Camera cam;
     PlayerController2D player;
@@ -34,6 +34,10 @@ public class CameraFollow2D : MonoBehaviour
     float trackedY;
     float shakeTime;
     float shakeMagnitude;
+    bool hasOverride;       // a secret room (or similar) is showing its own area
+    Vector2 overrideMin;
+    Vector2 overrideMax;
+    bool snapNext;          // jump straight to the target next frame instead of sliding
 
     void Awake()
     {
@@ -60,27 +64,36 @@ public class CameraFollow2D : MonoBehaviour
             trackedY + offset.y,
             transform.position.z);
 
-        // Floor lock: player jis floor pe hai uske center pe camera, upar neeche ke floors nahi dikhenge
-        if (lockToFloors && floorHeight > 0f)
+        // Floor lock: center the camera on the player's floor so the floors above and below are hidden
+        if (lockToFloors && floorHeight > 0f && !hasOverride)
         {
             float bottom = firstFloorCenterY - floorHeight * 0.5f;
             int floor = Mathf.FloorToInt((target.position.y - bottom) / floorHeight);
             desired.y = firstFloorCenterY + floor * floorHeight;
         }
 
-        Vector3 pos = Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime);
-
-        if (useBounds)
+        Vector3 pos;
+        if (snapNext)
         {
+            pos = desired;
+            velocity = Vector3.zero;
+            snapNext = false;
+        }
+        else pos = Vector3.SmoothDamp(transform.position, desired, ref velocity, smoothTime);
+
+        if (useBounds || hasOverride)
+        {
+            Vector2 min = hasOverride ? overrideMin : minBounds;
+            Vector2 max = hasOverride ? overrideMax : maxBounds;
             float halfH = cam.orthographicSize;
             float halfW = halfH * cam.aspect;
-            // Screen bounds se bada ho toh beech mein raho, warna camera har frame idhar udhar kudta hai
-            pos.x = maxBounds.x - minBounds.x <= halfW * 2f
-                ? (minBounds.x + maxBounds.x) * 0.5f
-                : Mathf.Clamp(pos.x, minBounds.x + halfW, maxBounds.x - halfW);
-            pos.y = maxBounds.y - minBounds.y <= halfH * 2f
-                ? (minBounds.y + maxBounds.y) * 0.5f
-                : Mathf.Clamp(pos.y, minBounds.y + halfH, maxBounds.y - halfH);
+            // If the screen is bigger than the bounds, stay centered (otherwise the camera jumps back and forth every frame)
+            pos.x = max.x - min.x <= halfW * 2f
+                ? (min.x + max.x) * 0.5f
+                : Mathf.Clamp(pos.x, min.x + halfW, max.x - halfW);
+            pos.y = max.y - min.y <= halfH * 2f
+                ? (min.y + max.y) * 0.5f
+                : Mathf.Clamp(pos.y, min.y + halfH, max.y - halfH);
         }
 
         if (shakeTime > 0f)
@@ -90,6 +103,22 @@ public class CameraFollow2D : MonoBehaviour
         }
 
         transform.position = pos;
+    }
+
+    // Show only this area (for example a secret room) until ClearBoundsOverride is called
+    public void SetBoundsOverride(Vector2 min, Vector2 max)
+    {
+        hasOverride = true;
+        overrideMin = min;
+        overrideMax = max;
+        snapNext = true;
+    }
+
+    // Back to the normal camera
+    public void ClearBoundsOverride()
+    {
+        hasOverride = false;
+        snapNext = true;
     }
 
     public void Shake(float duration, float magnitude)

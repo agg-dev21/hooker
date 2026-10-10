@@ -5,10 +5,10 @@ using UnityEngine.Events;
 public class Health : MonoBehaviour
 {
     [SerializeField] int maxHealth = 3;
-    [SerializeField] float invincibleTime = 0.5f; // hit ke baad itne second tak dobara damage nahi
-    [SerializeField] bool flashOnHit = true; // hit lagne pe chamke ya nahi
+    [SerializeField] float invincibleTime = 0.5f; // seconds after a hit before it can be damaged again
+    [SerializeField] bool flashOnHit = true; // flash when hit or not
     [SerializeField] Color flashColor = Color.white;
-    [SerializeField] float flashTime = 0.1f; // hit lagne pe kitni der chamke
+    [SerializeField] float flashTime = 0.1f; // how long the hit flash lasts
 
     public UnityEvent onDamaged;
     public UnityEvent onDied;
@@ -32,13 +32,13 @@ public class Health : MonoBehaviour
         if (invincibleTimer > 0f) invincibleTimer -= Time.deltaTime;
     }
 
-    // Dash isse call karta hai: itni der koi damage nahi
+    // Called by the dash: no damage for this long
     public void MakeInvulnerable(float duration)
     {
         invincibleTimer = Mathf.Max(invincibleTimer, duration);
     }
 
-    // Combat system bas ye function call karta hai
+    // The combat system just calls this
     public void TakeDamage(int amount)
     {
         if (invincibleTimer > 0f || CurrentHealth <= 0) return;
@@ -60,7 +60,7 @@ public class Health : MonoBehaviour
     {
         onDied?.Invoke();
 
-        // Player hai toh respawn, warna (enemy) destroy
+        // The player respawns; anything else (enemies) is destroyed
         if (TryGetComponent(out PlayerRespawn respawn))
         {
             respawn.Respawn();

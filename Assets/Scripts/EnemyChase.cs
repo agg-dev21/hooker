@@ -4,8 +4,8 @@ using UnityEngine;
 public class EnemyChase : MonoBehaviour
 {
     [SerializeField] float speed = 2.5f;
-    [SerializeField] float detectRange = 10f;  // player itna paas aaye toh peeche bhaago
-    [SerializeField] float stopDistance = 3f;  // itna paas pahunch ke ruk jao aur shoot karo
+    [SerializeField] float detectRange = 10f;  // start chasing when the player is this close
+    [SerializeField] float stopDistance = 3f;  // stop this far from the player (and shoot)
     [SerializeField] LayerMask groundLayer;
 
     Rigidbody2D rb;
@@ -34,7 +34,7 @@ public class EnemyChase : MonoBehaviour
             float dx = player.position.x - transform.position.x;
             float distance = Vector2.Distance(transform.position, player.position);
 
-            // Player range mein hai, par abhi bhi door hai: uski taraf chalo
+            // Player is in range but still far: move toward them
             if (distance < detectRange && Mathf.Abs(dx) > stopDistance)
                 moveDir = Mathf.Sign(dx);
         }
@@ -42,13 +42,13 @@ public class EnemyChase : MonoBehaviour
         if (moveDir != 0f)
         {
             Face(moveDir);
-            if (!CanMove(moveDir)) moveDir = 0f; // kinara ya deewar hai: ruk jao
+            if (!CanMove(moveDir)) moveDir = 0f; // edge or wall ahead: stop
         }
 
         rb.linearVelocity = new Vector2(moveDir * speed, rb.linearVelocity.y);
     }
 
-    // Aage zameen hai aur deewar nahi, tabhi chalo
+    // Only move if there is ground ahead and no wall
     bool CanMove(float dir)
     {
         Bounds b = col.bounds;
@@ -68,7 +68,7 @@ public class EnemyChase : MonoBehaviour
         transform.localScale = s;
     }
 
-    // Scene mein yellow circle = detect range, blue = stop distance
+    // In the Scene view: yellow circle = detect range, blue = stop distance
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.yellow;

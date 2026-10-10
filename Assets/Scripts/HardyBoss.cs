@@ -2,28 +2,28 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// HARDY: Level 1 ka boss (Venom jaisa). Teen attacks, random order (same attack do baar lagatar nahi):
-// 1) Tentacle Lash: tentacle zameen ke saath player ki taraf. Body = kam damage, tip = zyada.
-// 2) Leap + Roll: upar uchhal ke player ke paas girta hai (shockwave AOE), phir player ki taraf rolls.
-// 3) Spikes: zameen se spikes ek ke baad ek player ki taraf nikalte hain.
-// Koi warning/flash nahi: har attack se pehle boss ek pose leta hai (abhi box ka shape badalta hai,
-// baad mein art aaye toh Animator trigger chala sakte ho). Marne pe tukde tukde ho ke bikhar jaata hai.
-// Har value Inspector mein. Chhoone ka damage (ContactDamage) alag script hai, usme aag nahi.
-// Object pe chahiye: SpriteRenderer, BoxCollider2D (solid), Rigidbody2D (Kinematic), Health.
+// HARDY: the Level 1 boss (Venom-style). Three attacks in random order (never the same one twice in a row):
+// 1) Tentacle Lash: a tentacle shoots along the ground toward the player. Body = less damage, tip = more.
+// 2) Leap + Roll: jumps high and lands near the player (shockwave AOE), then rolls at the player.
+// 3) Spikes: spikes burst out of the ground one after another toward the player.
+// No warning flash: before each attack the boss strikes a short pose (for now the box changes shape;
+// once there is art, it can fire Animator triggers). On death it crumbles into pieces.
+// Every value is in the Inspector. Touch damage is the separate ContactDamage script and does not burn.
+// Needs: SpriteRenderer, BoxCollider2D (solid), Rigidbody2D (Kinematic), Health.
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D), typeof(Health))]
 public class HardyBoss : MonoBehaviour
 {
     [Header("Arena")]
-    [SerializeField] float groundY = -5f;     // deck ki surface
-    [SerializeField] float arenaMinX = -13f;  // deck ka left end
-    [SerializeField] float arenaMaxX = 39f;   // deck ka right end
+    [SerializeField] float groundY = -5f;     // top surface of the deck
+    [SerializeField] float arenaMinX = -13f;  // left end of the deck
+    [SerializeField] float arenaMaxX = 66f;   // right end of the deck
 
     [Header("Fight Flow")]
-    [SerializeField] float startDelay = 1.5f; // scene shuru hone ke baad pehla attack
-    [SerializeField] float restTime = 1.2f;   // do attacks ke beech
-    [SerializeField] GameObject healthBarRoot; // boss marne pe chhupa do
-    [SerializeField] string sceneAfterDeath;   // khaali = kuch nahi, bhara = fade karke ye scene
-    [SerializeField] Animator animator;        // optional: art aaye toh pose triggers isme jaate hain
+    [SerializeField] float startDelay = 1.5f; // delay before the first attack
+    [SerializeField] float restTime = 1.2f;   // pause between attacks
+    [SerializeField] GameObject healthBarRoot; // hidden when the boss dies
+    [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = fade to this scene
+    [SerializeField] Animator animator;        // optional: pose triggers are sent here once there is art
 
     [Header("Fire (used by attacks that burn)")]
     [SerializeField] int burnDamage = 1;
@@ -32,13 +32,13 @@ public class HardyBoss : MonoBehaviour
 
     [Header("1) Tentacle Lash")]
     [SerializeField] bool useTentacle = true;
-    [SerializeField] float tentaclePoseTime = 0.1f;            // attack se pehle pose kitni der
-    [SerializeField] Vector2 tentaclePoseScale = new Vector2(1.3f, 0.85f); // pose: thoda chauda aur neecha
+    [SerializeField] float tentaclePoseTime = 0.1f;            // how long the pose lasts before the attack
+    [SerializeField] Vector2 tentaclePoseScale = new Vector2(1.3f, 0.85f); // pose: a bit wider and lower
     [SerializeField] string tentacleAnimTrigger = "Tentacle";
     [SerializeField] float tentacleLength = 14f;
     [SerializeField] float tentacleTipLength = 2f;
     [SerializeField] float tentacleThickness = 0.8f;
-    [SerializeField] float tentacleHeight = 1f;       // zameen se kitna upar
+    [SerializeField] float tentacleHeight = 1f;       // height above the ground
     [SerializeField] float tentacleExtendSpeed = 50f;
     [SerializeField] float tentacleHoldTime = 0.3f;
     [SerializeField] float tentacleRetractSpeed = 30f;
@@ -52,11 +52,11 @@ public class HardyBoss : MonoBehaviour
     [Header("2) Leap + Roll")]
     [SerializeField] bool useLeap = true;
     [SerializeField] float leapPoseTime = 0.1f;
-    [SerializeField] Vector2 leapPoseScale = new Vector2(1.2f, 0.7f); // pose: jhuk ke baith jaata hai
+    [SerializeField] Vector2 leapPoseScale = new Vector2(1.2f, 0.7f); // pose: crouches down
     [SerializeField] string leapAnimTrigger = "Leap";
     [SerializeField] float leapHeight = 7f;
     [SerializeField] float leapDuration = 1f;
-    [SerializeField] float leapLandOffset = 3f;       // player se kitna door land kare
+    [SerializeField] float leapLandOffset = 3f;       // how far from the player it lands
     [SerializeField] float landingRadius = 3.5f;
     [SerializeField] int landingDamage = 2;
     [SerializeField] float landingKnockback = 12f;
@@ -64,7 +64,7 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] Color shockwaveColor = new Color(1f, 0.45f, 0.1f, 0.5f);
     [SerializeField] float shockwaveShowTime = 0.2f;
     [SerializeField] float rollPoseTime = 0.1f;
-    [SerializeField] Vector2 rollPoseScale = new Vector2(0.8f, 0.8f); // pose: gola ban jaata hai
+    [SerializeField] Vector2 rollPoseScale = new Vector2(0.8f, 0.8f); // pose: curls into a ball
     [SerializeField] string rollAnimTrigger = "Roll";
     [SerializeField] float rollSpeed = 14f;
     [SerializeField] float rollDistance = 12f;
@@ -75,12 +75,12 @@ public class HardyBoss : MonoBehaviour
     [Header("3) Spikes")]
     [SerializeField] bool useSpikes = true;
     [SerializeField] float spikesPoseTime = 0.1f;
-    [SerializeField] Vector2 spikesPoseScale = new Vector2(0.85f, 1.25f); // pose: lamba khada ho jaata hai
+    [SerializeField] Vector2 spikesPoseScale = new Vector2(0.85f, 1.25f); // pose: stands up tall
     [SerializeField] string spikesAnimTrigger = "Spikes";
     [SerializeField] int spikeCount = 6;
-    [SerializeField] float spikeStartDistance = 2f;   // boss se pehla spike kitna door
+    [SerializeField] float spikeStartDistance = 2f;   // distance from the boss to the first spike
     [SerializeField] float spikeSpacing = 2.2f;
-    [SerializeField] float spikeInterval = 0.15f;     // ek spike se agle tak
+    [SerializeField] float spikeInterval = 0.15f;     // time between one spike and the next
     [SerializeField] float spikeWidth = 1f;
     [SerializeField] float spikeHeight = 3f;
     [SerializeField] float spikeRiseSpeed = 30f;
@@ -104,7 +104,7 @@ public class HardyBoss : MonoBehaviour
     Vector3 baseScale;
     Vector2 baseHalfSize;
     Vector2 pose = Vector2.one;
-    bool movingSelf; // leap ya roll: boss khud move kar raha hai
+    bool movingSelf; // leaping or rolling: the boss is moving itself
     int lastAttack = -1;
     readonly List<GameObject> spawned = new List<GameObject>();
 
@@ -129,7 +129,7 @@ public class HardyBoss : MonoBehaviour
 
     void FixedUpdate()
     {
-        // Punch ke dhakke se hawa mein na tairey: zameen pe khada raho (jab tak leap/roll nahi)
+        // Stay planted on the ground so punches cannot knock it into the air (except while leaping/rolling)
         if (!movingSelf) rb.MovePosition(new Vector2(ClampX(rb.position.x), GroundCenterY));
     }
 
@@ -148,7 +148,7 @@ public class HardyBoss : MonoBehaviour
             if (useTentacle) options.Add(0);
             if (useLeap) options.Add(1);
             if (useSpikes) options.Add(2);
-            if (options.Count > 1) options.Remove(lastAttack); // same attack do baar nahi
+            if (options.Count > 1) options.Remove(lastAttack); // never the same attack twice in a row
             if (options.Count == 0 || !player) { yield return null; continue; }
 
             int attack = options[Random.Range(0, options.Count)];
@@ -162,7 +162,7 @@ public class HardyBoss : MonoBehaviour
         }
     }
 
-    // ---------------- Pose (attack se pehle) ----------------
+    // ---------------- Pose (before an attack) ----------------
     IEnumerator Pose(Vector2 scale, float time, string animTrigger)
     {
         if (animator && !string.IsNullOrEmpty(animTrigger)) animator.SetTrigger(animTrigger);
@@ -174,7 +174,7 @@ public class HardyBoss : MonoBehaviour
     {
         pose = scale;
         transform.localScale = new Vector3(baseScale.x * scale.x, baseScale.y * scale.y, baseScale.z);
-        if (!movingSelf) rb.position = new Vector2(ClampX(rb.position.x), GroundCenterY); // pair zameen pe
+        if (!movingSelf) rb.position = new Vector2(ClampX(rb.position.x), GroundCenterY); // keep feet on the ground
     }
 
     // ---------------- 1) Tentacle Lash ----------------
@@ -227,7 +227,7 @@ public class HardyBoss : MonoBehaviour
         yield return Pose(leapPoseScale, leapPoseTime, leapAnimTrigger);
         SetPose(Vector2.one);
 
-        // Player ke paas land karo (thoda pehle), arena ke andar
+        // Land a little short of the player, inside the arena
         float targetX = ClampX(player.position.x - DirToPlayer * leapLandOffset);
         Vector2 from = rb.position;
         Vector2 to = new Vector2(targetX, GroundCenterY);
@@ -260,7 +260,7 @@ public class HardyBoss : MonoBehaviour
 
         GameObject rollZone = MakePiece("RollHitbox", Color.clear, true);
         rollZone.GetComponent<DamageZone>().Setup(rollDamage, rollKnockback, rollBurns, burnDamage, burnDuration, burnTickInterval);
-        body.isTrigger = true; // rolling: player dash karke aar paar ja sakta hai
+        body.isTrigger = true; // while rolling the player can dash straight through
         movingSelf = true;
 
         float rolled = 0f;
@@ -268,7 +268,7 @@ public class HardyBoss : MonoBehaviour
         {
             float step = rollSpeed * Time.fixedDeltaTime;
             float nextX = ClampX(rb.position.x + dir * step);
-            if (Mathf.Approximately(nextX, rb.position.x)) break; // deewar tak pahunch gaye
+            if (Mathf.Approximately(nextX, rb.position.x)) break; // reached the edge
             rolled += Mathf.Abs(nextX - rb.position.x);
             rb.MovePosition(new Vector2(nextX, GroundCenterY));
             SetBox(rollZone, new Vector2(nextX, GroundCenterY), HalfSize * 2f);
@@ -337,7 +337,7 @@ public class HardyBoss : MonoBehaviour
         }
     }
 
-    // Ek box jo boss ke sprite se bana hai. hurts = true: trigger + DamageZone
+    // A box made from the boss's sprite. hurts = true adds a trigger + DamageZone
     GameObject MakePiece(string name, Color color, bool hurts)
     {
         var go = new GameObject(name);
@@ -390,7 +390,7 @@ public class HardyBoss : MonoBehaviour
         spawned.Clear();
         if (healthBarRoot) healthBarRoot.SetActive(false);
 
-        // Tukde: boss ke size ke andar random chhote box, idhar udhar gir ke gayab
+        // Pieces: small random boxes inside the boss's size that fly apart, fall and disappear
         Vector2 size = HalfSize * 2f;
         for (int i = 0; i < crumblePieces; i++)
         {

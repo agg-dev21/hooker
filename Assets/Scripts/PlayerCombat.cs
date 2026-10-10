@@ -3,16 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-// Left click  = punch (spam kar sakte ho): mouse ki taraf, damage + halka sa knockback
-// Right click = hook: mouse ki taraf jaata hai, enemy ko damage deta hai aur player ki taraf kheenchta hai
+// Left click  = punch (spammable): toward the mouse, damage + light knockback
+// Right click = hook: flies toward the mouse, damages enemies and pulls them toward the player
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Punch (Left Click)")]
-    [SerializeField] float punchDistance = 0.9f;  // player se mouse ki taraf punch kitna door lage
+    [SerializeField] float punchDistance = 0.9f;  // how far from the player (toward the mouse) the punch lands
     [SerializeField] float punchRadius = 0.5f;
     [SerializeField] int punchDamage = 1;
     [SerializeField] float punchCooldown = 0.12f;
-    [SerializeField] float punchKnockback = 0.3f; // enemy kitna peeche khiske
+    [SerializeField] float punchKnockback = 0.3f; // how far enemies get pushed back
 
     [Header("Hook (Right Click)")]
     [SerializeField] LineRenderer hookLine;
@@ -20,16 +20,16 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] float hookRadius = 0.3f;
 
     [Header("Hook: Medium vs Long Range")]
-    [SerializeField] float mediumRange = 8f;        // isse paas = medium range, isse door = long range
-    [SerializeField] float mediumRangeSpeed = 64f;  // medium range mein hook ki speed (thoda dheere)
-    [SerializeField] float longRangeSpeed = 85f;    // long range mein hook ki speed (tez)
+    [SerializeField] float mediumRange = 8f;        // closer than this = medium range, farther = long range
+    [SerializeField] float mediumRangeSpeed = 64f;  // hook speed within medium range (a bit slower)
+    [SerializeField] float longRangeSpeed = 85f;    // hook speed beyond medium range (faster)
     [SerializeField] int mediumRangeDamage = 2;
-    [SerializeField] int longRangeDamage = 3;       // door se maara toh zyada damage
-    [SerializeField] float returnSpeed = 100f;      // hook wapas aane ki speed
+    [SerializeField] int longRangeDamage = 3;       // hits from far away do more damage
+    [SerializeField] float returnSpeed = 100f;      // speed of the hook coming back
     [SerializeField] float hookCooldown = 0.6f;
     [SerializeField] float pullSpeed = 31.5f;
-    [SerializeField] float pullStopDistance = 1.2f; // enemy itna paas aake ruk jaye
-    [SerializeField] LayerMask groundLayer;         // hook deewar pe lage toh wapas aaye
+    [SerializeField] float pullStopDistance = 1.2f; // pulled enemies stop this close
+    [SerializeField] LayerMask groundLayer;         // the hook bounces back off these layers
 
     PlayerController2D controller;
     float punchTimer;
@@ -65,21 +65,21 @@ public class PlayerCombat : MonoBehaviour
     void Punch()
     {
         punchTimer = punchCooldown;
-        HashSet<Health> alreadyHit = new HashSet<Health>(); // ek punch mein ek enemy ko ek hi baar
+        HashSet<Health> alreadyHit = new HashSet<Health>(); // hit each enemy only once per punch
 
-        // Punch mouse ki taraf lagta hai
+        // The punch lands toward the mouse
         Vector2 dir = GetMouseDirection();
         Vector2 punchCenter = (Vector2)transform.position + dir * punchDistance;
 
         foreach (Collider2D hit in Physics2D.OverlapCircleAll(punchCenter, punchRadius))
         {
-            if (hit.transform.IsChildOf(transform)) continue; // khud ko mat maaro
+            if (hit.transform.IsChildOf(transform)) continue; // do not hit yourself
             if (!hit.TryGetComponent(out Health health) || alreadyHit.Contains(health)) continue;
             alreadyHit.Add(health);
 
             health.TakeDamage(punchDamage);
 
-            // Halka sa knockback: enemy ko punch ki direction mein thoda khiska do
+            // Light knockback: nudge the enemy in the punch direction
             Vector2 push = dir * punchKnockback;
             Rigidbody2D rb = hit.attachedRigidbody;
             if (rb) rb.position += push;
@@ -93,7 +93,7 @@ public class PlayerCombat : MonoBehaviour
         hookOut = true;
         hookTimer = hookCooldown;
 
-        Vector2 dir = GetMouseDirection(); // hook mouse ki taraf jaayega
+        Vector2 dir = GetMouseDirection(); // the hook flies toward the mouse
         Vector2 tip = transform.position;
         float traveled = 0f;
         Health target = null;
@@ -101,8 +101,8 @@ public class PlayerCombat : MonoBehaviour
 
         if (hookLine) hookLine.enabled = true;
 
-        // 1) Hook bahar jaata hai
-        // Screen ke andar jitna chahe utna door jaata hai, frame se bahar nikla toh wapas
+        // 1) The hook flies out
+        // It can go as far as it likes inside the screen; leaving the frame sends it back
         while (Camera.main ? InsideScreen(tip) : traveled < hookRange)
         {
             float step = (traveled < mediumRange ? mediumRangeSpeed : longRangeSpeed) * Time.deltaTime;
@@ -123,11 +123,11 @@ public class PlayerCombat : MonoBehaviour
             yield return null;
         }
 
-        // Ring ko laga: player khud ring tak khinchta hai, phir upar uchhalta hai
+        // Hit a ring: the player is pulled to the ring, then launched upward
         if (anchor)
         {
             Rigidbody2D myRb = GetComponent<Rigidbody2D>();
-            if (controller) controller.enabled = false; // khinchte waqt movement band
+            if (controller) controller.enabled = false; // no movement while being pulled
             myRb.gravityScale = 0f;
 
             Vector2 point = anchor.transform.position;
@@ -145,7 +145,7 @@ public class PlayerCombat : MonoBehaviour
                 yield return new WaitForFixedUpdate();
             }
 
-            // Ye ring agle scene ki taraf le jaata hai: ring pe latko, screen black, naya scene
+            // This ring leads to another scene: hang on the ring, fade to black, load the scene
             if (!string.IsNullOrEmpty(anchor.NextScene))
             {
                 myRb.linearVelocity = Vector2.zero;
@@ -155,10 +155,10 @@ public class PlayerCombat : MonoBehaviour
             }
 
             myRb.linearVelocity = new Vector2(0f, anchor.LaunchSpeed);
-            if (controller) controller.enabled = true; // gravity controller khud wapas set karta hai
+            if (controller) controller.enabled = true; // the controller restores gravity itself
         }
 
-        // 2) Enemy ko laga: damage do aur kheencho
+        // 2) Hit an enemy: damage it and pull it
         if (target)
         {
             target.TakeDamage(traveled <= mediumRange ? mediumRangeDamage : longRangeDamage);
@@ -166,7 +166,7 @@ public class PlayerCombat : MonoBehaviour
             Rigidbody2D rb = target.GetComponent<Rigidbody2D>();
             if (rb && rb.bodyType == RigidbodyType2D.Dynamic)
             {
-                // Kheenchte waqt enemy ki apni chalne wali scripts rok do, warna wo kheenchna cancel kar dengi
+                // Pause the enemy's own movement scripts while pulling, otherwise they cancel the pull
                 List<MonoBehaviour> paused = new List<MonoBehaviour>();
                 foreach (MonoBehaviour mb in target.GetComponents<MonoBehaviour>())
                 {
@@ -191,13 +191,13 @@ public class PlayerCombat : MonoBehaviour
 
                 if (target && rb) rb.linearVelocity = Vector2.zero;
 
-                // Kheenchna khatam: enemy wapas normal
+                // Pull finished: the enemy goes back to normal
                 foreach (MonoBehaviour mb in paused)
                     if (mb) mb.enabled = true;
             }
         }
 
-        // 3) Hook wapas aata hai
+        // 3) The hook comes back
         while (true)
         {
             Vector2 origin = transform.position;
@@ -211,7 +211,7 @@ public class PlayerCombat : MonoBehaviour
         hookOut = false;
     }
 
-    // Player se mouse ki taraf ki direction
+    // Direction from the player to the mouse
     Vector2 GetMouseDirection()
     {
         if (Camera.main != null && Mouse.current != null)
@@ -220,10 +220,10 @@ public class PlayerCombat : MonoBehaviour
             Vector2 d = (Vector2)(mouseWorld - transform.position);
             if (d.sqrMagnitude > 0.01f) return d.normalized;
         }
-        return new Vector2(Facing, 0f); // mouse player ke upar hi ho toh seedha aage
+        return new Vector2(Facing, 0f); // if the mouse is right on the player, aim straight ahead
     }
 
-    // Point camera ke frame ke andar hai ya nahi
+    // Is the point inside the camera frame?
     bool InsideScreen(Vector2 point)
     {
         Vector3 v = Camera.main.WorldToViewportPoint(point);
@@ -240,7 +240,7 @@ public class PlayerCombat : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Red circle = punch ka area (editor mein seedha aage dikhata hai, game mein mouse ki taraf)
+        // Red circle = punch area (shown straight ahead in the editor, toward the mouse in game)
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position + Vector3.right * punchDistance, punchRadius);
         Gizmos.color = Color.yellow;

@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// Isko kisi bhi object pe lagao (Box Collider 2D, Is Trigger ON).
-// Inspector mein Lines likho. Player area mein aaye toh dialogue ek baar chalega.
+// Put this on any object (Box Collider 2D with Is Trigger ON).
+// Write the Lines in the Inspector. The dialogue plays once when the player enters the area.
 public class DialogueTrigger : MonoBehaviour
 {
     [SerializeField] List<DialogueLine> lines = new List<DialogueLine>();

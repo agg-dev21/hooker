@@ -54,7 +54,7 @@ public class PlayerController2D : MonoBehaviour
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
 
-        // Zero friction: warna hawa mein deewar ya platform ki side se chipak jaata hai
+        // Zero friction: otherwise the player sticks to walls and platform sides in the air
         Collider2D col = GetComponent<Collider2D>();
         if (col && col.sharedMaterial == null)
             col.sharedMaterial = new PhysicsMaterial2D("PlayerNoFriction") { friction = 0f, bounciness = 0f };
@@ -141,7 +141,7 @@ public class PlayerController2D : MonoBehaviour
         dashCooldownTimer = dashDuration + dashCooldown;
         rb.gravityScale = 0f;
 
-        // Dash ke time player ko damage nahi lagega
+        // The player takes no damage while dashing
         if (health) health.MakeInvulnerable(dashDuration);
     }
 

@@ -7,14 +7,14 @@ public class ContactDamage : MonoBehaviour
 
     void OnCollisionStay2D(Collision2D collision)
     {
-        // Sirf player ko damage do
+        // Only damage the player
         if (!collision.gameObject.TryGetComponent(out PlayerController2D _)) return;
         if (!collision.gameObject.TryGetComponent(out Health health)) return;
 
         int before = health.CurrentHealth;
         health.TakeDamage(damage);
 
-        // Damage sach mein laga, tabhi knockback
+        // Knock back only if the damage actually landed
         if (health.CurrentHealth < before && collision.rigidbody)
         {
             float dir = Mathf.Sign(collision.transform.position.x - transform.position.x);
