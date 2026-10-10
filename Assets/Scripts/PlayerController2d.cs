@@ -58,9 +58,9 @@ public class PlayerController2D : MonoBehaviour
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
-        rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
+        rb.sleepMode = RigidbodySleepMode2D.NeverSleep; // keep physics awake so moving hazards still hit an idle player
 
-        // Zero friction: otherwise the player sticks to walls and platform sides in the air
+        // Zero friction: otherwise the player sticks to walls and platform sides in mid-air
         Collider2D col = GetComponent<Collider2D>();
         if (col && col.sharedMaterial == null)
             col.sharedMaterial = new PhysicsMaterial2D("PlayerNoFriction") { friction = 0f, bounciness = 0f };
@@ -120,8 +120,8 @@ public class PlayerController2D : MonoBehaviour
         float x = 0f;
         if (kb != null)
         {
-            if (kb.aKey.isPressed || kb.leftArrowKey.isPressed) x -= 1f;
-            if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) x += 1f;
+            if (kb.aKey.isPressed) x -= 1f; // arrow keys are used for hook aiming
+            if (kb.dKey.isPressed) x += 1f;
         }
         if (gp != null)
         {
@@ -151,7 +151,7 @@ public class PlayerController2D : MonoBehaviour
         dashCooldownTimer = dashDuration + dashCooldown;
         rb.gravityScale = 0f;
 
-        // The player takes no damage while dashing
+        // Player can't take damage during a dash
         if (health) health.MakeInvulnerable(dashDuration);
     }
 

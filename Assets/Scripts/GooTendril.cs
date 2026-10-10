@@ -1,26 +1,27 @@
 using UnityEngine;
 
 // Venom-style goo tentacle. Shoots out of a wall/ceiling/floor on a timer.
-// It flashes first (warning), then extends. Touching it deals damage and knockback.
-// Solid collider stops the player from passing through. Needs a SpriteRenderer and BoxCollider2D.
+// First it flashes (warning), then it extends. Touching it deals damage + knockback.
+// It is SOLID: the player cannot pass through it (Is Trigger OFF).
+// Needs a SpriteRenderer + BoxCollider2D. The object's position = the point it grows out of.
 [RequireComponent(typeof(SpriteRenderer), typeof(BoxCollider2D))]
 public class GooTendril : MonoBehaviour
 {
-    [SerializeField] Vector2 direction = Vector2.down; // direction it extends
+    [SerializeField] Vector2 direction = Vector2.down; // direction it extends in
     [SerializeField] float length = 8f;
     [SerializeField] float thickness = 0.6f;
 
     [Header("Timing")]
     [SerializeField] float startDelay = 0f;  // offset so different tendrils fire at different times
     [SerializeField] float restTime = 1.5f;  // time spent hidden
-    [SerializeField] float warnTime = 0.6f;  // time spent flashing (warning)
-    [SerializeField] float warnPeek = 0.4f;  // how far it pokes out during the warning
+    [SerializeField] float warnTime = 0.6f;  // time spent flashing
+    [SerializeField] float warnPeek = 0.4f;  // how far it peeks out during the warning
     [SerializeField] float warnFlashSpeed = 8f;
-    [SerializeField] float outTime = 0.8f;   // time spent extended
+    [SerializeField] float outTime = 0.8f;   // time spent fully extended
     [SerializeField] float extendSpeed = 40f;
 
     [Header("Damage")]
-    [SerializeField] int damage = 10;
+    [SerializeField] int damage = 1;
     [SerializeField] float knockback = 10f;
     [SerializeField] float knockbackUp = 0.5f; // upward part of the knockback (fraction of knockback)
 
@@ -41,9 +42,10 @@ public class GooTendril : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         col = GetComponent<BoxCollider2D>();
-        col.isTrigger = false;
+        col.isTrigger = false; // SOLID: blocks the player
         col.size = Vector2.one;
 
+        // Moving solid collider -> Kinematic Rigidbody2D so physics pushes the player out correctly
         var rb = GetComponent<Rigidbody2D>();
         if (!rb) rb = gameObject.AddComponent<Rigidbody2D>();
         rb.bodyType = RigidbodyType2D.Kinematic;
@@ -51,7 +53,7 @@ public class GooTendril : MonoBehaviour
 
         direction = direction.normalized;
         basePos = transform.position;
-        transform.right = direction; // length runs along the direction
+        transform.right = direction; // length points along the direction
         timer = -startDelay;
         SetLength(0f);
     }
@@ -67,7 +69,7 @@ public class GooTendril : MonoBehaviour
                 if (timer >= restTime) { state = State.Warn; timer = 0f; }
                 break;
             case State.Warn:
-                target = warnPeek; // pokes out a little
+                target = warnPeek; // peek out a little
                 if (timer >= warnTime) { state = State.Out; timer = 0f; }
                 break;
             case State.Out:
@@ -90,8 +92,9 @@ public class GooTendril : MonoBehaviour
         sr.enabled = l > 0.01f;
     }
 
+    // Solid collider -> use Collision events instead of Trigger events
     void OnCollisionEnter2D(Collision2D collision) => HitPlayer(collision);
-    void OnCollisionStay2D(Collision2D collision) => HitPlayer(collision);
+    void OnCollisionStay2D(Collision2D collision)  => HitPlayer(collision);
 
     void HitPlayer(Collision2D collision)
     {
@@ -101,11 +104,12 @@ public class GooTendril : MonoBehaviour
         int before = health.CurrentHealth;
         health.TakeDamage(damage);
 
-        // Knock back only if the damage landed (it does not while dashing)
+        // Only knock back if damage actually landed (none during a dash)
         if (health.CurrentHealth < before && collision.rigidbody)
             collision.rigidbody.linearVelocity = KnockbackFor(other.transform.position);
     }
 
+    // Push the player away from the tendril (sideways if touched from the side; sweeping tendrils push along their direction)
     Vector2 KnockbackFor(Vector2 playerPos)
     {
         Vector2 push;
@@ -113,13 +117,13 @@ public class GooTendril : MonoBehaviour
 
         if (horizontalTendril)
         {
-            push = direction * knockback;
+            push = direction * knockback; // floor sweeper: pushes forward
         }
         else
         {
-            Vector2 perpendicular = new Vector2(-direction.y, direction.x);
-            float side = Vector2.Dot(playerPos - (Vector2)basePos, perpendicular) >= 0f ? 1f : -1f;
-            push = perpendicular * side * knockback;
+            Vector2 perp = new Vector2(-direction.y, direction.x);
+            float side = Vector2.Dot(playerPos - (Vector2)basePos, perp) >= 0f ? 1f : -1f;
+            push = perp * side * knockback; // vertical tendril: push toward the side the player is on
         }
 
         return push + Vector2.up * knockback * knockbackUp;
