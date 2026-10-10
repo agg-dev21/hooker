@@ -26,8 +26,9 @@ public class Chest : MonoBehaviour
 
     void Update()
     {
-        if (IsOpen || !playerNear || Keyboard.current == null) return;
-        if (Keyboard.current[openKey].wasPressedThisFrame) Open();
+        if (IsOpen || !playerNear) return;
+        bool keyPressed = Keyboard.current != null && Keyboard.current[openKey].wasPressedThisFrame;
+        if (keyPressed || GameInput.InteractPadPressed) Open(); // open key or controller Y
     }
 
     public void Open()

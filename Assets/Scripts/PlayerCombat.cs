@@ -4,20 +4,18 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // Left click  = punch (can be spammed): toward the mouse, damage + light knockback
+// X           = punch: toward the held arrow keys, or straight ahead if none are held
 // Right click = hook: flies toward the mouse, damages an enemy and pulls it to the player
 // Z + Arrows  = hook: arrow first, Z first, or both together all work (two arrows = diagonal). Z alone = forward
+// Controller  = X punch, RB / RT hook, aimed with the left stick / D-pad (8 directions) or right stick (free aim)
 public class PlayerCombat : MonoBehaviour
 {
-    [Header("Punch (Left Click)")]
-    [SerializeField] float punchDistance = 2.4f;  // how far in front of the player the punch lands
-    [SerializeField] float punchRadius = 1f;
-    [SerializeField] int punchDamage = 4;
-    [SerializeField] float punchCooldown = 0.2f;
+    [Header("Punch (Left Click / X)")]
+    [SerializeField] float punchDistance = 0.9f;  // how far from the player (in the punch direction) the punch lands
+    [SerializeField] float punchRadius = 0.5f;
+    [SerializeField] int punchDamage = 1;
+    [SerializeField] float punchCooldown = 0.12f;
     [SerializeField] float punchKnockback = 0.3f; // how far the enemy gets pushed back
-    [SerializeField] bool punchTowardMouse = false; // OFF: punch in the direction the player faces. ON: toward the mouse
-    [SerializeField] bool showPunchEffect = true;   // a quick flash where the punch lands
-    [SerializeField] Color punchEffectColor = new Color(1f, 1f, 1f, 0.6f);
-    [SerializeField] float punchEffectTime = 0.08f;
 
     [Header("Hook (Right Click)")]
     [SerializeField] LineRenderer hookLine;
@@ -28,8 +26,8 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] float mediumRange = 8f;        // closer than this = medium range, farther = long range
     [SerializeField] float mediumRangeSpeed = 64f;  // hook speed at medium range (slower)
     [SerializeField] float longRangeSpeed = 85f;    // hook speed at long range (faster)
-    [SerializeField] int mediumRangeDamage = 6;
-    [SerializeField] int longRangeDamage = 10;       // more damage when hit from far away
+    [SerializeField] int mediumRangeDamage = 2;
+    [SerializeField] int longRangeDamage = 3;       // more damage when hit from far away
     [SerializeField] float returnSpeed = 100f;      // speed of the hook returning
     [SerializeField] float hookCooldown = 0.6f;
     [SerializeField] float pullSpeed = 31.5f;
@@ -60,6 +58,7 @@ public class PlayerCombat : MonoBehaviour
     {
         controller = GetComponent<PlayerController2D>();
         if (hookLine) hookLine.enabled = false;
+        if (TryGetComponent(out Rigidbody2D body)) riseGravity = body.gravityScale;
 
         // Ground Layer left as "Nothing" in the Inspector: use the "Ground" layer automatically.
         // Without it the hook goes through walls and the ring climb can't find the floor above.
@@ -71,12 +70,6 @@ public class PlayerCombat : MonoBehaviour
         }
     }
 
-    // Read the gravity in Start (not Awake): PlayerController2D sets the player's gravity in its own Awake
-    void Start()
-    {
-        if (TryGetComponent(out Rigidbody2D body)) riseGravity = body.gravityScale;
-    }
-
     void Update()
     {
         if (Time.timeScale == 0f) return; // game paused
@@ -86,14 +79,22 @@ public class PlayerCombat : MonoBehaviour
 
         bool canHook = hookTimer <= 0f && !hookOut;
 
+        // Controller hook (RB / RT): fires right away toward the stick (or straight ahead)
+        if (canHook && GameInput.HookPadPressed)
+            FireHook(GetArrowAim(), true);
+
         // Z + arrows: arrow first / Z first / both together all work
         HandleKeyboardHook(canHook);
+
+        // X key or controller X = punch toward the aim (arrows / stick), or straight ahead
+        if ((GameInput.PunchKeyPressed || GameInput.PunchPadPressed) && punchTimer <= 0f)
+            Punch(GetArrowAim());
 
         Mouse mouse = Mouse.current;
         if (mouse == null) return;
 
         if (mouse.leftButton.wasPressedThisFrame && punchTimer <= 0f)
-            Punch();
+            Punch(GetMouseDirection());
 
         if (mouse.rightButton.wasPressedThisFrame && canHook && !hookOut)
             FireHook(GetMouseDirection());
@@ -101,11 +102,8 @@ public class PlayerCombat : MonoBehaviour
 
     void HandleKeyboardHook(bool canHook)
     {
-        Keyboard kb = Keyboard.current;
-        if (kb == null) return;
-
         // Z pressed
-        if (canHook && !waitingForArrow && kb.zKey.wasPressedThisFrame)
+        if (canHook && !waitingForArrow && GameInput.HookKeyPressed)
         {
             // Arrow already held (or pressed this same frame): fire immediately
             if (ArrowsHeld()) { FireHook(GetArrowAim(), true); return; }
@@ -113,7 +111,7 @@ public class PlayerCombat : MonoBehaviour
             // No arrow yet: wait for one
             waitingForArrow = true;
             zHoldTime = 0f;
-            zReleaseTime = kb.zKey.isPressed ? -1f : 0f;
+            zReleaseTime = GameInput.HookKeyHeld ? -1f : 0f;
             arrowHeldTime = -1f;
             return;
         }
@@ -132,7 +130,7 @@ public class PlayerCombat : MonoBehaviour
         // Arrow was only tapped (released before the diagonal grace ended): use the remembered aim
         if (arrowHeldTime >= 0f) { FireHook(lastArrowAim, true); return; }
 
-        if (kb.zKey.isPressed)
+        if (GameInput.HookKeyHeld)
         {
             // Z still held: keep waiting for an arrow (up to maxZHold)
             zHoldTime += Time.deltaTime;
@@ -194,59 +192,23 @@ public class PlayerCombat : MonoBehaviour
         return false;
     }
 
-    bool ArrowsHeld()
-    {
-        Keyboard kb = Keyboard.current;
-        return kb != null && (kb.upArrowKey.isPressed || kb.downArrowKey.isPressed ||
-                              kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed);
-    }
+    // Aiming with arrows, D-pad or a stick right now?
+    bool ArrowsHeld() => GameInput.AimHeld;
 
-    // Direction from the arrows currently held
-    // Up, Down, Left, Right; two together = diagonal
+    // Aim from the arrows / D-pad / left stick (8 directions) or right stick (free aim)
     Vector2 GetArrowAim()
     {
-        Vector2 dir = Vector2.zero;
-        Keyboard kb = Keyboard.current;
-        if (kb != null)
-        {
-            if (kb.upArrowKey.isPressed)    dir.y += 1f;
-            if (kb.downArrowKey.isPressed)  dir.y -= 1f;
-            if (kb.leftArrowKey.isPressed)  dir.x -= 1f;
-            if (kb.rightArrowKey.isPressed) dir.x += 1f;
-        }
-
-        if (dir == Vector2.zero) return new Vector2(Facing, 0f); // no arrow: straight ahead
-        return dir.normalized;
+        if (GameInput.TryGetAim(out Vector2 dir)) return dir;
+        return new Vector2(Facing, 0f); // not aiming: straight ahead
     }
 
     // ---------------- PUNCH ----------------
-    static Sprite flashSprite;
-
-    // A quick see-through square where the punch lands, so you can tell where it hit
-    IEnumerator PunchFlash(Vector2 center)
-    {
-        if (!flashSprite)
-            flashSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
-        var go = new GameObject("PunchFlash");
-        go.transform.position = center;
-        go.transform.localScale = Vector3.one * punchRadius * 2f;
-        var flashSr = go.AddComponent<SpriteRenderer>();
-        flashSr.sprite = flashSprite;
-        flashSr.color = punchEffectColor;
-        flashSr.sortingOrder = 50;
-        yield return new WaitForSeconds(punchEffectTime);
-        Destroy(go);
-    }
-
-    void Punch()
+    void Punch(Vector2 dir) // dir comes from the mouse or the arrow keys
     {
         punchTimer = punchCooldown;
         HashSet<Health> alreadyHit = new HashSet<Health>(); // hit each enemy only once per punch
 
-        // Punch goes the way the player faces (or toward the mouse if Punch Toward Mouse is on)
-        Vector2 dir = punchTowardMouse ? GetMouseDirection() : new Vector2(Facing, 0f);
         Vector2 punchCenter = (Vector2)transform.position + dir * punchDistance;
-        if (showPunchEffect) StartCoroutine(PunchFlash(punchCenter));
 
         foreach (Collider2D hit in Physics2D.OverlapCircleAll(punchCenter, punchRadius))
         {
@@ -461,7 +423,7 @@ public class PlayerCombat : MonoBehaviour
 
     void OnDrawGizmosSelected()
     {
-        // Red circle = punch area (drawn straight ahead in the editor; in game it follows the mouse)
+        // Red circle = punch area (drawn straight ahead in the editor; in game it follows the aim)
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position + Vector3.right * punchDistance, punchRadius);
         Gizmos.color = Color.yellow;
