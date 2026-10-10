@@ -2,6 +2,10 @@ using UnityEngine;
 
 public class PlayerRespawn : MonoBehaviour
 {
+    // Fired every time the player respawns (died from damage OR fell into a kill zone).
+    // Bosses listen to this to reset their fight.
+    public static event System.Action Respawned;
+
     Vector3 respawnPoint;
     Rigidbody2D rb;
 
@@ -20,5 +24,6 @@ public class PlayerRespawn : MonoBehaviour
     {
         rb.linearVelocity = Vector2.zero; // stop any falling speed
         transform.position = respawnPoint;
+        Respawned?.Invoke();
     }
 }

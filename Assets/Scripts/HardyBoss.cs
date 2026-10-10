@@ -11,7 +11,7 @@ using UnityEngine;
 // Phase 2 (at half health): spikes also keep erupting at random spots all over the deck.
 // No warning flash: before each attack the boss strikes a pose. Attacks with art play their sprite frames;
 // attacks without art yet use a placeholder (the box changes shape). Between attacks he walks toward the player.
-// On death he crumbles into pieces.
+// On death he crumbles into pieces. If the player dies, he gets all his health back and the fight restarts.
 // Every value is in the Inspector. Touching him does no damage by default (Touch Hurts), only his attacks do.
 // Needs: SpriteRenderer, BoxCollider2D (solid), Rigidbody2D (Kinematic), Health.
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D), typeof(Health))]
@@ -153,6 +153,8 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float punchRestTime = 0.2f;        // pause after a punch while the player is still close (spam punch)
     [SerializeField, Range(0f, 1f)] float punchAlwaysAboveHealth = 0.3f; // above this part of his max health, a close player ALWAYS gets punched
     [SerializeField, Range(0f, 1f)] float punchPreferChance = 0.5f; // below it: chance he still picks the punch when the player is close
+    [SerializeField] float punchApproachTime = 0.8f;  // before punching: walk toward the player for up to this long until in reach
+    [SerializeField] int maxPunchCombo = 3;           // punches in a row before he must use a different attack
 
     [Header("Phase 2 (random spikes)")]
     [SerializeField] bool usePhase2 = true;
@@ -187,7 +189,11 @@ public class HardyBoss : MonoBehaviour
     bool HasArt => walkFrames != null && walkFrames.Length > 0;
     bool phase2;
     int lastAttack = -1;
+    int punchCombo;          // punches in a row
+    bool lastPunchSwung;     // false when the punch was cancelled because the player got out of reach
     readonly List<GameObject> spawned = new List<GameObject>();
+    Vector2 startPosition;   // where the fight started (he goes back here when the player dies)
+    int lastResetFrame = -1; // so two death signals in the same frame only reset once
 
     void Awake()
     {
@@ -203,7 +209,7 @@ public class HardyBoss : MonoBehaviour
 
     void Start()
     {
-        PlayerController2D pc = FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D pc = FindAnyObjectByType<PlayerController2D>();
         if (pc) player = pc.transform;
 
         // Touch damage now comes only from the optional TouchHitbox below, never from ContactDamage
@@ -224,7 +230,45 @@ public class HardyBoss : MonoBehaviour
             touch.AddComponent<DamageZone>().Setup(touchDamage, touchKnockback, false, 0, 0f, 1f);
         }
 
+        // Second way to notice the player dying (backup for the PlayerRespawn event below)
+        if (pc && pc.TryGetComponent(out Health playerHealth)) playerHealth.onDied.AddListener(ResetFight);
+
+        startPosition = rb.position;
         StartCoroutine(FightLoop());
+    }
+
+    void OnEnable()  => PlayerRespawn.Respawned += ResetFight;
+    void OnDisable() => PlayerRespawn.Respawned -= ResetFight;
+
+    // The player died (or fell off): the boss gets all his health back and the fight starts over
+    void ResetFight()
+    {
+        if (!health || health.CurrentHealth <= 0) return; // already beaten: nothing to reset
+        if (Time.frameCount == lastResetFrame) return;   // already reset this frame
+        lastResetFrame = Time.frameCount;
+        Debug.Log("Hardy: player died, boss health reset to " + health.MaxHealth, this);
+
+        StopAllCoroutines(); // stops the current attack, the fight loop and phase 2 spikes
+
+        // Remove every hitbox, tentacle, spike and shockwave still out
+        foreach (GameObject go in spawned) if (go) Destroy(go);
+        spawned.Clear();
+
+        // Back to the start: full health, phase 1, standing where the fight began
+        health.Heal(health.MaxHealth);
+        phase2 = false;
+        movingSelf = false;
+        walkDir = 0f;
+        lastAttack = -1;
+        punchCombo = 0;
+        lastPunchSwung = false;
+        transform.rotation = Quaternion.identity;
+        SetPose(Vector2.one);
+        rb.position = new Vector2(ClampX(startPosition.x), GroundCenterY);
+        if (healthBarRoot) healthBarRoot.SetActive(true);
+        PlayIdle();
+
+        StartCoroutine(FightLoop()); // waits Start Delay before the first attack, like the first time
     }
 
     void FixedUpdate()
@@ -306,24 +350,28 @@ public class HardyBoss : MonoBehaviour
             if (useSpikes) options.Add(2);
             bool playerClose = usePunch && player && Mathf.Abs(player.position.x - rb.position.x) <= punchTriggerDistance;
             bool healthy = health.CurrentHealth > health.MaxHealth * punchAlwaysAboveHealth;
-            if (playerClose) options.Add(3);
-            if (options.Count > 1 && !(playerClose && healthy)) options.Remove(lastAttack); // never the same attack twice in a row
+            // Too many punches in a row: he has to do something else first (stops endless punch loops)
+            bool punchAllowed = playerClose && punchCombo < maxPunchCombo;
+            if (punchAllowed) options.Add(3);
+            if (options.Count > 1 && !(punchAllowed && healthy)) options.Remove(lastAttack); // never the same attack twice in a row
             if (options.Count == 0 || !player) { yield return null; continue; }
 
             // Close and still healthy: always punch. Otherwise punch sometimes, or any attack at random.
-            int attack = playerClose && healthy ? 3
+            int attack = punchAllowed && healthy ? 3
                 : options.Contains(3) && Random.value < punchPreferChance ? 3
                 : options[Random.Range(0, options.Count)];
             lastAttack = attack;
+            punchCombo = attack == 3 ? punchCombo + 1 : 0;
 
             if (attack == 0) yield return TentacleLash();
             else if (attack == 1) yield return LeapAndRoll();
             else if (attack == 2) yield return Spikes();
             else yield return Punch();
 
-            // Player still close after a punch: punch again almost right away. Otherwise rest (and walk) as normal.
-            bool stillClose = player && Mathf.Abs(player.position.x - rb.position.x) <= punchTriggerDistance;
-            if (attack == 3 && stillClose) yield return new WaitForSeconds(punchRestTime);
+            // Player still inside the blade's reach after a real punch: punch again almost right away.
+            // Otherwise rest (and walk) as normal.
+            bool stillInReach = player && Mathf.Abs(player.position.x - rb.position.x) <= PunchReach;
+            if (attack == 3 && lastPunchSwung && stillInReach) yield return new WaitForSeconds(punchRestTime);
             else yield return WalkPhase(phase2 ? restTime * phase2RestMultiplier : restTime);
         }
     }
@@ -657,40 +705,95 @@ public class HardyBoss : MonoBehaviour
     }
 
     // ---------------- 4) Punch ----------------
-    // The hit area is a box in front of him: Punch Range wide, Punch Hit Height tall, standing on the ground.
+    // How far the blade reaches from his center (his half width + Punch Range)
+    float PunchReach => HalfSize.x + punchRange;
+
+    // The hit area is a box from his center out to Punch Reach, Punch Hit Height tall, standing on the ground.
+    // It starts at his center (not his edge) so a player standing inside or right next to him is hit too.
     IEnumerator Punch()
     {
+        lastPunchSwung = false;
+
+        // Step in first: he often stops walking further away than the blade reaches
+        float t = 0f;
+        while (player && Mathf.Abs(player.position.x - rb.position.x) > PunchReach - 0.3f && t < punchApproachTime)
+        {
+            walkDir = DirToPlayer;
+            Face(walkDir);
+            Play(walkFrames, walkFps, true);
+            t += Time.deltaTime;
+            yield return null;
+        }
+        walkDir = 0f;
+
+        // Player got away: don't swing at the air, let the fight loop pick something else
+        if (!player || Mathf.Abs(player.position.x - rb.position.x) > PunchReach)
+        {
+            PlayIdle();
+            yield break;
+        }
+
+        lastPunchSwung = true;
         float dir = DirToPlayer;
         Face(dir);
-
-        GameObject hit = MakePiece("PunchHitbox", Color.clear, true);
-        var zone = hit.GetComponent<DamageZone>();
-        zone.Setup(punchDamage, punchKnockback, punchBurns, burnDamage, burnDuration, burnTickInterval);
-        float centerX = rb.position.x + dir * (HalfSize.x + punchRange * 0.5f);
-        SetBox(hit, new Vector2(centerX, groundY + punchHitHeight * 0.5f), new Vector2(punchRange, punchHitHeight));
+        Vector2 boxCenter = new Vector2(rb.position.x + dir * PunchReach * 0.5f, groundY + punchHitHeight * 0.5f);
+        Vector2 boxSize = new Vector2(PunchReach, punchHitHeight);
+        bool landed = false;
 
         if (punchFrames != null && punchFrames.Length > 0)
         {
             Play(punchFrames, punchFps, false);
-            float fps = Mathf.Max(punchFps, 0.01f);
+            float frameTime = 1f / Mathf.Max(punchFps, 0.01f);
             for (int i = 0; i < punchFrames.Length; i++)
             {
-                zone.Active = i >= punchHitFirstFrame && i <= punchHitLastFrame;
-                yield return new WaitForSeconds(1f / fps);
+                bool active = i >= punchHitFirstFrame && i <= punchHitLastFrame;
+                // Check for a hit every frame the blade is out (not just once per animation frame)
+                for (float f = 0f; f < frameTime; f += Time.deltaTime)
+                {
+                    if (active && !landed) landed = HitBox(boxCenter, boxSize, punchDamage, punchKnockback, punchBurns);
+                    yield return null;
+                }
             }
         }
         else
         {
             // No art yet: the hit area is simply active for a moment
-            zone.Active = true;
-            yield return new WaitForSeconds(punchPlaceholderTime);
+            for (float f = 0f; f < punchPlaceholderTime; f += Time.deltaTime)
+            {
+                if (!landed) landed = HitBox(boxCenter, boxSize, punchDamage, punchKnockback, punchBurns);
+                yield return null;
+            }
         }
 
-        Remove(hit);
         PlayIdle();
     }
 
     // ---------------- Helpers ----------------
+    // Damages the player if they are inside the box. Returns true if damage landed.
+    bool HitBox(Vector2 center, Vector2 size, int damage, float knockback, bool burns)
+    {
+        foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, size, 0f))
+        {
+            if (!hit.TryGetComponent(out PlayerController2D _) || !hit.TryGetComponent(out Health h)) continue;
+
+            int before = h.CurrentHealth;
+            h.TakeDamage(damage);
+            if (h.CurrentHealth >= before) return false; // dashing or invincible: nothing landed
+
+            if (hit.attachedRigidbody)
+            {
+                float dir = Mathf.Sign(hit.transform.position.x - rb.position.x); // always away from the boss
+                if (dir == 0f) dir = sr && (artFacesRight ? !sr.flipX : sr.flipX) ? 1f : -1f; // exactly on top: push the way he faces
+                Vector2 push = new Vector2(dir, 0.6f).normalized * knockback;
+                Rigidbody2D prb = hit.attachedRigidbody;
+                prb.linearVelocity = new Vector2(push.x, Mathf.Max(prb.linearVelocity.y, push.y)); // never cancels a jump in progress
+            }
+            if (burns) Burn.Apply(hit.gameObject, burnDamage, burnDuration, burnTickInterval);
+            return true;
+        }
+        return false;
+    }
+
     void HitCircle(Vector2 center, float radius, int damage, float knockback, bool burns)
     {
         foreach (Collider2D hit in Physics2D.OverlapCircleAll(center, radius))
@@ -793,5 +896,10 @@ public class HardyBoss : MonoBehaviour
         Gizmos.DrawLine(new Vector3(arenaMinX, groundY), new Vector3(arenaMaxX, groundY));
         Gizmos.color = new Color(1f, 0.5f, 0f);
         Gizmos.DrawWireSphere(transform.position, landingRadius);
+
+        // Red box = punch hit area (to the left; it flips toward the player in game; exact size shows in Play mode)
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(new Vector3(transform.position.x - PunchReach * 0.5f, groundY + punchHitHeight * 0.5f),
+                            new Vector3(PunchReach, punchHitHeight));
     }
 }
