@@ -17,9 +17,15 @@ public class PlayerCombat : MonoBehaviour
     [Header("Hook (Right Click)")]
     [SerializeField] LineRenderer hookLine;
     [SerializeField] float hookRange = 12f;
-    [SerializeField] float hookSpeed = 68f;
     [SerializeField] float hookRadius = 0.3f;
-    [SerializeField] int hookDamage = 2;
+
+    [Header("Hook: Medium vs Long Range")]
+    [SerializeField] float mediumRange = 8f;        // isse paas = medium range, isse door = long range
+    [SerializeField] float mediumRangeSpeed = 64f;  // medium range mein hook ki speed (thoda dheere)
+    [SerializeField] float longRangeSpeed = 85f;    // long range mein hook ki speed (tez)
+    [SerializeField] int mediumRangeDamage = 2;
+    [SerializeField] int longRangeDamage = 3;       // door se maara toh zyada damage
+    [SerializeField] float returnSpeed = 100f;      // hook wapas aane ki speed
     [SerializeField] float hookCooldown = 0.6f;
     [SerializeField] float pullSpeed = 31.5f;
     [SerializeField] float pullStopDistance = 1.2f; // enemy itna paas aake ruk jaye
@@ -99,7 +105,7 @@ public class PlayerCombat : MonoBehaviour
         // Screen ke andar jitna chahe utna door jaata hai, frame se bahar nikla toh wapas
         while (Camera.main ? InsideScreen(tip) : traveled < hookRange)
         {
-            float step = hookSpeed * Time.deltaTime;
+            float step = (traveled < mediumRange ? mediumRangeSpeed : longRangeSpeed) * Time.deltaTime;
             tip += dir * step;
             traveled += step;
             DrawLine(tip);
@@ -155,7 +161,7 @@ public class PlayerCombat : MonoBehaviour
         // 2) Enemy ko laga: damage do aur kheencho
         if (target)
         {
-            target.TakeDamage(hookDamage);
+            target.TakeDamage(traveled <= mediumRange ? mediumRangeDamage : longRangeDamage);
 
             Rigidbody2D rb = target.GetComponent<Rigidbody2D>();
             if (rb && rb.bodyType == RigidbodyType2D.Dynamic)
@@ -195,7 +201,7 @@ public class PlayerCombat : MonoBehaviour
         while (true)
         {
             Vector2 origin = transform.position;
-            tip = Vector2.MoveTowards(tip, origin, hookSpeed * 1.5f * Time.deltaTime);
+            tip = Vector2.MoveTowards(tip, origin, returnSpeed * Time.deltaTime);
             DrawLine(tip);
             if (Vector2.Distance(tip, origin) < 0.1f) break;
             yield return null;

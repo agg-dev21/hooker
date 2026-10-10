@@ -6,6 +6,7 @@ public class Health : MonoBehaviour
 {
     [SerializeField] int maxHealth = 3;
     [SerializeField] float invincibleTime = 0.5f; // hit ke baad itne second tak dobara damage nahi
+    [SerializeField] bool flashOnHit = true; // hit lagne pe chamke ya nahi
     [SerializeField] Color flashColor = Color.white;
     [SerializeField] float flashTime = 0.1f; // hit lagne pe kitni der chamke
 
@@ -45,7 +46,7 @@ public class Health : MonoBehaviour
         CurrentHealth -= amount;
         invincibleTimer = invincibleTime;
         onDamaged?.Invoke();
-        if (sr) StartCoroutine(Flash());
+        if (sr && flashOnHit) StartCoroutine(Flash());
 
         if (CurrentHealth <= 0) Die();
     }

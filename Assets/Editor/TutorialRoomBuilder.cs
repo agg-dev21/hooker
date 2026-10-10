@@ -719,6 +719,107 @@ public static class TutorialRoomBuilder
         EditorUtility.DisplayDialog("Build Level 1 Deck", "Done! Level_1_Deck is built and open, and in the Scene List.", "OK");
     }
 
+    // ---------------- HARDY (Level 1 boss) ----------------
+    // Puts Hardy and his health bar (top middle of the screen) into Level_1_Deck.
+    // All of Hardy's attack values are on the HardyBoss component in the Inspector.
+
+    [MenuItem("Tools/Add Hardy To Deck")]
+    static void AddHardy()
+    {
+        string path = ScenePath(DeckSceneName);
+        if (!File.Exists(path))
+        {
+            EditorUtility.DisplayDialog("Add Hardy", "Build Level 1 Deck first (Tools > Build Level 1 Deck).", "OK");
+            return;
+        }
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+
+        if (GameObject.Find("Hardy") || GameObject.Find("BossBar"))
+        {
+            if (!EditorUtility.DisplayDialog("Add Hardy", "Hardy is already in the deck.\n\nReplace him and his health bar with fresh ones? Values you changed on him will be lost.", "Replace", "Cancel"))
+                return;
+            DestroyByName("Hardy");
+            DestroyByName("BossBar");
+        }
+
+        Tilemap map = FindGroundTilemap();
+        const float deckTop = -5f;
+
+        // Hardy: dark box 3 wide, 4 tall, on the right side of the deck
+        GameObject hardy = MakeBox("Hardy", null, map, new Vector2(30f, deckTop + 2f), new Vector2(3f, 4f), new Color(0.1f, 0.08f, 0.15f));
+        var rb = hardy.AddComponent<Rigidbody2D>();
+        rb.bodyType = RigidbodyType2D.Kinematic;
+        AddHealth(hardy, 60);
+        var hardyHealth = new SerializedObject(hardy.GetComponent<Health>());
+        hardyHealth.FindProperty("flashOnHit").boolValue = false; // no hit flash on Hardy
+        hardyHealth.ApplyModifiedPropertiesWithoutUndo();
+        hardy.AddComponent<ContactDamage>(); // touch damage, no fire
+        var boss = hardy.AddComponent<HardyBoss>();
+
+        // Boss health bar, top middle of the screen
+        Canvas canvas = Object.FindFirstObjectByType<Canvas>();
+        Sprite uiSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
+
+        var barRoot = new GameObject("BossBar", typeof(RectTransform), typeof(Image));
+        barRoot.transform.SetParent(canvas.transform, false);
+        var rootRt = (RectTransform)barRoot.transform;
+        rootRt.anchorMin = rootRt.anchorMax = new Vector2(0.5f, 1f);
+        rootRt.pivot = new Vector2(0.5f, 1f);
+        rootRt.anchoredPosition = new Vector2(0f, -40f);
+        rootRt.sizeDelta = new Vector2(700f, 28f);
+        var bg = barRoot.GetComponent<Image>();
+        bg.sprite = uiSprite;
+        bg.type = Image.Type.Sliced;
+        bg.color = new Color(0.1f, 0.1f, 0.1f, 0.85f);
+
+        var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
+        fillGo.transform.SetParent(barRoot.transform, false);
+        var fillRt = (RectTransform)fillGo.transform;
+        fillRt.anchorMin = Vector2.zero;
+        fillRt.anchorMax = Vector2.one;
+        fillRt.offsetMin = new Vector2(4f, 4f);
+        fillRt.offsetMax = new Vector2(-4f, -4f);
+        var fill = fillGo.GetComponent<Image>();
+        fill.sprite = uiSprite;
+        fill.type = Image.Type.Filled;
+        fill.fillMethod = Image.FillMethod.Horizontal;
+        fill.color = new Color(0.55f, 0.1f, 0.75f);
+
+        var nameGo = new GameObject("Name", typeof(RectTransform));
+        nameGo.transform.SetParent(barRoot.transform, false);
+        var nameRt = (RectTransform)nameGo.transform;
+        nameRt.anchorMin = new Vector2(0f, 1f);
+        nameRt.anchorMax = new Vector2(1f, 1f);
+        nameRt.pivot = new Vector2(0.5f, 0f);
+        nameRt.anchoredPosition = new Vector2(0f, 4f);
+        nameRt.sizeDelta = new Vector2(0f, 30f);
+        var nameText = nameGo.AddComponent<TMPro.TextMeshProUGUI>();
+        nameText.text = "HARDY";
+        nameText.fontSize = 24;
+        nameText.alignment = TMPro.TextAlignmentOptions.Center;
+        nameText.color = Color.white;
+
+        var bar = barRoot.AddComponent<HealthBar>();
+        var barSo = new SerializedObject(bar);
+        barSo.FindProperty("target").objectReferenceValue = hardy.GetComponent<Health>();
+        barSo.FindProperty("fill").objectReferenceValue = fill;
+        barSo.ApplyModifiedPropertiesWithoutUndo();
+
+        // Boss settings that depend on this deck
+        var bossSo = new SerializedObject(boss);
+        bossSo.FindProperty("groundY").floatValue = deckTop;
+        bossSo.FindProperty("arenaMinX").floatValue = WallLeft + 1;
+        bossSo.FindProperty("arenaMaxX").floatValue = WallRight;
+        bossSo.FindProperty("healthBarRoot").objectReferenceValue = barRoot;
+        bossSo.ApplyModifiedPropertiesWithoutUndo();
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        Selection.activeGameObject = hardy;
+        EditorUtility.DisplayDialog("Add Hardy", "Hardy is on the deck!\n\nClick Hardy and look at the HardyBoss component to change any attack value.", "OK");
+    }
+
     // A pile of big cargo crates stacked on top of each other (too tall to jump over).
     // Each crate breaks after 2 punches; the crates above then drop down (they can only fall straight down).
     static void MakeCrateStack(string name, Transform parent, Tilemap map, float x, float floorTop, int count)
