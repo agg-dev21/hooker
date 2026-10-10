@@ -58,6 +58,7 @@ public class PlayerController2D : MonoBehaviour
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+        rb.sleepMode = RigidbodySleepMode2D.NeverSleep;
 
         // Zero friction: otherwise the player sticks to walls and platform sides in the air
         Collider2D col = GetComponent<Collider2D>();
