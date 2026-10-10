@@ -49,7 +49,7 @@ public class DialogueManager : MonoBehaviour
 
     void Update()
     {
-        if (!IsOpen || Time.frameCount == openedFrame) return;
+        if (!IsOpen || Time.frameCount == openedFrame || Time.timeScale == 0f) return;
 
         if (GameInput.InteractPressed) // E or controller Y
         {

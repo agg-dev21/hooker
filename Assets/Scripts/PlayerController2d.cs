@@ -76,6 +76,8 @@ public class PlayerController2D : MonoBehaviour
 
     void Update()
     {
+        if (Time.timeScale == 0f) return; // paused: ignore input (menu buttons must not jump / dash)
+
         Vector2 checkPos = groundCheck ? (Vector2)groundCheck.position : (Vector2)transform.position;
         isGrounded = standOnAnything ? TouchingSolid(checkPos) : Physics2D.OverlapBox(checkPos, groundCheckSize, 0f, groundLayer);
 

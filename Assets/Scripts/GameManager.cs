@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
@@ -8,10 +9,11 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance { get; private set; }
 
     [SerializeField] GameObject winPanel;
-    [SerializeField] GameObject pausePanel;
+    [SerializeField] GameObject pausePanel; // leave empty to use the built-in pause menu (with Controls)
 
     bool paused;
     bool won;
+    PauseMenu menu;
 
     public bool IsPausedOrWon => paused || won;
 
@@ -21,13 +23,19 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 1f;
         if (winPanel) winPanel.SetActive(false);
         if (pausePanel) pausePanel.SetActive(false);
+        else menu = PauseMenu.Create(this); // no custom panel: build the pause menu in code
     }
 
     void Update()
     {
-        // Esc or controller Start (Menu) to pause
+        if (menu && menu.IsListening) return; // waiting for a new key in the Controls page
+
+        // Pause key (Esc / controller Menu by default)
         if (GameInput.PausePressed)
-            TogglePause();
+        {
+            if (menu && menu.InControls) menu.ShowMain(); // from Controls, go back one page first
+            else TogglePause();
+        }
     }
 
     public void Win()
@@ -42,9 +50,31 @@ public class GameManager : MonoBehaviour
     {
         if (won) return; // no pausing after winning
         paused = !paused;
-        if (pausePanel) pausePanel.SetActive(paused);
-        if (paused) SelectFirstButton(pausePanel);
+
+        if (pausePanel)
+        {
+            pausePanel.SetActive(paused);
+            if (paused) SelectFirstButton(pausePanel);
+        }
+        if (menu)
+        {
+            if (paused) menu.Open();
+            else menu.Close();
+        }
+
         Time.timeScale = paused ? 0f : 1f;
+    }
+
+    // Resume button. Waits one frame so the button press (e.g. A or Space) doesn't also make the player jump.
+    public void Resume()
+    {
+        if (paused) StartCoroutine(ResumeNextFrame());
+    }
+
+    IEnumerator ResumeNextFrame()
+    {
+        yield return null;
+        if (paused) TogglePause();
     }
 
     // Highlight the first button in a menu so a controller can navigate it (D-pad / stick, A to press)
@@ -70,6 +100,10 @@ public class GameManager : MonoBehaviour
 
     public void Quit()
     {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false; // stop Play mode in the editor
+#else
         Application.Quit();
+#endif
     }
 }

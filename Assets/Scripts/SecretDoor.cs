@@ -1,14 +1,12 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
 
-// A door the player can use by standing at it and pressing the use key.
+// A door the player can use by standing at it and pressing Interact (E / controller Y by default).
 // It moves the player to Destination. Used for secret rooms that sit outside the main level:
 // - Entrance door (Enters Room ON): the camera switches to show only the room (Room Min / Room Max).
 // - Exit door (Enters Room OFF): the camera goes back to normal.
 // Needs a SpriteRenderer and a Collider2D with Is Trigger ON.
 public class SecretDoor : MonoBehaviour
 {
-    [SerializeField] Key useKey = Key.E;
     [SerializeField] Transform destination;
     [SerializeField] bool entersRoom = true;
     [SerializeField] Vector2 roomMin;   // bottom-left corner of the room (for the camera)
@@ -24,9 +22,8 @@ public class SecretDoor : MonoBehaviour
 
     void Update()
     {
-        if (!player || !destination) return;
-        bool keyPressed = Keyboard.current != null && Keyboard.current[useKey].wasPressedThisFrame;
-        if (keyPressed || GameInput.InteractPadPressed) Use(); // use key or controller Y
+        if (!player || !destination || Time.timeScale == 0f) return;
+        if (GameInput.InteractPressed) Use(); // Interact (E / controller Y by default, changeable in Controls)
     }
 
     void Use()
