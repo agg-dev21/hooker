@@ -8,21 +8,24 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] float moveSpeed = 8f;
     [SerializeField] float acceleration = 70f;
     [SerializeField] float deceleration = 80f;
-    [SerializeField, Range(0f, 1f)] float airControl = 0.65f;
+    [SerializeField, Range(0f, 1f)] float airControl = 1f;   // 1 = full control in the air
 
     [Header("Jump")]
+    // Hollow Knight style: while jump is held you rise at a steady speed (Jump Force) for up to Max Jump Hold Time.
+    // Let go (or run out of time) and the rise is cut, then gravity takes over. Tap = small hop, hold = about 6 tiles.
     [SerializeField] float gravity = 5f;         // player's gravity (higher = snappier jumps and falls)
-    [SerializeField] float jumpForce = 19.5f;
-    [SerializeField, Range(0f, 1f)] float jumpCutMultiplier = 0.4f;    // let go early: rising speed is cut to this (short hop)
-    [SerializeField, Range(0.1f, 1f)] float jumpHoldGravity = 0.6f;    // holding jump while rising: gravity times this (big jump, about 6 tiles)
+    [SerializeField] float jumpForce = 14f;      // steady rising speed while jump is held
+    [SerializeField] float maxJumpHoldTime = 0.3f;  // how long holding jump keeps you rising
+    [SerializeField] float minJumpHoldTime = 0.08f; // even a quick tap rises at least this long
+    [SerializeField, Range(0f, 1f)] float jumpCutMultiplier = 0.4f;    // when the rise ends early, speed is cut to this
     [SerializeField] float coyoteTime = 0.1f;
     [SerializeField] float jumpBufferTime = 0.12f;
     [SerializeField] float fallGravityMultiplier = 1.8f;
     [SerializeField] float maxFallSpeed = 26f;
 
     [Header("Dash")]
-    [SerializeField] float dashSpeed = 20f;
-    [SerializeField] float dashDuration = 0.15f;
+    [SerializeField] float dashSpeed = 22f;
+    [SerializeField] float dashDuration = 0.18f;   // distance = speed x duration (about 4 tiles)
     [SerializeField] float dashCooldown = 0.4f;
 
     [Header("Ground Check")]
@@ -36,6 +39,8 @@ public class PlayerController2D : MonoBehaviour
     float baseGravity;
     float moveInput;
     bool jumpHeld;
+    bool isJumping;      // in the steady-rise part of a jump
+    float jumpHoldTimer;
     bool isGrounded;
     float coyoteCounter;
     float jumpBufferCounter;
@@ -80,6 +85,8 @@ public class PlayerController2D : MonoBehaviour
         if (jumpBufferCounter > 0f && coyoteCounter > 0f && !isDashing)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+            isJumping = true;
+            jumpHoldTimer = 0f;
             jumpBufferCounter = 0f;
             coyoteCounter = 0f;
         }
@@ -104,12 +111,24 @@ public class PlayerController2D : MonoBehaviour
 
         float newX = Mathf.MoveTowards(rb.linearVelocity.x, target, rate * Time.fixedDeltaTime);
         float newY = Mathf.Max(rb.linearVelocity.y, -maxFallSpeed);
+
+        // Steady rise while jump is held
+        if (isJumping)
+        {
+            jumpHoldTimer += Time.fixedDeltaTime;
+            bool hitCeiling = rb.linearVelocity.y < jumpForce * 0.5f && jumpHoldTimer > Time.fixedDeltaTime * 2f;
+            bool keepRising = (jumpHeld || jumpHoldTimer < minJumpHoldTime) && jumpHoldTimer < maxJumpHoldTime && !hitCeiling;
+            if (keepRising) newY = jumpForce;
+            else
+            {
+                isJumping = false;
+                if (!jumpHeld && newY > 0f) newY *= jumpCutMultiplier; // let go early: short hop
+            }
+        }
         rb.linearVelocity = new Vector2(newX, newY);
 
-        // Falling: heavier. Rising while holding jump: lighter, so holding gives a bigger jump.
-        if (rb.linearVelocity.y < 0f) rb.gravityScale = baseGravity * fallGravityMultiplier;
-        else if (jumpHeld) rb.gravityScale = baseGravity * jumpHoldGravity;
-        else rb.gravityScale = baseGravity;
+        // Falling is heavier than rising, for a snappy arc
+        rb.gravityScale = rb.linearVelocity.y < 0f ? baseGravity * fallGravityMultiplier : baseGravity;
     }
 
     void ReadInput()
@@ -137,16 +156,24 @@ public class PlayerController2D : MonoBehaviour
 
         if (jumpPressed) jumpBufferCounter = jumpBufferTime;
 
-        if (jumpReleased && rb.linearVelocity.y > 0f && !isDashing)
+        // Let go after the steady rise has ended (already falling back): cut what is left of the rise
+        if (jumpReleased && !isJumping && rb.linearVelocity.y > 0f && !isDashing)
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, rb.linearVelocity.y * jumpCutMultiplier);
 
         if (dashPressed && dashCooldownTimer <= 0f && !isDashing)
             StartDash();
     }
 
+    // Switched off (hook pull, boat): forget any jump in progress so it does not continue afterwards
+    void OnDisable()
+    {
+        isJumping = false;
+    }
+
     void StartDash()
     {
         isDashing = true;
+        isJumping = false;
         dashTimer = dashDuration;
         dashCooldownTimer = dashDuration + dashCooldown;
         rb.gravityScale = 0f;

@@ -2375,15 +2375,15 @@ MonoBehaviour:
   moveSpeed: 8
   acceleration: 70
   deceleration: 80
-  airControl: 0.65
-  jumpForce: 19.5
+  airControl: 1
+  jumpForce: 14
   jumpCutMultiplier: 0.4
   coyoteTime: 0.1
   jumpBufferTime: 0.12
   fallGravityMultiplier: 1.8
   maxFallSpeed: 26
-  dashSpeed: 20
-  dashDuration: 0.15
+  dashSpeed: 22
+  dashDuration: 0.18
   dashCooldown: 0.4
   groundCheck: {fileID: 1792069261}
   groundCheckSize: {x: 0.5, y: 0.1}

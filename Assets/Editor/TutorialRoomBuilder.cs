@@ -726,9 +726,41 @@ public static class TutorialRoomBuilder
     }
 
     // ---------------- LEVEL 1 DECK (boss arena, no boss yet) ----------------
-    // Big flat open-air deck, 3 screens long. Fixed camera zoomed out so the whole deck fits on screen.
+    // Big flat open-air deck, 3 screens long. The camera (same zoom as Level_1) follows the player left and right.
     // Low railings and invisible edges, nothing else on it (room for the boss later).
     // You start next to the hatch you climbed out of. The screen fades in from black (ScreenFade).
+
+    // Deck camera: same zoom as Level_1, follows the player left/right only, never shows past the railings
+    static void SetDeckCamera(Transform player)
+    {
+        Camera cam = Object.FindFirstObjectByType<Camera>();
+        cam.orthographicSize = L1HalfHeight;
+        cam.transform.position = new Vector3(DeckLeft + 1 + L1HalfWidth, L1FirstFloorCenterY, cam.transform.position.z);
+        if (!cam.TryGetComponent(out CameraFollow2D follow)) follow = cam.gameObject.AddComponent<CameraFollow2D>();
+        follow.enabled = true;
+        var so = new SerializedObject(follow);
+        so.FindProperty("target").objectReferenceValue = player;
+        so.FindProperty("useBounds").boolValue = true;
+        so.FindProperty("minBounds").vector2Value = new Vector2(DeckLeft + 0.67f, L1FirstFloorCenterY - L1HalfHeight);
+        so.FindProperty("maxBounds").vector2Value = new Vector2(DeckRight + 0.33f, L1FirstFloorCenterY + L1HalfHeight); // one screen tall: never moves up/down
+        so.FindProperty("lockToFloors").boolValue = false;
+        so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // Changes only the camera in the existing Level_1_Deck (keeps Hardy and everything else)
+    [MenuItem("Tools/Update Deck Camera")]
+    static void UpdateDeckCamera()
+    {
+        string path = ScenePath(DeckSceneName);
+        if (!File.Exists(path)) return;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        SetDeckCamera(player.transform);
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        EditorUtility.DisplayDialog("Update Deck Camera", "The deck camera now follows the player left and right (same zoom as Level 1).", "OK");
+    }
 
     [MenuItem("Tools/Build Level 1 Deck")]
     static void BuildLevel1Deck()
@@ -793,12 +825,7 @@ public static class TutorialRoomBuilder
             feet = (capsule.size.y * 0.5f - capsule.offset.y) * player.transform.lossyScale.y;
         player.transform.position = new Vector3(-10.5f, deckTop + feet + 0.05f, 0f);
 
-        // Camera: fixed, zoomed out so the whole deck (railing to railing) fits, deck at the bottom of the screen
-        Camera cam = Object.FindFirstObjectByType<Camera>();
-        float deckHalfWidth = (right + 1 - left) * 0.5f;
-        cam.orthographicSize = deckHalfWidth * 9f / 16f;
-        cam.transform.position = new Vector3((left + right + 1) * 0.5f, deckRow + cam.orthographicSize, cam.transform.position.z);
-        if (cam.TryGetComponent(out CameraFollow2D follow)) follow.enabled = false;
+        SetDeckCamera(player.transform);
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
