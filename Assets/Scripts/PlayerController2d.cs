@@ -26,7 +26,8 @@ public class PlayerController2D : MonoBehaviour
 
     [Header("Dash")]
     [SerializeField] float dashSpeed = 22f;
-    [SerializeField] float dashDuration = 0.18f;   // distance = speed x duration (about 4 tiles)
+    [SerializeField] float dashTime = 0.24f;       // distance = speed x time (about 5.3 tiles; was 0.18 = 4 tiles)
+    [SerializeField] float dashIFrameGrace = 0.05f; // stay invincible this much longer after the dash ends
     [SerializeField] float dashCooldown = 0.4f;
     [SerializeField] bool dashThroughEnemies = true; // pass through enemies (cannons, chasers, shooters, bosses) while dashing
 
@@ -168,12 +169,12 @@ public class PlayerController2D : MonoBehaviour
     {
         isDashing = true;
         isJumping = false;
-        dashTimer = dashDuration;
-        dashCooldownTimer = dashDuration + dashCooldown;
+        dashTimer = dashTime;
+        dashCooldownTimer = dashTime + dashCooldown;
         rb.gravityScale = 0f;
 
         // Player can't take damage during a dash
-        if (health) health.MakeInvulnerable(dashDuration);
+        if (health) health.MakeInvulnerable(dashTime + dashIFrameGrace);
 
         if (dashThroughEnemies) IgnoreEnemiesOnDashPath();
     }
@@ -189,7 +190,7 @@ public class PlayerController2D : MonoBehaviour
     // Stop colliding with every enemy along the dash
     void IgnoreEnemiesOnDashPath()
     {
-        float distance = dashSpeed * dashDuration;
+        float distance = dashSpeed * dashTime;
         Vector2 center = (Vector2)transform.position + Vector2.right * FacingDirection * distance * 0.5f;
         Vector2 size = new Vector2(distance + 2f, 3f);
         Collider2D[] mine = GetComponentsInChildren<Collider2D>();

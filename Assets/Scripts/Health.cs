@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -10,14 +11,23 @@ public class Health : MonoBehaviour
     [SerializeField] Color flashColor = Color.white;
     [SerializeField] float flashTime = 0.1f; // how long the hit flash lasts
 
+    [Header("Invincibility Frames (player only)")]
+    [SerializeField] float playerHitIFrames = 1f;     // after the player is hit: invincible this long (blinking)
+    [SerializeField] float playerRespawnIFrames = 1.5f; // after respawning: invincible this long (blinking)
+    [SerializeField] float blinkInterval = 0.08f;     // how fast the player blinks while invincible
+
     public UnityEvent onDamaged;
     public UnityEvent onDied;
 
     public int CurrentHealth { get; private set; }
     public int MaxHealth => maxHealth;
+    public bool IsInvincible => invincibleTimer > 0f;
 
     float invincibleTimer;
+    float blinkTimer;
+    bool isPlayer;
     SpriteRenderer sr;
+    readonly List<SpriteRenderer> blinking = new List<SpriteRenderer>(); // sprites that were visible when blinking started
     Color originalColor;
 
     void Awake()
@@ -25,17 +35,47 @@ public class Health : MonoBehaviour
         CurrentHealth = maxHealth;
         sr = GetComponent<SpriteRenderer>();
         if (sr) originalColor = sr.color;
+        isPlayer = GetComponent<PlayerController2D>() != null;
     }
 
     void Update()
     {
         if (invincibleTimer > 0f) invincibleTimer -= Time.deltaTime;
+
+        if (blinkTimer > 0f)
+        {
+            blinkTimer -= Time.deltaTime;
+            // Visible / hidden every blinkInterval; always visible again when the blinking ends
+            bool visible = blinkTimer <= 0f || Mathf.Repeat(blinkTimer, blinkInterval * 2f) < blinkInterval;
+            SetVisible(visible);
+        }
     }
 
-    // Called by the dash: no damage for this long
+    void OnDisable()
+    {
+        blinkTimer = 0f;
+        SetVisible(true);
+    }
+
+    // Called by the dash: no damage for this long (no blinking)
     public void MakeInvulnerable(float duration)
     {
         invincibleTimer = Mathf.Max(invincibleTimer, duration);
+    }
+
+    // Invincible for this long and blink so the player can see it
+    public void StartIFrames(float duration)
+    {
+        invincibleTimer = Mathf.Max(invincibleTimer, duration);
+
+        if (blinkTimer <= 0f)
+        {
+            // Only blink the sprites that are currently shown, so hidden ones stay hidden afterwards
+            blinking.Clear();
+            foreach (SpriteRenderer r in GetComponentsInChildren<SpriteRenderer>())
+                if (r.enabled) blinking.Add(r);
+        }
+        blinkTimer = Mathf.Max(blinkTimer, duration);
     }
 
     // The combat system just calls this
@@ -48,7 +88,10 @@ public class Health : MonoBehaviour
         onDamaged?.Invoke();
         if (sr && flashOnHit) StartCoroutine(Flash());
 
-        if (CurrentHealth <= 0) Die();
+        if (CurrentHealth <= 0) { Die(); return; }
+
+        // Player: invincibility frames after a hit, with blinking
+        if (isPlayer) StartIFrames(Mathf.Max(invincibleTime, playerHitIFrames));
     }
 
     public void Heal(int amount)
@@ -65,6 +108,7 @@ public class Health : MonoBehaviour
         {
             respawn.Respawn();
             CurrentHealth = maxHealth;
+            StartIFrames(playerRespawnIFrames); // spawn protection
         }
         else
         {
@@ -77,5 +121,11 @@ public class Health : MonoBehaviour
         sr.color = flashColor;
         yield return new WaitForSeconds(flashTime);
         sr.color = originalColor;
+    }
+
+    void SetVisible(bool visible)
+    {
+        foreach (SpriteRenderer r in blinking)
+            if (r) r.enabled = visible;
     }
 }
