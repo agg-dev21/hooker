@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 // X           = punch: toward the held arrow keys, or straight ahead if none are held
 // Right click = hook: flies toward the mouse, damages an enemy and pulls it to the player
 // Z + Arrows  = hook: arrow first, Z first, or both together all work (two arrows = diagonal). Z alone = forward
+// Controller  = X punch, RB / RT hook, aimed with the left stick / D-pad (8 directions) or right stick (free aim)
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Punch (Left Click / X)")]
@@ -78,12 +79,15 @@ public class PlayerCombat : MonoBehaviour
 
         bool canHook = hookTimer <= 0f && !hookOut;
 
+        // Controller hook (RB / RT): fires right away toward the stick (or straight ahead)
+        if (canHook && GameInput.HookPadPressed)
+            FireHook(GetArrowAim(), true);
+
         // Z + arrows: arrow first / Z first / both together all work
         HandleKeyboardHook(canHook);
 
-        // X = punch toward the held arrows (or straight ahead)
-        Keyboard kb = Keyboard.current;
-        if (kb != null && kb.xKey.wasPressedThisFrame && punchTimer <= 0f)
+        // X key or controller X = punch toward the aim (arrows / stick), or straight ahead
+        if ((GameInput.PunchKeyPressed || GameInput.PunchPadPressed) && punchTimer <= 0f)
             Punch(GetArrowAim());
 
         Mouse mouse = Mouse.current;
@@ -98,11 +102,8 @@ public class PlayerCombat : MonoBehaviour
 
     void HandleKeyboardHook(bool canHook)
     {
-        Keyboard kb = Keyboard.current;
-        if (kb == null) return;
-
         // Z pressed
-        if (canHook && !waitingForArrow && kb.zKey.wasPressedThisFrame)
+        if (canHook && !waitingForArrow && GameInput.HookKeyPressed)
         {
             // Arrow already held (or pressed this same frame): fire immediately
             if (ArrowsHeld()) { FireHook(GetArrowAim(), true); return; }
@@ -110,7 +111,7 @@ public class PlayerCombat : MonoBehaviour
             // No arrow yet: wait for one
             waitingForArrow = true;
             zHoldTime = 0f;
-            zReleaseTime = kb.zKey.isPressed ? -1f : 0f;
+            zReleaseTime = GameInput.HookKeyHeld ? -1f : 0f;
             arrowHeldTime = -1f;
             return;
         }
@@ -129,7 +130,7 @@ public class PlayerCombat : MonoBehaviour
         // Arrow was only tapped (released before the diagonal grace ended): use the remembered aim
         if (arrowHeldTime >= 0f) { FireHook(lastArrowAim, true); return; }
 
-        if (kb.zKey.isPressed)
+        if (GameInput.HookKeyHeld)
         {
             // Z still held: keep waiting for an arrow (up to maxZHold)
             zHoldTime += Time.deltaTime;
@@ -191,29 +192,14 @@ public class PlayerCombat : MonoBehaviour
         return false;
     }
 
-    bool ArrowsHeld()
-    {
-        Keyboard kb = Keyboard.current;
-        return kb != null && (kb.upArrowKey.isPressed || kb.downArrowKey.isPressed ||
-                              kb.leftArrowKey.isPressed || kb.rightArrowKey.isPressed);
-    }
+    // Aiming with arrows, D-pad or a stick right now?
+    bool ArrowsHeld() => GameInput.AimHeld;
 
-    // Direction from the arrows currently held
-    // Up, Down, Left, Right; two together = diagonal
+    // Aim from the arrows / D-pad / left stick (8 directions) or right stick (free aim)
     Vector2 GetArrowAim()
     {
-        Vector2 dir = Vector2.zero;
-        Keyboard kb = Keyboard.current;
-        if (kb != null)
-        {
-            if (kb.upArrowKey.isPressed)    dir.y += 1f;
-            if (kb.downArrowKey.isPressed)  dir.y -= 1f;
-            if (kb.leftArrowKey.isPressed)  dir.x -= 1f;
-            if (kb.rightArrowKey.isPressed) dir.x += 1f;
-        }
-
-        if (dir == Vector2.zero) return new Vector2(Facing, 0f); // no arrow: straight ahead
-        return dir.normalized;
+        if (GameInput.TryGetAim(out Vector2 dir)) return dir;
+        return new Vector2(Facing, 0f); // not aiming: straight ahead
     }
 
     // ---------------- PUNCH ----------------

@@ -51,7 +51,7 @@ public class DialogueManager : MonoBehaviour
     {
         if (!IsOpen || Time.frameCount == openedFrame) return;
 
-        if (Keyboard.current != null && Keyboard.current.eKey.wasPressedThisFrame)
+        if (GameInput.InteractPressed) // E or controller Y
         {
             index++;
             if (index >= lines.Count)

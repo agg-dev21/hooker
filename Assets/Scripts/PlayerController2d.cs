@@ -138,26 +138,13 @@ public class PlayerController2D : MonoBehaviour
 
     void ReadInput()
     {
-        var kb = Keyboard.current;
-        var gp = Gamepad.current;
+        // Keyboard + controller, see GameInput.cs for the full button layout
+        moveInput = GameInput.MoveX;
 
-        float x = 0f;
-        if (kb != null)
-        {
-            if (kb.aKey.isPressed) x -= 1f; // arrow keys are used for hook aiming
-            if (kb.dKey.isPressed) x += 1f;
-        }
-        if (gp != null)
-        {
-            float stick = gp.leftStick.x.ReadValue();
-            if (Mathf.Abs(stick) > 0.2f) x = stick;
-        }
-        moveInput = Mathf.Clamp(x, -1f, 1f);
-
-        bool jumpPressed  = (kb != null && kb.spaceKey.wasPressedThisFrame)  || (gp != null && gp.buttonSouth.wasPressedThisFrame);
-        bool jumpReleased = (kb != null && kb.spaceKey.wasReleasedThisFrame) || (gp != null && gp.buttonSouth.wasReleasedThisFrame);
-        jumpHeld = (kb != null && kb.spaceKey.isPressed) || (gp != null && gp.buttonSouth.isPressed);
-        bool dashPressed  = (kb != null && kb.leftShiftKey.wasPressedThisFrame) || (gp != null && gp.buttonEast.wasPressedThisFrame);
+        bool jumpPressed  = GameInput.JumpPressed;
+        bool jumpReleased = GameInput.JumpReleased;
+        jumpHeld = GameInput.JumpHeld;
+        bool dashPressed  = GameInput.DashPressed;
 
         if (jumpPressed) jumpBufferCounter = jumpBufferTime;
 

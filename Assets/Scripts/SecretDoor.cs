@@ -24,8 +24,9 @@ public class SecretDoor : MonoBehaviour
 
     void Update()
     {
-        if (!player || !destination || Keyboard.current == null) return;
-        if (Keyboard.current[useKey].wasPressedThisFrame) Use();
+        if (!player || !destination) return;
+        bool keyPressed = Keyboard.current != null && Keyboard.current[useKey].wasPressedThisFrame;
+        if (keyPressed || GameInput.InteractPadPressed) Use(); // use key or controller Y
     }
 
     void Use()

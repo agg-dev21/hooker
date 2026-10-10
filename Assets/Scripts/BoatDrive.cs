@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 
 // A boat the player steers. The player rides on it (their own movement is switched off).
-// A / D (or the arrow keys, or the left stick) move the boat left and right.
+// A / D (or the arrow keys, or the controller's left stick / D-pad) move the boat left and right.
 // When the boat has sailed fully off the right edge of the screen, the screen fades to black and Next Scene loads.
 // Needs a SpriteRenderer (used to know how wide the boat is).
 public class BoatDrive : MonoBehaviour
@@ -73,8 +73,8 @@ public class BoatDrive : MonoBehaviour
             if (kb.aKey.isPressed || kb.leftArrowKey.isPressed) x -= 1f;
             if (kb.dKey.isPressed || kb.rightArrowKey.isPressed) x += 1f;
         }
-        var gp = Gamepad.current;
-        if (gp != null && Mathf.Abs(gp.leftStick.x.ReadValue()) > 0.2f) x = gp.leftStick.x.ReadValue();
+        float pad = GameInput.PadMoveX; // controller: left stick or D-pad
+        if (pad != 0f) x = pad;
         return Mathf.Clamp(x, -1f, 1f);
     }
 }
