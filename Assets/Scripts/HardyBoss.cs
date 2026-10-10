@@ -6,8 +6,9 @@ using UnityEngine;
 // 1) Tentacle Lash: a tentacle shoots along the ground toward the player. Body = less damage, tip = more.
 // 2) Leap + Roll: jumps high and lands near the player (shockwave AOE), then rolls at the player.
 // 3) Spikes: spikes burst out of the ground one after another toward the player.
-// No warning flash: before each attack the boss strikes a short pose (for now the box changes shape;
-// once there is art, it can fire Animator triggers). On death it crumbles into pieces.
+// No warning flash: before each attack the boss strikes a pose. Attacks with art play their sprite frames;
+// attacks without art yet use a placeholder (the box changes shape). Between attacks he walks toward the player.
+// On death he crumbles into pieces.
 // Every value is in the Inspector. Touch damage is the separate ContactDamage script and does not burn.
 // Needs: SpriteRenderer, BoxCollider2D (solid), Rigidbody2D (Kinematic), Health.
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D), typeof(Health))]
@@ -23,10 +24,27 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float restTime = 1.2f;   // pause between attacks
     [SerializeField] GameObject healthBarRoot; // hidden when the boss dies
     [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = fade to this scene
-    [SerializeField] Animator animator;        // optional: pose triggers are sent here once there is art
+    [SerializeField] float sceneAfterDeathDelay = 2f; // seconds to watch him crumble before the fade starts
+    [SerializeField] Animator animator;        // optional: pose triggers are sent here if you use an Animator
+
+    [Header("Art (sprite frames; filled by Tools > Set Up Hardy Art)")]
+    [SerializeField] bool artFacesRight = false;   // the drawings face left
+    [SerializeField] Sprite blockSprite;           // plain square for attacks that have no art yet
+    [SerializeField] Sprite[] walkFrames;          // first frame is also used when standing still
+    [SerializeField] float walkFps = 8f;
+
+    [Header("Touch")]
+    [SerializeField] bool blocksPlayer = false;    // OFF: the player can jump over / pass through him (touching still hurts)
+    [SerializeField] int touchDamage = 10;         // no fire
+    [SerializeField] float touchKnockback = 8f;
+
+    [Header("Walking (between attacks)")]
+    [SerializeField] bool walkBetweenAttacks = true;
+    [SerializeField] float walkSpeed = 2.5f;
+    [SerializeField] float walkStopDistance = 6f;  // stops walking when this close to the player
 
     [Header("Fire (used by attacks that burn)")]
-    [SerializeField] int burnDamage = 1;
+    [SerializeField] int burnDamage = 5;
     [SerializeField] float burnTickInterval = 1f;
     [SerializeField] float burnDuration = 3f;
 
@@ -42,12 +60,17 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float tentacleExtendSpeed = 50f;
     [SerializeField] float tentacleHoldTime = 0.3f;
     [SerializeField] float tentacleRetractSpeed = 30f;
-    [SerializeField] int tentacleBodyDamage = 1;
-    [SerializeField] int tentacleTipDamage = 2;
+    [SerializeField] int tentacleBodyDamage = 10;
+    [SerializeField] int tentacleTipDamage = 20;
     [SerializeField] float tentacleKnockback = 10f;
     [SerializeField] bool tentacleBurns = true;
     [SerializeField] Color tentacleColor = new Color(0.08f, 0.05f, 0.12f);
     [SerializeField] Color tentacleTipColor = new Color(0.15f, 0.08f, 0.2f);
+    [SerializeField] Sprite[] tentacleFxFrames;       // if set, the tentacle plays this animation (drawn growing to the left)
+    [SerializeField] float tentacleFxFps = 18f;
+    [SerializeField] int tentacleHitFirstFrame = 6;   // frames (counting from 0) during which the tentacle can hurt
+    [SerializeField] int tentacleHitLastFrame = 11;
+    [SerializeField] float tentacleFxThicknessScale = 1f; // vertical size of the drawing (length follows Tentacle Length)
 
     [Header("2) Leap + Roll")]
     [SerializeField] bool useLeap = true;
@@ -58,7 +81,7 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float leapDuration = 1f;
     [SerializeField] float leapLandOffset = 3f;       // how far from the player it lands
     [SerializeField] float landingRadius = 3.5f;
-    [SerializeField] int landingDamage = 2;
+    [SerializeField] int landingDamage = 20;
     [SerializeField] float landingKnockback = 12f;
     [SerializeField] bool landingBurns = true;
     [SerializeField] Color shockwaveColor = new Color(1f, 0.45f, 0.1f, 0.5f);
@@ -68,7 +91,7 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] string rollAnimTrigger = "Roll";
     [SerializeField] float rollSpeed = 14f;
     [SerializeField] float rollDistance = 12f;
-    [SerializeField] int rollDamage = 2;
+    [SerializeField] int rollDamage = 20;
     [SerializeField] float rollKnockback = 12f;
     [SerializeField] bool rollBurns = true;
 
@@ -85,16 +108,25 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float spikeHeight = 3f;
     [SerializeField] float spikeRiseSpeed = 30f;
     [SerializeField] float spikeUpTime = 0.4f;
-    [SerializeField] int spikeDamage = 2;
+    [SerializeField] int spikeDamage = 20;
     [SerializeField] float spikeKnockback = 10f;
     [SerializeField] bool spikesBurn = true;
-    [SerializeField] Color spikeColor = new Color(0.1f, 0.05f, 0.15f);
+    [SerializeField] Color spikeColor = new Color(0.1f, 0.05f, 0.15f);   // only used when there is no spike art
+    [SerializeField] Sprite[] spikesPoseFrames;        // if set, this plays instead of the box pose
+    [SerializeField] float spikesPoseFps = 14f;
+    [SerializeField] int spikesPoseLoopFrames = 4;     // the last frames of the pose keep looping while spikes erupt
+    [SerializeField] Sprite[] spikeFxFrames;           // if set, each spike plays this animation
+    [SerializeField] float spikeFxFps = 16f;
+    [SerializeField] int spikeHitFirstFrame = 4;       // frames (counting from 0) during which the spike can hurt
+    [SerializeField] int spikeHitLastFrame = 10;
+    [SerializeField] float spikeFxScale = 1f;
 
     [Header("Death (placeholder: crumbles)")]
     [SerializeField] int crumblePieces = 16;
     [SerializeField] float crumbleForce = 6f;
     [SerializeField] float crumbleLifetime = 1.5f;
     [SerializeField] float crumbleGravity = 2f;
+    [SerializeField] Color crumbleColor = new Color(0.12f, 0.08f, 0.18f);
 
     Rigidbody2D rb;
     BoxCollider2D body;
@@ -105,6 +137,12 @@ public class HardyBoss : MonoBehaviour
     Vector2 baseHalfSize;
     Vector2 pose = Vector2.one;
     bool movingSelf; // leaping or rolling: the boss is moving itself
+    float walkDir;   // -1, 0 or 1 while walking between attacks
+    Sprite[] animFrames;
+    float animFps;
+    bool animLoop;
+    float animTime;
+    bool HasArt => walkFrames != null && walkFrames.Length > 0;
     int lastAttack = -1;
     readonly List<GameObject> spawned = new List<GameObject>();
 
@@ -124,13 +162,76 @@ public class HardyBoss : MonoBehaviour
     {
         PlayerController2D pc = FindFirstObjectByType<PlayerController2D>();
         if (pc) player = pc.transform;
+
+        if (!blocksPlayer && pc)
+        {
+            // The body no longer pushes the player; a trigger hitbox the same size deals touch damage instead
+            foreach (Collider2D c in pc.GetComponentsInChildren<Collider2D>()) Physics2D.IgnoreCollision(c, body);
+            if (TryGetComponent(out ContactDamage contact)) contact.enabled = false;
+            var touch = new GameObject("TouchHitbox");
+            touch.transform.SetParent(transform, false);
+            var touchCol = touch.AddComponent<BoxCollider2D>();
+            touchCol.isTrigger = true;
+            touchCol.size = body.size;
+            touchCol.offset = body.offset;
+            touch.AddComponent<DamageZone>().Setup(touchDamage, touchKnockback, false, 0, 0f, 1f);
+        }
+
         StartCoroutine(FightLoop());
     }
 
     void FixedUpdate()
     {
-        // Stay planted on the ground so punches cannot knock it into the air (except while leaping/rolling)
-        if (!movingSelf) rb.MovePosition(new Vector2(ClampX(rb.position.x), GroundCenterY));
+        // Stay planted on the ground so punches cannot knock it into the air (except while leaping/rolling).
+        // While walking, also step toward the player.
+        if (!movingSelf) rb.MovePosition(new Vector2(ClampX(rb.position.x + walkDir * walkSpeed * Time.fixedDeltaTime), GroundCenterY));
+    }
+
+    // ---------------- Sprite animation ----------------
+    void Update()
+    {
+        if (!sr || animFrames == null || animFrames.Length == 0) return;
+        animTime += Time.deltaTime;
+        int i = Mathf.FloorToInt(animTime * animFps);
+        i = animLoop ? i % animFrames.Length : Mathf.Min(i, animFrames.Length - 1);
+        sr.sprite = animFrames[i];
+    }
+
+    // Plays a set of frames (does nothing if it is already playing them)
+    void Play(Sprite[] frames, float fps, bool loop)
+    {
+        if (frames == null || frames.Length == 0) return;
+        if (frames == animFrames && loop == animLoop) return;
+        animFrames = frames;
+        animFps = Mathf.Max(fps, 0.01f);
+        animLoop = loop;
+        animTime = 0f;
+    }
+
+    Sprite[] idleFrames;
+    void PlayIdle()
+    {
+        if (!HasArt) return;
+        if (idleFrames == null) idleFrames = new[] { walkFrames[0] };
+        Play(idleFrames, 1f, true);
+    }
+
+    // Walks toward the player for this long (stops when close enough), then stands still
+    IEnumerator WalkPhase(float time)
+    {
+        float t = 0f;
+        while (t < time)
+        {
+            t += Time.deltaTime;
+            float dist = player ? Mathf.Abs(player.position.x - rb.position.x) : 0f;
+            bool walk = walkBetweenAttacks && player && dist > walkStopDistance;
+            walkDir = walk ? DirToPlayer : 0f;
+            if (walk) { Face(walkDir); Play(walkFrames, walkFps, true); }
+            else PlayIdle();
+            yield return null;
+        }
+        walkDir = 0f;
+        PlayIdle();
     }
 
     Vector2 HalfSize => new Vector2(baseHalfSize.x * pose.x, baseHalfSize.y * pose.y);
@@ -140,6 +241,7 @@ public class HardyBoss : MonoBehaviour
 
     IEnumerator FightLoop()
     {
+        PlayIdle();
         yield return new WaitForSeconds(startDelay);
 
         while (true)
@@ -158,7 +260,7 @@ public class HardyBoss : MonoBehaviour
             else if (attack == 1) yield return LeapAndRoll();
             else yield return Spikes();
 
-            yield return new WaitForSeconds(restTime);
+            yield return WalkPhase(restTime);
         }
     }
 
@@ -172,6 +274,7 @@ public class HardyBoss : MonoBehaviour
 
     void SetPose(Vector2 scale)
     {
+        if (HasArt) return; // real art: do not squash the drawing
         pose = scale;
         transform.localScale = new Vector3(baseScale.x * scale.x, baseScale.y * scale.y, baseScale.z);
         if (!movingSelf) rb.position = new Vector2(ClampX(rb.position.x), GroundCenterY); // keep feet on the ground
@@ -186,6 +289,14 @@ public class HardyBoss : MonoBehaviour
         float dir = DirToPlayer;
         Face(dir);
         Vector2 start = new Vector2(rb.position.x + dir * HalfSize.x, groundY + tentacleHeight);
+
+        if (tentacleFxFrames != null && tentacleFxFrames.Length > 0)
+        {
+            yield return TentacleArt(start, dir);
+            SetPose(Vector2.one);
+            PlayIdle();
+            yield break;
+        }
 
         GameObject bodyPiece = MakePiece("TentacleBody", tentacleColor, true);
         GameObject tipPiece = MakePiece("TentacleTip", tentacleTipColor, true);
@@ -210,6 +321,43 @@ public class HardyBoss : MonoBehaviour
         Remove(bodyPiece);
         Remove(tipPiece);
         SetPose(Vector2.one);
+    }
+
+    // The tentacle animation. The drawing is stretched to Tentacle Length; the body and tip hitboxes
+    // only hurt between Tentacle Hit First Frame and Tentacle Hit Last Frame.
+    IEnumerator TentacleArt(Vector2 start, float dir)
+    {
+        var fx = new GameObject("TentacleFX");
+        fx.transform.position = start;
+        var fxSr = fx.AddComponent<SpriteRenderer>();
+        fxSr.sortingOrder = 3;
+        fxSr.sprite = tentacleFxFrames[0];
+        float drawnLength = Mathf.Max(fxSr.sprite.bounds.size.x, 0.01f);
+        // The drawing grows to the left from its pivot; flip it (negative x) to grow to the right
+        fx.transform.localScale = new Vector3(-dir * tentacleLength / drawnLength, tentacleFxThicknessScale, 1f);
+        spawned.Add(fx);
+
+        GameObject bodyPiece = MakePiece("TentacleBodyHitbox", Color.clear, true);
+        GameObject tipPiece = MakePiece("TentacleTipHitbox", Color.clear, true);
+        var bodyZone = bodyPiece.GetComponent<DamageZone>();
+        var tipZone = tipPiece.GetComponent<DamageZone>();
+        bodyZone.Setup(tentacleBodyDamage, tentacleKnockback, tentacleBurns, burnDamage, burnDuration, burnTickInterval);
+        tipZone.Setup(tentacleTipDamage, tentacleKnockback, tentacleBurns, burnDamage, burnDuration, burnTickInterval);
+        PlaceTentacle(bodyPiece, tipPiece, start, dir, tentacleLength);
+
+        float fps = Mathf.Max(tentacleFxFps, 0.01f);
+        for (int i = 0; i < tentacleFxFrames.Length; i++)
+        {
+            fxSr.sprite = tentacleFxFrames[i];
+            bool hurts = i >= tentacleHitFirstFrame && i <= tentacleHitLastFrame;
+            bodyZone.Active = hurts;
+            tipZone.Active = hurts;
+            yield return new WaitForSeconds(1f / fps);
+        }
+
+        Remove(fx);
+        Remove(bodyPiece);
+        Remove(tipPiece);
     }
 
     void PlaceTentacle(GameObject bodyPiece, GameObject tipPiece, Vector2 start, float dir, float length)
@@ -285,7 +433,17 @@ public class HardyBoss : MonoBehaviour
     IEnumerator Spikes()
     {
         Face(DirToPlayer);
-        yield return Pose(spikesPoseScale, spikesPoseTime, spikesAnimTrigger);
+        if (spikesPoseFrames != null && spikesPoseFrames.Length > 0)
+        {
+            // Play the pose once, then keep looping its last frames while the spikes erupt
+            Play(spikesPoseFrames, spikesPoseFps, false);
+            yield return new WaitForSeconds(spikesPoseFrames.Length / Mathf.Max(spikesPoseFps, 0.01f));
+            int loopCount = Mathf.Clamp(spikesPoseLoopFrames, 1, spikesPoseFrames.Length);
+            var tail = new Sprite[loopCount];
+            System.Array.Copy(spikesPoseFrames, spikesPoseFrames.Length - loopCount, tail, 0, loopCount);
+            Play(tail, spikesPoseFps, true);
+        }
+        else yield return Pose(spikesPoseScale, spikesPoseTime, spikesAnimTrigger);
 
         float dir = DirToPlayer;
         float x = rb.position.x + dir * (HalfSize.x + spikeStartDistance);
@@ -297,12 +455,22 @@ public class HardyBoss : MonoBehaviour
             yield return new WaitForSeconds(spikeInterval);
         }
 
-        yield return new WaitForSeconds(spikeUpTime + spikeHeight / Mathf.Max(spikeRiseSpeed, 0.01f));
+        float spikeLife = spikeFxFrames != null && spikeFxFrames.Length > 0
+            ? spikeFxFrames.Length / Mathf.Max(spikeFxFps, 0.01f)
+            : spikeUpTime + spikeHeight / Mathf.Max(spikeRiseSpeed, 0.01f);
+        yield return new WaitForSeconds(spikeLife);
         SetPose(Vector2.one);
+        PlayIdle();
     }
 
     IEnumerator OneSpike(float x)
     {
+        if (spikeFxFrames != null && spikeFxFrames.Length > 0)
+        {
+            yield return OneSpikeArt(x);
+            yield break;
+        }
+
         GameObject spike = MakePiece("Spike", spikeColor, true);
         spike.GetComponent<DamageZone>().Setup(spikeDamage, spikeKnockback, spikesBurn, burnDamage, burnDuration, burnTickInterval);
 
@@ -315,6 +483,34 @@ public class HardyBoss : MonoBehaviour
         }
         yield return new WaitForSeconds(spikeUpTime);
         Remove(spike);
+    }
+
+    // A spike that plays the spike animation. The hitbox (Spike Width x Spike Height) only hurts
+    // between Spike Hit First Frame and Spike Hit Last Frame.
+    IEnumerator OneSpikeArt(float x)
+    {
+        var fx = new GameObject("SpikeFX");
+        fx.transform.position = new Vector3(x, groundY, 0f);
+        fx.transform.localScale = Vector3.one * spikeFxScale;
+        var fxSr = fx.AddComponent<SpriteRenderer>();
+        fxSr.sortingOrder = 3;
+        spawned.Add(fx);
+
+        GameObject hit = MakePiece("SpikeHitbox", Color.clear, true);
+        SetBox(hit, new Vector2(x, groundY + spikeHeight * 0.5f), new Vector2(spikeWidth, spikeHeight));
+        var zone = hit.GetComponent<DamageZone>();
+        zone.Setup(spikeDamage, spikeKnockback, spikesBurn, burnDamage, burnDuration, burnTickInterval);
+
+        float fps = Mathf.Max(spikeFxFps, 0.01f);
+        for (int i = 0; i < spikeFxFrames.Length; i++)
+        {
+            fxSr.sprite = spikeFxFrames[i];
+            zone.Active = i >= spikeHitFirstFrame && i <= spikeHitLastFrame;
+            yield return new WaitForSeconds(1f / fps);
+        }
+
+        Remove(fx);
+        Remove(hit);
     }
 
     // ---------------- Helpers ----------------
@@ -342,7 +538,7 @@ public class HardyBoss : MonoBehaviour
     {
         var go = new GameObject(name);
         var pieceSr = go.AddComponent<SpriteRenderer>();
-        pieceSr.sprite = sr ? sr.sprite : null;
+        pieceSr.sprite = blockSprite ? blockSprite : (sr ? sr.sprite : null);
         pieceSr.color = color;
         pieceSr.sortingOrder = 3;
         if (hurts)
@@ -380,7 +576,7 @@ public class HardyBoss : MonoBehaviour
 
     void Face(float dir)
     {
-        if (sr) sr.flipX = dir < 0f;
+        if (sr && dir != 0f) sr.flipX = artFacesRight ? dir < 0f : dir > 0f;
     }
 
     // ---------------- Death: crumbles (placeholder) ----------------
@@ -399,8 +595,8 @@ public class HardyBoss : MonoBehaviour
             float s = Random.Range(0.3f, 0.7f);
             piece.transform.localScale = new Vector3(s, s, 1f);
             var psr = piece.AddComponent<SpriteRenderer>();
-            psr.sprite = sr ? sr.sprite : null;
-            psr.color = sr ? sr.color : Color.black;
+            psr.sprite = blockSprite ? blockSprite : (sr ? sr.sprite : null);
+            psr.color = crumbleColor;
             psr.sortingOrder = 3;
             var prb = piece.AddComponent<Rigidbody2D>();
             prb.gravityScale = crumbleGravity;
@@ -409,7 +605,7 @@ public class HardyBoss : MonoBehaviour
             Destroy(piece, crumbleLifetime);
         }
 
-        if (!string.IsNullOrEmpty(sceneAfterDeath)) ScreenFade.FadeToScene(sceneAfterDeath);
+        if (!string.IsNullOrEmpty(sceneAfterDeath)) ScreenFade.FadeToScene(sceneAfterDeath, 0.6f, 0.6f, sceneAfterDeathDelay);
     }
 
     void OnDrawGizmosSelected()

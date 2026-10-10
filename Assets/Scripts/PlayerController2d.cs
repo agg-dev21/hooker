@@ -11,12 +11,14 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float airControl = 0.65f;
 
     [Header("Jump")]
-    [SerializeField] float jumpForce = 15f;
-    [SerializeField, Range(0f, 1f)] float jumpCutMultiplier = 0.5f;
+    [SerializeField] float gravity = 5f;         // player's gravity (higher = snappier jumps and falls)
+    [SerializeField] float jumpForce = 19.5f;
+    [SerializeField, Range(0f, 1f)] float jumpCutMultiplier = 0.4f;    // let go early: rising speed is cut to this (short hop)
+    [SerializeField, Range(0.1f, 1f)] float jumpHoldGravity = 0.6f;    // holding jump while rising: gravity times this (big jump, about 6 tiles)
     [SerializeField] float coyoteTime = 0.1f;
     [SerializeField] float jumpBufferTime = 0.12f;
     [SerializeField] float fallGravityMultiplier = 1.8f;
-    [SerializeField] float maxFallSpeed = 20f;
+    [SerializeField] float maxFallSpeed = 26f;
 
     [Header("Dash")]
     [SerializeField] float dashSpeed = 20f;
@@ -27,11 +29,13 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] Transform groundCheck;
     [SerializeField] Vector2 groundCheckSize = new Vector2(0.5f, 0.1f);
     [SerializeField] LayerMask groundLayer;
+    [SerializeField] bool standOnAnything = true; // ON: crates, barrels, cannons, enemies and bosses count as ground too
 
     Rigidbody2D rb;
     Health health;
     float baseGravity;
     float moveInput;
+    bool jumpHeld;
     bool isGrounded;
     float coyoteCounter;
     float jumpBufferCounter;
@@ -49,7 +53,8 @@ public class PlayerController2D : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         health = GetComponent<Health>();
-        baseGravity = rb.gravityScale;
+        rb.gravityScale = gravity;
+        baseGravity = gravity;
         rb.freezeRotation = true;
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
@@ -63,7 +68,7 @@ public class PlayerController2D : MonoBehaviour
     void Update()
     {
         Vector2 checkPos = groundCheck ? (Vector2)groundCheck.position : (Vector2)transform.position;
-        isGrounded = Physics2D.OverlapBox(checkPos, groundCheckSize, 0f, groundLayer);
+        isGrounded = standOnAnything ? TouchingSolid(checkPos) : Physics2D.OverlapBox(checkPos, groundCheckSize, 0f, groundLayer);
 
         coyoteCounter = isGrounded ? coyoteTime : coyoteCounter - Time.deltaTime;
         jumpBufferCounter -= Time.deltaTime;
@@ -100,7 +105,10 @@ public class PlayerController2D : MonoBehaviour
         float newY = Mathf.Max(rb.linearVelocity.y, -maxFallSpeed);
         rb.linearVelocity = new Vector2(newX, newY);
 
-        rb.gravityScale = rb.linearVelocity.y < 0f ? baseGravity * fallGravityMultiplier : baseGravity;
+        // Falling: heavier. Rising while holding jump: lighter, so holding gives a bigger jump.
+        if (rb.linearVelocity.y < 0f) rb.gravityScale = baseGravity * fallGravityMultiplier;
+        else if (jumpHeld) rb.gravityScale = baseGravity * jumpHoldGravity;
+        else rb.gravityScale = baseGravity;
     }
 
     void ReadInput()
@@ -123,6 +131,7 @@ public class PlayerController2D : MonoBehaviour
 
         bool jumpPressed  = (kb != null && kb.spaceKey.wasPressedThisFrame)  || (gp != null && gp.buttonSouth.wasPressedThisFrame);
         bool jumpReleased = (kb != null && kb.spaceKey.wasReleasedThisFrame) || (gp != null && gp.buttonSouth.wasReleasedThisFrame);
+        jumpHeld = (kb != null && kb.spaceKey.isPressed) || (gp != null && gp.buttonSouth.isPressed);
         bool dashPressed  = (kb != null && kb.leftShiftKey.wasPressedThisFrame) || (gp != null && gp.buttonEast.wasPressedThisFrame);
 
         if (jumpPressed) jumpBufferCounter = jumpBufferTime;
@@ -159,6 +168,14 @@ public class PlayerController2D : MonoBehaviour
         Vector3 s = transform.localScale;
         s.x = Mathf.Abs(s.x) * dir;
         transform.localScale = s;
+    }
+
+    // Is there any solid (non-trigger) collider under the feet that is not part of the player?
+    bool TouchingSolid(Vector2 checkPos)
+    {
+        foreach (Collider2D hit in Physics2D.OverlapBoxAll(checkPos, groundCheckSize, 0f))
+            if (!hit.isTrigger && !hit.transform.IsChildOf(transform)) return true;
+        return false;
     }
 
     void OnDrawGizmosSelected()

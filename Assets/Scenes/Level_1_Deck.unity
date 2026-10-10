@@ -380,7 +380,23 @@ MonoBehaviour:
   restTime: 1.2
   healthBarRoot: {fileID: 877147099}
   sceneAfterDeath: 
+  sceneAfterDeathDelay: 2
   animator: {fileID: 0}
+  artFacesRight: 0
+  blockSprite: {fileID: 7482667652216324306, guid: 241043a192bb9224c8c879ef7e08a292, type: 3}
+  walkFrames:
+  - {fileID: -1307678714, guid: e511c79007be76646b2768ed5a4b7c0c, type: 3}
+  - {fileID: -1210127367, guid: e511c79007be76646b2768ed5a4b7c0c, type: 3}
+  - {fileID: 444912449, guid: e511c79007be76646b2768ed5a4b7c0c, type: 3}
+  - {fileID: -1190308522, guid: e511c79007be76646b2768ed5a4b7c0c, type: 3}
+  - {fileID: -1453219543, guid: e511c79007be76646b2768ed5a4b7c0c, type: 3}
+  walkFps: 8
+  blocksPlayer: 0
+  touchDamage: 10
+  touchKnockback: 8
+  walkBetweenAttacks: 1
+  walkSpeed: 2.5
+  walkStopDistance: 6
   burnDamage: 1
   burnTickInterval: 1
   burnDuration: 3
@@ -401,6 +417,25 @@ MonoBehaviour:
   tentacleBurns: 1
   tentacleColor: {r: 0.08, g: 0.05, b: 0.12, a: 1}
   tentacleTipColor: {r: 0.15, g: 0.08, b: 0.2, a: 1}
+  tentacleFxFrames:
+  - {fileID: -1054569958, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 580456078, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 1591728569, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 2093903008, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 1947930892, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 232141404, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: -710099588, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: -387831952, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 1937309744, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 1368735338, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: -999351690, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: -590770491, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: -1059782243, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  - {fileID: 1980184316, guid: 0a4b4ef738325c545908e67e41c50146, type: 3}
+  tentacleFxFps: 18
+  tentacleHitFirstFrame: 6
+  tentacleHitLastFrame: 11
+  tentacleFxThicknessScale: 1
   useLeap: 1
   leapPoseTime: 0.1
   leapPoseScale: {x: 1.2, y: 0.7}
@@ -430,18 +465,47 @@ MonoBehaviour:
   spikeStartDistance: 2
   spikeSpacing: 2.2
   spikeInterval: 0.15
-  spikeWidth: 1
-  spikeHeight: 3
+  spikeWidth: 1.4
+  spikeHeight: 3.8
   spikeRiseSpeed: 30
   spikeUpTime: 0.4
   spikeDamage: 2
   spikeKnockback: 10
   spikesBurn: 1
   spikeColor: {r: 0.1, g: 0.05, b: 0.15, a: 1}
+  spikesPoseFrames:
+  - {fileID: -883408665, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: -403792011, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: -863162819, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: 1282687624, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: -669646808, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: 1209409498, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: 584402009, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  - {fileID: -840260377, guid: 31cf6027ed53bd44193c62bef83964e9, type: 3}
+  spikesPoseFps: 14
+  spikesPoseLoopFrames: 4
+  spikeFxFrames:
+  - {fileID: -608447410, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: -438229768, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: 1221563680, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: 606303151, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: 970271730, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: 638343741, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: -68006423, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: -330983110, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: -1030711538, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: -1225127065, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: -407647449, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  - {fileID: 1591798276, guid: 5048fb7f4da46114fb5669e394ad81df, type: 3}
+  spikeFxFps: 16
+  spikeHitFirstFrame: 4
+  spikeHitLastFrame: 10
+  spikeFxScale: 1
   crumblePieces: 16
   crumbleForce: 6
   crumbleLifetime: 1.5
   crumbleGravity: 2
+  crumbleColor: {r: 0.12, g: 0.08, b: 0.18, a: 1}
 --- !u!114 &463069176
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -544,13 +608,13 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1, y: 1}
+    oldSize: {x: 4.4444447, y: 4.4444447}
     newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 2.4, y: 4}
   m_EdgeRadius: 0
 --- !u!212 &463069180
 SpriteRenderer:
@@ -601,8 +665,8 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 1
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 241043a192bb9224c8c879ef7e08a292, type: 3}
-  m_Color: {r: 0.1, g: 0.08, b: 0.15, a: 1}
+  m_Sprite: {fileID: -1307678714, guid: e511c79007be76646b2768ed5a4b7c0c, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -622,7 +686,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 50, y: -3, z: 0}
-  m_LocalScale: {x: 3, y: 4, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3822,12 +3886,13 @@ MonoBehaviour:
   acceleration: 70
   deceleration: 80
   airControl: 0.65
-  jumpForce: 15
-  jumpCutMultiplier: 0.5
+  jumpForce: 19.5
+  jumpCutMultiplier: 0.4
+  jumpHoldGravity: 0.6
   coyoteTime: 0.1
   jumpBufferTime: 0.12
   fallGravityMultiplier: 1.8
-  maxFallSpeed: 20
+  maxFallSpeed: 26
   dashSpeed: 20
   dashDuration: 0.15
   dashCooldown: 0.4
@@ -3836,6 +3901,7 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  standOnAnything: 1
 --- !u!114 &1367096555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3914,8 +3980,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376bd9221049ccb43b16b9e21e78fe05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
-  punchDistance: 0.9
-  punchRadius: 0.5
+  punchDistance: 1.6
+  punchRadius: 0.8
   punchDamage: 1
   punchCooldown: 0.12
   punchKnockback: 0.3

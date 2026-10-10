@@ -2376,12 +2376,12 @@ MonoBehaviour:
   acceleration: 70
   deceleration: 80
   airControl: 0.65
-  jumpForce: 15
-  jumpCutMultiplier: 0.5
+  jumpForce: 19.5
+  jumpCutMultiplier: 0.4
   coyoteTime: 0.1
   jumpBufferTime: 0.12
   fallGravityMultiplier: 1.8
-  maxFallSpeed: 20
+  maxFallSpeed: 26
   dashSpeed: 20
   dashDuration: 0.15
   dashCooldown: 0.4
@@ -2466,8 +2466,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 376bd9221049ccb43b16b9e21e78fe05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerCombat
-  punchDistance: 0.9
-  punchRadius: 0.5
+  punchDistance: 1.6
+  punchRadius: 0.8
   punchDamage: 1
   punchCooldown: 0.12
   punchKnockback: 0.3

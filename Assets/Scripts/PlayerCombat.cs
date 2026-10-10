@@ -8,8 +8,8 @@ using UnityEngine.InputSystem;
 public class PlayerCombat : MonoBehaviour
 {
     [Header("Punch (Left Click)")]
-    [SerializeField] float punchDistance = 0.9f;  // how far from the player (toward the mouse) the punch lands
-    [SerializeField] float punchRadius = 0.5f;
+    [SerializeField] float punchDistance = 1.6f;  // how far from the player (toward the mouse) the punch lands
+    [SerializeField] float punchRadius = 0.8f;
     [SerializeField] int punchDamage = 1;
     [SerializeField] float punchCooldown = 0.12f;
     [SerializeField] float punchKnockback = 0.3f; // how far enemies get pushed back

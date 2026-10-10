@@ -8,7 +8,7 @@ public class ExplodingBarrel : MonoBehaviour
 {
     [SerializeField] float fuseTime = 0.8f;     // seconds from touch to explosion
     [SerializeField] float radius = 3f;
-    [SerializeField] int damage = 3;
+    [SerializeField] int damage = 25;
     [SerializeField] float knockback = 14f;
     [SerializeField] float knockbackUp = 0.5f;    // how much of the knockback goes upward
     [SerializeField] float fuseFlashSpeed = 10f;

@@ -13,8 +13,14 @@ public class SecretDoor : MonoBehaviour
     [SerializeField] bool entersRoom = true;
     [SerializeField] Vector2 roomMin;   // bottom-left corner of the room (for the camera)
     [SerializeField] Vector2 roomMax;   // top-right corner of the room (for the camera)
+    [SerializeField] GameObject prompt; // "Press E" pop-up, shown while the player is at the door
 
     Transform player;
+
+    void Awake()
+    {
+        if (prompt) prompt.SetActive(false);
+    }
 
     void Update()
     {
@@ -34,16 +40,21 @@ public class SecretDoor : MonoBehaviour
             else cam.ClearBoundsOverride();
         }
         player = null; // the player is no longer at this door
+        if (prompt) prompt.SetActive(false);
     }
 
     void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.TryGetComponent(out PlayerController2D _)) player = other.transform;
+        if (!other.TryGetComponent(out PlayerController2D _)) return;
+        player = other.transform;
+        if (prompt) prompt.SetActive(true);
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.TryGetComponent(out PlayerController2D _)) player = null;
+        if (!other.TryGetComponent(out PlayerController2D _)) return;
+        player = null;
+        if (prompt) prompt.SetActive(false);
     }
 
     void OnDrawGizmosSelected()

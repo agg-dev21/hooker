@@ -198,11 +198,11 @@ public static class TutorialRoomBuilder
         built.Add(room);
     }
 
-    // Room 2: a 2-tile wall, then 3 floating step platforms (up, up, down)
+    // Room 2: a 5-tile wall (too high for a tap jump: hold Space), then 3 floating step platforms (up, up, down)
     static void JumpRoom(Tilemap map, Transform parent)
     {
         TileBase tile = FirstTile(map);
-        FillTiles(map, tile, -4, -3, 1, 2, true);  // wall: x -4, 2 tall on the floor
+        FillTiles(map, tile, -4, -3, 1, JumpWallHeight, true);  // wall: x -4, on the floor
         FillTiles(map, tile, 0, -1, 2, 1, true);   // step 1
         FillTiles(map, tile, 3, 1, 2, 1, true);    // step 2 (higher)
         FillTiles(map, tile, 6, -1, 2, 1, true);   // step 3 (back down)
@@ -278,12 +278,40 @@ public static class TutorialRoomBuilder
     static readonly (string room, string text)[] GuideTexts =
     {
         ("Tutorial_1_Move", "A / D to move"),
-        ("Tutorial_2_Jump", "SPACE to jump"),
+        ("Tutorial_2_Jump", JumpTutorialText),
         ("Tutorial_3_Dash", "Jump, then SHIFT to dash"),
         ("Tutorial_4_Punch", "LEFT CLICK to punch"),
         ("Tutorial_5_Hook", "RIGHT CLICK to hook"),
         ("Tutorial_6_DashThroughBullets", "SHIFT to dash through bullets"),
     };
+
+    const int JumpWallHeight = 5;
+    const string JumpTutorialText = "SPACE to jump\nHold SPACE to jump higher";
+
+    // Updates the existing Jump room: makes its first wall 5 tall and changes its guide text.
+    [MenuItem("Tools/Update Jump Tutorial")]
+    static void UpdateJumpTutorial()
+    {
+        string path = ScenePath("Tutorial_2_Jump");
+        if (!File.Exists(path)) return;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+
+        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+        Tilemap map = FindGroundTilemap();
+        FillTiles(map, FirstTile(map), -4, -3, 1, JumpWallHeight, true);
+        RebuildColliders(map);
+
+        GameObject guide = GameObject.Find(GuideTextName);
+        if (guide && guide.TryGetComponent(out TMPro.TextMeshPro text))
+        {
+            text.text = JumpTutorialText;
+            guide.transform.position = new Vector3(-7f, 3.5f, 0f); // above the start, clear of the tall wall
+        }
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        EditorUtility.DisplayDialog("Update Jump Tutorial", "Tutorial_2_Jump now has a 5-tall wall and the 'hold to jump higher' text.", "OK");
+    }
 
     [MenuItem("Tools/Build Tutorial Text")]
     static void BuildGuideText()
@@ -449,9 +477,18 @@ public static class TutorialRoomBuilder
     const int FloorSpacing = 15;               // one screen per floor
     const int Floors = 4;                   // floors 0..3. The ring in the top ceiling leads to the deck scene.
     const string DeckSceneName = "Level_1_Deck";
+    const string SailSceneName = "Level_1_Sail";
+    const string NextLevelName = "Level_2";
     const int DeckLeft = -14, DeckRight = 66; // deck railing columns: 3 screens long (inside x -13 to 66)
     const int FloorInside = 13;             // open space from floor to ceiling
     static readonly Color RingColor = new Color(1f, 0.85f, 0.1f);
+
+    // Hazard damage in Level 1 (the player has 100 health). Change these and rebuild, or edit each object.
+    const int TendrilDamage = 1;
+    const int BarrelDamage = 25;
+    const int CannonTouchDamage = 5;
+    const int CannonBallDamage = 5;
+    const string CannonBallPrefab = "Assets/Prefabs/CannonBall.prefab";
     static readonly Color CrateColor = new Color(0.6f, 0.4f, 0.2f);
     static readonly Color CannonColor = new Color(0.25f, 0.25f, 0.25f);
     static readonly Color CheckpointColor = new Color(0.9f, 0.9f, 0.1f);
@@ -553,10 +590,23 @@ public static class TutorialRoomBuilder
         MakeCrateStack("CrateStack_F1b", obstacles, map, 22f, t, 3);
         MakeTendril("Tendril_F1b", obstacles, map, new Vector2(27f, t + FloorInside), Vector2.down, FloorInside, 0.8f);
         MakeTendril("Tendril_F1c", obstacles, map, new Vector2(30f, t + FloorInside), Vector2.down, FloorInside, 1.6f);
+        // third screen: dash pit, low beam, barrels, ceiling tendril
+        FillTiles(map, null, 41, bottom, 8, 1, false);    // pit (jump + dash)
+        MakeKillZone("KillZone_F1b", obstacles, new Vector2(45f, bottom - 1.5f), new Vector2(10f, 1f));
+        FillTiles(map, tile, 51, t + 3, 3, FloorInside - 3, true); // low beam
+        MakeBarrel("Barrel_F1b", obstacles, map, new Vector2(56.5f, t + 0.6f));
+        MakeBarrel("Barrel_F1c", obstacles, map, new Vector2(57.5f, t + 0.6f));
+        MakeTendril("Tendril_F1d", obstacles, map, new Vector2(59.5f, t + FloorInside), Vector2.down, FloorInside, 0.4f);
 
         // Floor 2 (arrive right, hole up on the left):
-        // 3-tall wall, row of barrels to jump over, ceiling cannon, two tendrils, another 3-tall wall, low beam, wall cannon
+        // third screen: tendrils bursting from the floor, crate stack, ceiling cannon, gap (falls to floor 1)
+        // then: 3-tall wall, row of barrels to jump over, ceiling cannon, two tendrils, another 3-tall wall, low beam, wall cannon
         t = FloorTop(1);
+        MakeTendril("Tendril_F2c", obstacles, map, new Vector2(57.5f, t), Vector2.up, 6f, 0f);
+        MakeTendril("Tendril_F2d", obstacles, map, new Vector2(54.5f, t), Vector2.up, 6f, 0.6f);
+        MakeCrateStack("CrateStack_F2", obstacles, map, 50f, t, 3);
+        MakeCannon("Cannon_F2_Ceiling2", obstacles, map, new Vector2(45.5f, t + FloorInside - 0.5f));
+        FillTiles(map, null, 41, t - 2, 4, 2, false);     // gap
         FillTiles(map, tile, 30, t, 1, 3, true);          // 3-tall wall
         MakeBarrel("Barrel_F2a", obstacles, map, new Vector2(25.5f, t + 0.6f));
         MakeBarrel("Barrel_F2b", obstacles, map, new Vector2(24.5f, t + 0.6f));
@@ -571,7 +621,7 @@ public static class TutorialRoomBuilder
         // platform up onto a tall wall, gap (falls to floor 2), tendrils bursting up from the floor,
         // barrel next to a crate stack, second gap, cannon on the right wall
         t = FloorTop(2);
-        FillTiles(map, tile, -7, t + 2, 3, 1, true);      // platform, top 3 above the floor
+        FillTiles(map, tile, -7, t + 2, 4, 1, true);      // platform, top 3 above the floor, touching the wall (no 1-tile gap to get stuck in)
         FillTiles(map, tile, -3, t, 1, 6, true);          // 6-tall wall, only reachable from the platform
         FillTiles(map, null, 2, t - 2, 3, 2, false);      // gap
         MakeTendril("Tendril_F3a", obstacles, map, new Vector2(10f, t), Vector2.up, 6f, 0f);
@@ -580,6 +630,14 @@ public static class TutorialRoomBuilder
         MakeCrateStack("CrateStack_F3", obstacles, map, 22f, t, 3);
         FillTiles(map, null, 26, t - 2, 4, 2, false);     // second gap
         MakeCannon("Cannon_F3", obstacles, map, new Vector2(WallRight - 0.5f, t + 1f));
+        // third screen: wide gap with two floating platforms, two ceiling tendrils, barrel next to a crate stack
+        FillTiles(map, null, 40, t - 2, 9, 2, false);     // wide gap (falls to floor 2)
+        FillTiles(map, tile, 42, t + 2, 2, 1, true);      // floating platform
+        FillTiles(map, tile, 46, t + 2, 2, 1, true);      // floating platform
+        MakeTendril("Tendril_F3c", obstacles, map, new Vector2(52f, t + FloorInside), Vector2.down, FloorInside, 0f);
+        MakeTendril("Tendril_F3d", obstacles, map, new Vector2(54.5f, t + FloorInside), Vector2.down, FloorInside, 0.7f);
+        MakeBarrel("Barrel_F3b", obstacles, map, new Vector2(56.5f, t + 0.6f));
+        MakeCrateStack("CrateStack_F3b", obstacles, map, 58.5f, t, 3);
 
         // Floor 4 (arrive right, hole up on the left):
         // gap (falls to floor 3), crate stack, barrels under a tendril, sideways tendril sweeping the floor near the hole,
@@ -594,6 +652,13 @@ public static class TutorialRoomBuilder
         MakeTendril("Tendril_F4b", obstacles, map, new Vector2(-13f, t + 1f), Vector2.right, 10f, 0.5f); // sweeps the floor
         MakeCannon("Cannon_F4_Left", obstacles, map, new Vector2(-12.5f, t + 6f));
         MakeCannon("Cannon_F4_Right", obstacles, map, new Vector2(WallRight - 0.5f, t + 8f));
+        // third screen: barrels, two ceiling tendrils, gap (falls to floor 3, maybe further), crate stack
+        MakeBarrel("Barrel_F4c", obstacles, map, new Vector2(56.5f, t + 0.6f));
+        MakeBarrel("Barrel_F4d", obstacles, map, new Vector2(55.5f, t + 0.6f));
+        MakeTendril("Tendril_F4c", obstacles, map, new Vector2(52f, t + FloorInside), Vector2.down, FloorInside, 0f);
+        MakeTendril("Tendril_F4d", obstacles, map, new Vector2(49f, t + FloorInside), Vector2.down, FloorInside, 0.6f);
+        FillTiles(map, null, 43, t - 2, 4, 2, false);     // gap
+        MakeCrateStack("CrateStack_F4b", obstacles, map, 39f, t, 3);
 
         // ---- Secret rooms: outside the ship, one per floor, reached through a visible but hard-to-reach door ----
         var secrets = new GameObject("SecretRooms").transform;
@@ -610,17 +675,21 @@ public static class TutorialRoomBuilder
         cornerHook.FindProperty("launchSpeed").floatValue = 2f; // just drop onto the ledge
         cornerHook.ApplyModifiedPropertiesWithoutUndo();
         MakeOutsideRoom(0, secrets, map, tile, new Vector2(-12.4f, t + 10.1f));
+        MakeTendril("Guard_F1", secrets, map, new Vector2(-13f, t + 10.2f), Vector2.right, 4f, 0.3f); // sweeps the ledge
 
         // Floor 2: door on the 1-tile strip between the hole down and the right wall (miss and you fall)
         MakeOutsideRoom(1, secrets, map, tile, new Vector2(WallRight - 0.5f, FloorTop(1) + 1.1f));
+        MakeTendril("Guard_F2", secrets, map, new Vector2(WallRight - 0.5f, FloorTop(1) + FloorInside), Vector2.down, FloorInside, 0.9f); // drops onto the strip
 
         // Floor 3: door on a high ledge in the right corner, reached by jumping off the cannon
         t = FloorTop(2);
-        FillTiles(map, tile, 62, t + 4, 3, 1, true); // ledge
-        MakeOutsideRoom(2, secrets, map, tile, new Vector2(63.5f, t + 6.1f));
+        FillTiles(map, tile, 62, t + 4, 2, 1, true); // ledge (leaves a 2-tile gap by the wall so you cannot get stuck)
+        MakeOutsideRoom(2, secrets, map, tile, new Vector2(63f, t + 6.1f));
+        MakeTendril("Guard_F3", secrets, map, new Vector2(WallRight, t + 6.2f), Vector2.left, 4f, 0.5f); // sweeps the ledge
 
         // Floor 4: door at the bottom of the left wall, right where the sideways tendril comes out
         MakeOutsideRoom(3, secrets, map, tile, new Vector2(-12.4f, FloorTop(3) + 1.1f));
+        MakeBarrel("Guard_F4", secrets, map, new Vector2(-10.5f, FloorTop(3) + 0.6f)); // jump over it without touching it
 
         RebuildColliders(map);
 
@@ -773,7 +842,9 @@ public static class TutorialRoomBuilder
         var hardyHealth = new SerializedObject(hardy.GetComponent<Health>());
         hardyHealth.FindProperty("flashOnHit").boolValue = false; // no hit flash on Hardy
         hardyHealth.ApplyModifiedPropertiesWithoutUndo();
-        hardy.AddComponent<ContactDamage>(); // touch damage, no fire
+        var hardyTouch = new SerializedObject(hardy.AddComponent<ContactDamage>()); // touch damage, no fire
+        hardyTouch.FindProperty("damage").intValue = 10;
+        hardyTouch.ApplyModifiedPropertiesWithoutUndo();
         var boss = hardy.AddComponent<HardyBoss>();
 
         // Boss health bar, top middle of the screen
@@ -831,6 +902,7 @@ public static class TutorialRoomBuilder
         bossSo.FindProperty("arenaMinX").floatValue = DeckLeft + 1;
         bossSo.FindProperty("arenaMaxX").floatValue = DeckRight;
         bossSo.FindProperty("healthBarRoot").objectReferenceValue = barRoot;
+        bossSo.FindProperty("sceneAfterDeath").stringValue = SailSceneName;
         bossSo.ApplyModifiedPropertiesWithoutUndo();
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -888,6 +960,140 @@ public static class TutorialRoomBuilder
         exit.FindProperty("destination").objectReferenceValue = back;
         exit.FindProperty("entersRoom").boolValue = false;
         exit.ApplyModifiedPropertiesWithoutUndo();
+
+        AddPrompt(entrance, entrance.GetComponent<SecretDoor>());
+        AddPrompt(exitDoor, exitDoor.GetComponent<SecretDoor>());
+        AddPrompt(chest, chest.GetComponent<Chest>());
+    }
+
+    // ---------------- "Press E" pop-ups ----------------
+    // Adds a "Press E" text above every SecretDoor and Chest in the open scene that does not have one yet.
+
+    [MenuItem("Tools/Add Press E Pop-ups")]
+    static void AddPromptsToScene()
+    {
+        int added = 0;
+        foreach (SecretDoor door in Object.FindObjectsByType<SecretDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (AddPrompt(door.gameObject, door)) added++;
+        foreach (Chest chest in Object.FindObjectsByType<Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (AddPrompt(chest.gameObject, chest)) added++;
+
+        if (added > 0) EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
+        EditorUtility.DisplayDialog("Add Press E Pop-ups", "Added " + added + " pop-ups. Press Ctrl + S to save the scene.", "OK");
+    }
+
+    // Puts a "Press E" text just above the object and links it to the component's Prompt slot.
+    // The text is a sibling (not a child) so it does not get stretched by the object's scale.
+    static bool AddPrompt(GameObject target, Component owner)
+    {
+        var so = new SerializedObject(owner);
+        var promptProp = so.FindProperty("prompt");
+        if (promptProp == null || promptProp.objectReferenceValue) return false;
+
+        var go = new GameObject(target.name + "_PressE");
+        go.transform.SetParent(target.transform.parent, false);
+        var bounds = target.GetComponent<SpriteRenderer>() ? target.GetComponent<SpriteRenderer>().bounds : new Bounds(target.transform.position, Vector3.one);
+        go.transform.position = new Vector3(bounds.center.x, bounds.max.y + 0.6f, 0f);
+        var text = go.AddComponent<TMPro.TextMeshPro>();
+        text.text = "Press E";
+        text.fontSize = 4;
+        text.alignment = TMPro.TextAlignmentOptions.Center;
+        text.color = Color.white;
+        text.rectTransform.sizeDelta = new Vector2(4f, 1f);
+        text.GetComponent<MeshRenderer>().sortingOrder = 20;
+        go.SetActive(false);
+
+        promptProp.objectReferenceValue = go;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        return true;
+    }
+
+    // ---------------- LEVEL 1 SAIL (after Hardy) ----------------
+    // The player stands on the boat on the sea. A / D steer the boat. Sailing off the right edge
+    // fades to black and loads Level_2 (stays black until Level_2 exists).
+    // Also sets Hardy (if he is in the deck) to fade to this scene when he dies.
+
+    [MenuItem("Tools/Build Level 1 Sail")]
+    static void BuildLevel1Sail()
+    {
+        string path = ScenePath(SailSceneName);
+        if (File.Exists(path))
+        {
+            if (!EditorUtility.DisplayDialog("Build Level 1 Sail",
+                    SailSceneName + " already exists.\n\nReplace it with a fresh build? Anything you changed in it by hand will be lost.",
+                    "Replace", "Cancel"))
+                return;
+        }
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        if (File.Exists(path))
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            AssetDatabase.DeleteAsset(path);
+        }
+        if (!AssetDatabase.CopyAsset(ScenePath(TemplateName), path))
+        {
+            Debug.LogError("Could not copy Room_Template");
+            return;
+        }
+
+        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+        DestroyByName("Exit");
+        DestroyByName("LeftWall");
+        DestroyByName("KillZone");
+
+        Tilemap map = FindGroundTilemap();
+        map.ClearAllTiles();
+        RebuildColliders(map);
+
+        // Fixed camera, same zoom as Level_1
+        Camera cam = Object.FindFirstObjectByType<Camera>();
+        cam.transform.position = new Vector3(0f, L1FirstFloorCenterY, cam.transform.position.z);
+        cam.orthographicSize = L1HalfHeight;
+        if (cam.TryGetComponent(out CameraFollow2D follow)) follow.enabled = false;
+
+        // Sea along the bottom of the screen (wider than the screen so the boat can sail out)
+        float seaTop = L1FirstFloorCenterY - L1HalfHeight + 2f;
+        GameObject sea = MakeBox("Sea", null, map, new Vector2(0f, seaTop - 1.5f), new Vector2(L1HalfWidth * 4f, 3f), new Color(0.1f, 0.3f, 0.6f));
+        Object.DestroyImmediate(sea.GetComponent<BoxCollider2D>());
+        sea.GetComponent<SpriteRenderer>().sortingOrder = 4; // in front of the boat's bottom, like it sits in the water
+
+        // Boat with the player on it
+        GameObject boat = MakeBox("Boat", null, map, new Vector2(-9f, seaTop), new Vector2(4f, 1f), new Color(0.45f, 0.28f, 0.12f));
+        Object.DestroyImmediate(boat.GetComponent<BoxCollider2D>());
+        var drive = new SerializedObject(boat.AddComponent<BoatDrive>());
+        drive.FindProperty("leftLimit").floatValue = -L1HalfWidth + 2.5f;
+        drive.FindProperty("nextScene").stringValue = NextLevelName;
+        drive.ApplyModifiedPropertiesWithoutUndo();
+
+        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        if (player) player.transform.position = boat.transform.position + new Vector3(0f, 1.5f, 0f);
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        AddToSceneList(path);
+
+        // Point Hardy at this scene, if he is already in the deck
+        string deckPath = ScenePath(DeckSceneName);
+        bool hardyLinked = false;
+        if (File.Exists(deckPath))
+        {
+            Scene deck = EditorSceneManager.OpenScene(deckPath, OpenSceneMode.Single);
+            HardyBoss boss = Object.FindFirstObjectByType<HardyBoss>();
+            if (boss)
+            {
+                var so = new SerializedObject(boss);
+                so.FindProperty("sceneAfterDeath").stringValue = SailSceneName;
+                so.ApplyModifiedPropertiesWithoutUndo();
+                EditorSceneManager.MarkSceneDirty(deck);
+                EditorSceneManager.SaveScene(deck);
+                hardyLinked = true;
+            }
+            EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+        }
+
+        EditorUtility.DisplayDialog("Build Level 1 Sail",
+            "Done! Level_1_Sail is built and in the Scene List.\n\n" +
+            (hardyLinked ? "Hardy now fades to it when he dies." : "Hardy is not in the deck yet: run Tools > Add Hardy To Deck (it links automatically)."), "OK");
     }
 
     // A pile of big cargo crates stacked on top of each other (too tall to jump over).
@@ -925,14 +1131,29 @@ public static class TutorialRoomBuilder
         so.FindProperty("direction").vector2Value = dir;
         so.FindProperty("length").floatValue = length;
         so.FindProperty("startDelay").floatValue = startDelay;
+        so.FindProperty("damage").intValue = TendrilDamage;
         so.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // A trigger that sends the player back to their last checkpoint
+    static void MakeKillZone(string name, Transform parent, Vector2 center, Vector2 size)
+    {
+        var go = new GameObject(name);
+        go.transform.SetParent(parent);
+        go.transform.position = center;
+        var col = go.AddComponent<BoxCollider2D>();
+        col.size = size;
+        col.isTrigger = true;
+        go.AddComponent<KillZone>();
     }
 
     // A red barrel that explodes a moment after the player touches it
     static void MakeBarrel(string name, Transform parent, Tilemap map, Vector2 pos)
     {
         GameObject barrel = MakeBox(name, parent, map, pos, new Vector2(1f, 1.2f), new Color(0.85f, 0.1f, 0.1f));
-        barrel.AddComponent<ExplodingBarrel>();
+        var so = new SerializedObject(barrel.AddComponent<ExplodingBarrel>());
+        so.FindProperty("damage").intValue = BarrelDamage;
+        so.ApplyModifiedPropertiesWithoutUndo();
     }
 
     // A cannon that stands still and shoots at the player. Cannot be destroyed, hurts on touch.
@@ -941,11 +1162,26 @@ public static class TutorialRoomBuilder
         GameObject cannon = MakeBox(name, parent, map, pos, new Vector2(1f, 1f), CannonColor);
         var es = cannon.AddComponent<EnemyShooter>();
         var so = new SerializedObject(es);
-        so.FindProperty("projectilePrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>(ProjectilePrefab);
+        so.FindProperty("projectilePrefab").objectReferenceValue = GetCannonBall();
         so.FindProperty("range").floatValue = 14f; // floors are bigger now
         so.FindProperty("fireRate").floatValue = 1.5f;
         so.ApplyModifiedPropertiesWithoutUndo();
-        cannon.AddComponent<ContactDamage>(); // touching a cannon hurts
+        var touch = new SerializedObject(cannon.AddComponent<ContactDamage>()); // touching a cannon hurts
+        touch.FindProperty("damage").intValue = CannonTouchDamage;
+        touch.ApplyModifiedPropertiesWithoutUndo();
+    }
+
+    // Level 1 cannon ball: a copy of the tutorial Projectile with more damage
+    // (the tutorial keeps its 1-damage bullets, because Room 6 gives the player only 5 health)
+    static Projectile GetCannonBall()
+    {
+        if (!File.Exists(CannonBallPrefab)) AssetDatabase.CopyAsset(ProjectilePrefab, CannonBallPrefab);
+        var ball = AssetDatabase.LoadAssetAtPath<Projectile>(CannonBallPrefab);
+        var so = new SerializedObject(ball);
+        so.FindProperty("damage").intValue = CannonBallDamage;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        AssetDatabase.SaveAssets();
+        return ball;
     }
 
     // ---------------- BOAT (Tutorial_7_Dock) ----------------
