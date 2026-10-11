@@ -44,6 +44,12 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Level_1_Sail.unity
     guid: 26890d686f774384ea258ff13d5ee359
+  - enabled: 1
+    path: Assets/Scenes/Level_3.unity
+    guid: 7438aa8309d69144c9e8f46ea66c0d63
+  - enabled: 1
+    path: Assets/Scenes/Level_3_Boss.unity
+    guid: 625e1f4537e01c94b9e2ce25a9624f99
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
