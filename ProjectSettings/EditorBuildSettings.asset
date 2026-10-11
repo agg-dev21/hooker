@@ -31,10 +31,10 @@ EditorBuildSettings:
     guid: 97cc787451ae0784390bfbd81dec1431
   - enabled: 1
     path: Assets/Scenes/Level_1.unity
-    guid: f7328868785dcb441a311d41c50b5737
+    guid: 0c66ed2641c227f49be2ada6103c9cf0
   - enabled: 1
     path: Assets/Scenes/Level_1_Deck.unity
-    guid: fc963d19fd3601548b2939c6f4ff677d
+    guid: 1a579583985f30b4ebdf99c37bcd7cb8
   - enabled: 1
     path: Assets/Scenes/Level_2.unity
     guid: bfdabd5b8553ce4409e075e84709ce5e

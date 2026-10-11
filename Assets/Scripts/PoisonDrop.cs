@@ -32,7 +32,11 @@ public class PoisonDrop : MonoBehaviour
         float step = fallSpeed * Time.deltaTime;
         if (fallLeft <= 0f || Physics2D.Raycast(transform.position, Vector2.down, step + size * 0.5f, groundLayer))
         {
-            Destroy(gameObject); // splash
+            // Splash where it lands (only when it really hit the ground)
+            PoisonArt art = PoisonArt.Current;
+            if (fallLeft > 0f && art && art.splashWhenDropsLand)
+                PoisonArt.SplashAt((Vector2)transform.position + Vector2.down * size * 0.5f, size * art.splashSize);
+            Destroy(gameObject);
             return;
         }
         transform.position += Vector3.down * step;

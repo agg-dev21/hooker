@@ -1,0 +1,346 @@
+fileFormatVersion: 2
+guid: c6ecbd2b5300859499bfd03b7375ec2c
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7263805160352632718
+    second: lizard_dash_0
+  - first:
+      213: -1989864714266467095
+    second: lizard_dash_1
+  - first:
+      213: 628773308965651650
+    second: lizard_dash_2
+  - first:
+      213: -4999303650649387771
+    second: lizard_dash_3
+  - first:
+      213: -8890878567201607055
+    second: lizard_dash_4
+  - first:
+      213: -8448334483139831058
+    second: lizard_dash_5
+  - first:
+      213: -1287522737983372583
+    second: lizard_dash_6
+  - first:
+      213: -8986836015050896214
+    second: lizard_dash_7
+  - first:
+      213: -6791794518657824303
+    second: lizard_dash_8
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 88
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 8192
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: lizard_dash_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff3c6f3c52b4863419397d473bd46ac2
+      internalID: 7263805160352632718
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lizard_dash_1
+      rect:
+        serializedVersion: 2
+        x: 560
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 058a634d3869f364982d28352f54e963
+      internalID: -1989864714266467095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lizard_dash_2
+      rect:
+        serializedVersion: 2
+        x: 1120
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1f85975062bf45d4cada0a33a712b883
+      internalID: 628773308965651650
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lizard_dash_3
+      rect:
+        serializedVersion: 2
+        x: 1680
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63871e861af678044b6e44466491afd3
+      internalID: -4999303650649387771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lizard_dash_4
+      rect:
+        serializedVersion: 2
+        x: 2240
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b0ebd6578d063a43ae3687e9d819c15
+      internalID: -8890878567201607055
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lizard_dash_5
+      rect:
+        serializedVersion: 2
+        x: 2800
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f29fe0a979c10245abb79b6e5c470f4
+      internalID: -8448334483139831058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: lizard_dash_6
+      rect:
+        serializedVersion: 2
+        x: 3360
+        y: 0
+        width: 560
+        height: 560
+      alignment: 9
+      pivot: {x: 0.5, y: 0.114285715}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 235598d8b47222a478bf80c56ee6e160
+      internalID: -1287522737983372583
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: ad7868d5edc919445bb80ed929c69738
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      lizard_dash_0: 7263805160352632718
+      lizard_dash_1: -1989864714266467095
+      lizard_dash_2: 628773308965651650
+      lizard_dash_3: -4999303650649387771
+      lizard_dash_4: -8890878567201607055
+      lizard_dash_5: -8448334483139831058
+      lizard_dash_6: -1287522737983372583
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

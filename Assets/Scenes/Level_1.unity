@@ -63259,6 +63259,14 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 0
+  amount: 1
+  scrollTitle: A torn note
+  scrollText: "Write the hint about the mother here."
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &738726015
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -65307,6 +65315,14 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 2
+  amount: 2
+  scrollTitle: A torn note
+  scrollText: "Write the hint about the mother here."
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &755474307
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -132259,6 +132275,16 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 5
+  amount: 1
+  scrollTitle: A Torn Note
+  scrollText: "...the woman in the blue coat was taken aboard a black-sailed ship heading east.
+
+(Type the real hint about the mother here, in the chest's Inspector.)"
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &1390660844
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -161814,6 +161840,14 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 3
+  amount: 1
+  scrollTitle: A torn note
+  scrollText: "Write the hint about the mother here."
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &1788147856
 BoxCollider2D:
   m_ObjectHideFlags: 0

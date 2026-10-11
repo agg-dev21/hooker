@@ -21,7 +21,11 @@ public class PoisonHazard : MonoBehaviour
         poisonDuration = duration;
         poisonTickInterval = interval;
         destroyOnHit = destroy;
+        if (Application.isPlaying) PoisonArt.Dress(gameObject);
     }
+
+    // Swap the plain green box for the poison drawing (Assets/Resources/PoisonArt)
+    void Start() => PoisonArt.Dress(gameObject);
 
     void OnTriggerEnter2D(Collider2D other) => Touch(other);
     void OnTriggerStay2D(Collider2D other)  => Touch(other);

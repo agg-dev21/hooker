@@ -20,6 +20,12 @@ public class Health : MonoBehaviour
     public UnityEvent onDied;
 
     public int CurrentHealth { get; private set; }
+
+    // Item hooks (set by PlayerItems on the player):
+    // DamageFilter changes incoming damage (amount, isTick) -> new amount (shield, poison resistance).
+    // BeforeDeath can cancel a death by returning true (instant revival).
+    public System.Func<int, bool, int> DamageFilter;
+    public System.Func<bool> BeforeDeath;
     public int MaxHealth => maxHealth;
     public bool IsInvincible => invincibleTimer > 0f;
 
@@ -82,6 +88,8 @@ public class Health : MonoBehaviour
     public void TakeDamage(int amount)
     {
         if (invincibleTimer > 0f || CurrentHealth <= 0) return;
+        if (DamageFilter != null) amount = DamageFilter(amount, false);
+        if (amount <= 0) return;
 
         CurrentHealth -= amount;
         invincibleTimer = invincibleTime;
@@ -98,6 +106,8 @@ public class Health : MonoBehaviour
     public void TakeTickDamage(int amount)
     {
         if (CurrentHealth <= 0) return;
+        if (DamageFilter != null) amount = DamageFilter(amount, true);
+        if (amount <= 0) return;
         CurrentHealth -= amount;
         onDamaged?.Invoke();
         if (CurrentHealth <= 0) Die();
@@ -110,6 +120,8 @@ public class Health : MonoBehaviour
 
     void Die()
     {
+        if (BeforeDeath != null && BeforeDeath()) return; // revived on the spot
+
         onDied?.Invoke();
 
         // The player respawns; anything else (enemies) is destroyed
