@@ -109,10 +109,8 @@ public class EndingGrave : MonoBehaviour
         A, "...",
         A, "You absolute idiot. You proposed at your mother's grave.",
         R, "She'd have wanted a front-row seat.",
-        A, "My kingdom gave me titles. Rules. A cage.",
-        A, "You gave me a choice.",
-        A, "So I choose you. Yes, Raphael. I'll stay.",
-        R, "Then I'll stay too.",
+        A, "I have only know you for a few days.",
+        A, "Fine... I'll marry you.",
         A, "Now get up. The ground is wet, and you're crying on your mother's flowers.",
         R, "...Worth it.");
 
