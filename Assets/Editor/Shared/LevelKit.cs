@@ -65,7 +65,7 @@ public static class LevelKit
         RebuildColliders(Map);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        AddToSceneList($"{ScenesFolder}/{sceneName}.unity");
+        EditorKit.AddToSceneList($"{ScenesFolder}/{sceneName}.unity");
         EditorUtility.DisplayDialog("Build " + sceneName, message, "OK");
     }
 
@@ -461,13 +461,5 @@ public static class LevelKit
         foreach (TileBase t in tilemap.GetTilesBlock(tilemap.cellBounds))
             if (t) return t;
         return null;
-    }
-
-    static void AddToSceneList(string path)
-    {
-        var list = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        if (list.Exists(s => s.path == path)) return;
-        list.Add(new EditorBuildSettingsScene(path, true));
-        EditorBuildSettings.scenes = list.ToArray();
     }
 }

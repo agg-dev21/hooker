@@ -123,7 +123,7 @@ public static class PoisonLevelBuilder
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        AddToSceneList(path);
+        EditorKit.AddToSceneList(path);
         EditorUtility.DisplayDialog("Build Level 2", "Done! " + LevelName + " is built, open, and in the Scene List.\n\n" +
             "The boss door loads '" + BossSceneName + "' (the screen stays black until that scene exists).", "OK");
     }
@@ -658,13 +658,5 @@ public static class PoisonLevelBuilder
         foreach (TileBase t in tilemap.GetTilesBlock(tilemap.cellBounds))
             if (t) return t;
         return null;
-    }
-
-    static void AddToSceneList(string path)
-    {
-        var list = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        if (list.Exists(s => s.path == path)) return;
-        list.Add(new EditorBuildSettingsScene(path, true));
-        EditorBuildSettings.scenes = list.ToArray();
     }
 }

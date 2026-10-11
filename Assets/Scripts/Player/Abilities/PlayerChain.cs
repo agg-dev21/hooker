@@ -3,6 +3,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // Madame O's Chain: the player's second special ability, unlocked by beating Madame O (the Level 3 octopus boss).
 // Press Chain Ability (C / View button by default, can be changed in the pause menu Controls):
@@ -55,7 +56,6 @@ public class PlayerChain : MonoBehaviour
     GameObject iconRoot;
     Image cooldownSweep;
     TMP_Text keyText, newText;
-    static Sprite whiteSprite;
 
     // ---------------- Adds itself to the player in every scene ----------------
 
@@ -208,9 +208,6 @@ public class PlayerChain : MonoBehaviour
 
     void BuildIcon()
     {
-        if (!whiteSprite)
-            whiteSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
-
         iconRoot = new GameObject("ChainAbilityIcon");
         var canvas = iconRoot.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -253,41 +250,5 @@ public class PlayerChain : MonoBehaviour
         newText.color = new Color(1f, 0.85f, 0.2f);
 
         iconRoot.SetActive(false);
-    }
-
-    static RectTransform Panel(string name, Transform parent, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(parent, false);
-        var img = go.GetComponent<Image>();
-        img.sprite = whiteSprite;
-        img.color = color;
-        img.raycastTarget = false;
-        return (RectTransform)go.transform;
-    }
-
-    static void Fill(RectTransform rt, float inset)
-    {
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = new Vector2(inset, inset);
-        rt.offsetMax = new Vector2(-inset, -inset);
-    }
-
-    static TMP_Text Label(string name, Transform parent, string text, float size, Vector2 pos)
-    {
-        var go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        var rt = (RectTransform)go.transform;
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, pos.y < 0f ? 0f : 0.5f);
-        rt.anchoredPosition = pos;
-        rt.sizeDelta = new Vector2(200f, 40f);
-        var t = go.AddComponent<TextMeshProUGUI>();
-        t.text = text;
-        t.fontSize = size;
-        t.alignment = TextAlignmentOptions.Center;
-        t.color = Color.white;
-        t.raycastTarget = false;
-        return t;
     }
 }

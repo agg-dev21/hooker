@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // The companion you free from the jail in Level 2. Once freed she stays with you for the rest of the game
 // (saved, every scene). If you never find her, she is gone for good.
@@ -94,19 +95,17 @@ public class Companion : MonoBehaviour
     GameObject iconRoot;
     Image cooldownSweep;
     TMP_Text keyText, newText;
-    static Sprite whiteSprite;
 
     void Awake()
     {
         if (RunOrder.InTutorial) { Destroy(gameObject); return; } // never in the tutorial rooms
-        if (!whiteSprite) whiteSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
         player = FindAnyObjectByType<PlayerController2D>();
         if (player) playerCol = player.GetComponent<Collider2D>();
 
         var look = new GameObject("Body");
         look.transform.SetParent(transform, false);
         body = look.AddComponent<SpriteRenderer>();
-        body.sprite = HasArt ? S.idleFrames[0] : S.sprite ? S.sprite : whiteSprite;
+        body.sprite = HasArt ? S.idleFrames[0] : S.sprite ? S.sprite : WhiteSprite;
         body.color = Drawn ? Color.white : S.color;
         body.sortingOrder = 4;
         if (!Drawn) look.transform.localScale = new Vector3(S.size.x, S.size.y, 1f);
@@ -254,7 +253,7 @@ public class Companion : MonoBehaviour
             go.transform.position = transform.position + (Vector3)(Random.insideUnitCircle * 0.5f);
             go.transform.localScale = Vector3.one * Random.Range(0.08f, 0.16f);
             srs[i] = go.AddComponent<SpriteRenderer>();
-            srs[i].sprite = whiteSprite;
+            srs[i].sprite = WhiteSprite;
             srs[i].color = S.glowColor;
             srs[i].sortingOrder = 6;
             bits[i] = go.transform;
@@ -500,7 +499,7 @@ public class Companion : MonoBehaviour
         go.transform.position = center;
         go.transform.localScale = new Vector3(size.x, size.y, 1f);
         var sr = go.AddComponent<SpriteRenderer>();
-        sr.sprite = whiteSprite;
+        sr.sprite = WhiteSprite;
         sr.color = color;
         sr.sortingOrder = order;
         return go;
@@ -558,41 +557,5 @@ public class Companion : MonoBehaviour
         cooldownSweep.fillAmount = Mathf.Clamp01(cooldownLeft / Mathf.Max(S.cooldown, 0.01f));
         keyText.text = GameInput.KeyName(GameInput.GetKey(GameAction.Companion));
         newText.gameObject.SetActive(PlayerPrefs.GetInt(FoundSave + ".new", 0) == 1);
-    }
-
-    static RectTransform Panel(string name, Transform parent, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(parent, false);
-        var img = go.GetComponent<Image>();
-        img.sprite = whiteSprite;
-        img.color = color;
-        img.raycastTarget = false;
-        return (RectTransform)go.transform;
-    }
-
-    static void Fill(RectTransform rt, float inset)
-    {
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = new Vector2(inset, inset);
-        rt.offsetMax = new Vector2(-inset, -inset);
-    }
-
-    static TMP_Text Label(string name, Transform parent, string text, float size, Vector2 pos)
-    {
-        var go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        var rt = (RectTransform)go.transform;
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, pos.y < 0f ? 0f : 0.5f);
-        rt.anchoredPosition = pos;
-        rt.sizeDelta = new Vector2(200f, 40f);
-        var t = go.AddComponent<TextMeshProUGUI>();
-        t.text = text;
-        t.fontSize = size;
-        t.alignment = TextAlignmentOptions.Center;
-        t.color = Color.white;
-        t.raycastTarget = false;
-        return t;
     }
 }

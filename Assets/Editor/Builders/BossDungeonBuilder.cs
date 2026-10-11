@@ -95,7 +95,7 @@ public static class BossDungeonBuilder
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        AddToSceneList(path);
+        EditorKit.AddToSceneList(path);
         EditorUtility.DisplayDialog("Build Boss Dungeon", "Done! " + SceneName + " is built, open, and in the Scene List.\n\n" +
             "Beat Oscar to open the exit gate. The door behind it loads '" + NextScene + "'.", "OK");
     }
@@ -493,13 +493,5 @@ public static class BossDungeonBuilder
         foreach (TileBase t in tilemap.GetTilesBlock(tilemap.cellBounds))
             if (t) return t;
         return null;
-    }
-
-    static void AddToSceneList(string path)
-    {
-        var list = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        if (list.Exists(s => s.path == path)) return;
-        list.Add(new EditorBuildSettingsScene(path, true));
-        EditorBuildSettings.scenes = list.ToArray();
     }
 }

@@ -4,6 +4,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // The player's special ability, unlocked by beating a boss (like Genshin's elemental skill).
 // Right now: Hardy's Spikes - beat Hardy and you can shoot his sideways spike attack (it sets enemies on fire).
@@ -62,7 +63,6 @@ public class PlayerAbility : MonoBehaviour
     Image cooldownSweep;
     TMP_Text keyText;
     TMP_Text newText;
-    static Sprite whiteSprite;
 
     // ---------------- Adds itself to the player in every scene ----------------
 
@@ -200,9 +200,6 @@ public class PlayerAbility : MonoBehaviour
     // A framed square in the bottom-right corner: the ability picture, a dark sweep while recharging, and the key under it
     void BuildIcon()
     {
-        if (!whiteSprite)
-            whiteSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
-
         iconRoot = new GameObject("AbilityIcon");
         var canvas = iconRoot.AddComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -226,7 +223,7 @@ public class PlayerAbility : MonoBehaviour
         picGo.transform.SetParent(frame, false);
         Fill((RectTransform)picGo.transform, 10f);
         var pic = picGo.GetComponent<Image>();
-        pic.sprite = art && art.hardySpikesIcon ? art.hardySpikesIcon : whiteSprite;
+        pic.sprite = art && art.hardySpikesIcon ? art.hardySpikesIcon : WhiteSprite;
         pic.preserveAspect = true;
         if (!art || !art.hardySpikesIcon) pic.color = new Color(0.5f, 0.2f, 0.85f);
 
@@ -245,41 +242,5 @@ public class PlayerAbility : MonoBehaviour
         newText.color = new Color(1f, 0.85f, 0.2f);
 
         iconRoot.SetActive(false);
-    }
-
-    static RectTransform Panel(string name, Transform parent, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(parent, false);
-        var img = go.GetComponent<Image>();
-        img.sprite = whiteSprite;
-        img.color = color;
-        img.raycastTarget = false;
-        return (RectTransform)go.transform;
-    }
-
-    static void Fill(RectTransform rt, float inset)
-    {
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = new Vector2(inset, inset);
-        rt.offsetMax = new Vector2(-inset, -inset);
-    }
-
-    static TMP_Text Label(string name, Transform parent, string text, float size, Vector2 pos)
-    {
-        var go = new GameObject(name, typeof(RectTransform));
-        go.transform.SetParent(parent, false);
-        var rt = (RectTransform)go.transform;
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, pos.y < 0f ? 0f : 0.5f);
-        rt.anchoredPosition = pos;
-        rt.sizeDelta = new Vector2(200f, 40f);
-        var t = go.AddComponent<TextMeshProUGUI>();
-        t.text = text;
-        t.fontSize = size;
-        t.alignment = TextAlignmentOptions.Center;
-        t.color = Color.white;
-        t.raycastTarget = false;
-        return t;
     }
 }

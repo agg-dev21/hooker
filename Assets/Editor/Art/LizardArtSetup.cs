@@ -98,9 +98,9 @@ public static class LizardArtSetup
         var so = new SerializedObject(boss);
         so.FindProperty("artRenderer").objectReferenceValue = sr;
         so.FindProperty("idleFrame").objectReferenceValue = idle;
-        SetArray(so.FindProperty("dashFrames"), dash);
-        SetArray(so.FindProperty("spewFrames"), spew);
-        SetArray(so.FindProperty("poisonFrames"), poison);
+        EditorKit.SetArray(so.FindProperty("dashFrames"), dash);
+        EditorKit.SetArray(so.FindProperty("spewFrames"), spew);
+        EditorKit.SetArray(so.FindProperty("poisonFrames"), poison);
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
@@ -150,12 +150,5 @@ public static class LizardArtSetup
         return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>()
             .OrderBy(sp => int.Parse(sp.name.Substring(sp.name.LastIndexOf('_') + 1)))
             .ToArray();
-    }
-
-    static void SetArray(SerializedProperty prop, Sprite[] sprites)
-    {
-        prop.arraySize = sprites.Length;
-        for (int i = 0; i < sprites.Length; i++)
-            prop.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
     }
 }

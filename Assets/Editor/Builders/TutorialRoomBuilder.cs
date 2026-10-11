@@ -569,7 +569,6 @@ public static class TutorialRoomBuilder
             cp.AddComponent<Checkpoint>();
         }
 
-
         // ---- Obstacles (no enemies). Each floor is 3 screens wide (x -13 to 66). ----
         // Tuned for the current movement: held jump about 8.5 tiles high, running jump about 8.3 tiles far,
         // jump + dash about 13.6 tiles. Walls are 7 tall (hold jump), crate stacks 10 tall (break them),
@@ -727,7 +726,7 @@ public static class TutorialRoomBuilder
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        AddToSceneList(path);
+        EditorKit.AddToSceneList(path);
 
         EditorUtility.DisplayDialog("Build Level 1", "Done! Level_1 is built and open, and in the Scene List.", "OK");
     }
@@ -838,7 +837,7 @@ public static class TutorialRoomBuilder
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        AddToSceneList(path);
+        EditorKit.AddToSceneList(path);
 
         EditorUtility.DisplayDialog("Build Level 1 Deck", "Done! Level_1_Deck is built and open, and in the Scene List.", "OK");
     }
@@ -1192,7 +1191,7 @@ public static class TutorialRoomBuilder
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        AddToSceneList(path);
+        EditorKit.AddToSceneList(path);
 
         // Point Hardy at this scene, if he is already in the deck
         string deckPath = ScenePath(DeckSceneName);
@@ -1358,14 +1357,6 @@ public static class TutorialRoomBuilder
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         EditorUtility.DisplayDialog("Build Boat Scene", "Done! Tutorial_7_Dock now has a boat that sails to Level_1.", "OK");
-    }
-
-    static void AddToSceneList(string path)
-    {
-        var list = new List<EditorBuildSettingsScene>(EditorBuildSettings.scenes);
-        if (list.Exists(s => s.path == path)) return;
-        list.Add(new EditorBuildSettingsScene(path, true));
-        EditorBuildSettings.scenes = list.ToArray();
     }
 
     static string ScenePath(string name) => $"{ScenesFolder}/{name}.unity";

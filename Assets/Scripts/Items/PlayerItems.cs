@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // The player's items: a 4-slot quick bar at the bottom of the screen, the inventory screen, and the item effects.
 //   Quick bar   - 1 / 2 / 3 / 4 picks a slot, Use Item (F / RT) uses the item in it. New items go into a free slot
@@ -55,7 +56,6 @@ public class PlayerItems : MonoBehaviour
     bool reading;
     int readerOpenedFrame; // the E that opened a note (a chest) must not close it right away
     bool inventoryOpen;
-    static Sprite whiteSprite;
 
     ItemSettings S => ItemSettings.Current;
 
@@ -622,7 +622,6 @@ public class PlayerItems : MonoBehaviour
 
     void BuildUi()
     {
-        if (!whiteSprite) whiteSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
 
         uiRoot = new GameObject("InventoryUI");
         var canvas = uiRoot.AddComponent<Canvas>();
@@ -637,7 +636,7 @@ public class PlayerItems : MonoBehaviour
         inventoryScreen.transform.SetParent(uiRoot.transform, false);
         Fill((RectTransform)inventoryScreen.transform, 0f);
         var dim = inventoryScreen.GetComponent<Image>();
-        dim.sprite = whiteSprite;
+        dim.sprite = WhiteSprite;
         dim.color = new Color(0f, 0f, 0f, 0.6f);
         dim.raycastTarget = false;
 
@@ -705,7 +704,7 @@ public class PlayerItems : MonoBehaviour
         reader.transform.SetParent(uiRoot.transform, false);
         Fill((RectTransform)reader.transform, 0f);
         reader.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.7f);
-        reader.GetComponent<Image>().sprite = whiteSprite;
+        reader.GetComponent<Image>().sprite = WhiteSprite;
         RectTransform paper = Panel("Paper", reader.transform, new Color(0.9f, 0.82f, 0.62f));
         paper.anchorMin = paper.anchorMax = new Vector2(0.5f, 0.5f);
         paper.sizeDelta = new Vector2(1000f, 620f);
@@ -719,25 +718,6 @@ public class PlayerItems : MonoBehaviour
         TMP_Text close = Label("Close", paper, "Press " + KeyName(GameAction.Interact) + " to close", 22f, new Vector2(0f, -280f));
         close.color = new Color(0.35f, 0.25f, 0.15f);
         reader.SetActive(false);
-    }
-
-    static RectTransform Panel(string name, Transform parent, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(parent, false);
-        var img = go.GetComponent<Image>();
-        img.sprite = whiteSprite;
-        img.color = color;
-        img.raycastTarget = false;
-        return (RectTransform)go.transform;
-    }
-
-    static void Fill(RectTransform rt, float inset)
-    {
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = new Vector2(inset, inset);
-        rt.offsetMax = new Vector2(-inset, -inset);
     }
 
     static TMP_Text Label(string name, Transform parent, string text, float size, Vector2 pos)

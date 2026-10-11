@@ -69,13 +69,13 @@ public static class HardyArtSetup
 
         var so = new SerializedObject(boss);
         so.FindProperty("blockSprite").objectReferenceValue = (AssetDatabase.LoadAssetAtPath<Tile>(SquareTile))?.sprite;
-        SetArray(so.FindProperty("walkFrames"), walk);
-        SetArray(so.FindProperty("spikesPoseFrames"), spikesPose);
-        SetArray(so.FindProperty("spikeFxFrames"), spikeFx);
-        SetArray(so.FindProperty("tentaclePoseFrames"), tentaclePose);
-        SetArray(so.FindProperty("tentacleFxFrames"), tentacleFx);
-        SetArray(so.FindProperty("punchFrames"), punch);
-        SetArray(so.FindProperty("jumpSlamFrames"), jumpSlam);
+        EditorKit.SetArray(so.FindProperty("walkFrames"), walk);
+        EditorKit.SetArray(so.FindProperty("spikesPoseFrames"), spikesPose);
+        EditorKit.SetArray(so.FindProperty("spikeFxFrames"), spikeFx);
+        EditorKit.SetArray(so.FindProperty("tentaclePoseFrames"), tentaclePose);
+        EditorKit.SetArray(so.FindProperty("tentacleFxFrames"), tentacleFx);
+        EditorKit.SetArray(so.FindProperty("punchFrames"), punch);
+        EditorKit.SetArray(so.FindProperty("jumpSlamFrames"), jumpSlam);
 
         // Attack sizes to match the bigger art (all can be changed on HardyBoss later)
         so.FindProperty("spikeWidth").floatValue = 2.1f;
@@ -191,12 +191,5 @@ public static class HardyArtSetup
         PlayerPrefs.DeleteKey(PlayerUpgrades.PoisonHookSave);
         PlayerPrefs.Save();
         EditorUtility.DisplayDialog("Abilities", "All abilities are locked again (like a new game).", "OK");
-    }
-
-    static void SetArray(SerializedProperty prop, Sprite[] sprites)
-    {
-        prop.arraySize = sprites.Length;
-        for (int i = 0; i < sprites.Length; i++)
-            prop.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
     }
 }

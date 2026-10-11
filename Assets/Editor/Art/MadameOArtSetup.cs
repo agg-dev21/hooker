@@ -59,9 +59,9 @@ public static class MadameOArtSetup
 
         var so = new SerializedObject(siren);
         so.FindProperty("artRenderer").objectReferenceValue = sr;
-        SetArray(so.FindProperty("idleFrames"), idle);
-        SetArray(so.FindProperty("attackFrames"), attack);
-        SetArray(so.FindProperty("bindFrames"), bind);
+        EditorKit.SetArray(so.FindProperty("idleFrames"), idle);
+        EditorKit.SetArray(so.FindProperty("attackFrames"), attack);
+        EditorKit.SetArray(so.FindProperty("bindFrames"), bind);
         so.FindProperty("chainSprite").objectReferenceValue = chain;
         so.ApplyModifiedPropertiesWithoutUndo();
 
@@ -85,12 +85,5 @@ public static class MadameOArtSetup
         importer.alphaIsTransparency = true;
         importer.SaveAndReimport();
         return AssetDatabase.LoadAssetAtPath<Sprite>(path);
-    }
-
-    static void SetArray(SerializedProperty prop, Sprite[] sprites)
-    {
-        prop.arraySize = sprites.Length;
-        for (int i = 0; i < sprites.Length; i++)
-            prop.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
     }
 }

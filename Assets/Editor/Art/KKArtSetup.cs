@@ -75,12 +75,12 @@ public static class KKArtSetup
         var so = new SerializedObject(kk);
         so.FindProperty("artRenderer").objectReferenceValue = sr;
         so.FindProperty("surfRenderer").objectReferenceValue = surfSr;
-        SetArray(so.FindProperty("idleFrames"), idle);
-        SetArray(so.FindProperty("attackFrames"), attack);
-        SetArray(so.FindProperty("surfFrames"), surf);
-        SetArray(so.FindProperty("waveFrames"), waves);
-        SetArray(so.FindProperty("phase2Frames"), monster);
-        SetArray(so.FindProperty("blastFrames"), blast);
+        EditorKit.SetArray(so.FindProperty("idleFrames"), idle);
+        EditorKit.SetArray(so.FindProperty("attackFrames"), attack);
+        EditorKit.SetArray(so.FindProperty("surfFrames"), surf);
+        EditorKit.SetArray(so.FindProperty("waveFrames"), waves);
+        EditorKit.SetArray(so.FindProperty("phase2Frames"), monster);
+        EditorKit.SetArray(so.FindProperty("blastFrames"), blast);
         so.FindProperty("waveArtScale").floatValue = 1f;
         so.FindProperty("waveWidth").floatValue = 2.4f; // hit box about as wide as the drawn water
         so.ApplyModifiedPropertiesWithoutUndo();
@@ -90,12 +90,5 @@ public static class KKArtSetup
         Selection.activeGameObject = kk.gameObject;
         EditorUtility.DisplayDialog("Set Up KK Art",
             "Done! KK uses his drawings: idle " + idle.Length + ", attack " + attack.Length + ", surf " + surf.Length + ", waves " + waves.Length + ", monster " + monster.Length + ", blast " + blast.Length + " frames.", "OK");
-    }
-
-    static void SetArray(SerializedProperty prop, Sprite[] sprites)
-    {
-        prop.arraySize = sprites.Length;
-        for (int i = 0; i < sprites.Length; i++)
-            prop.GetArrayElementAtIndex(i).objectReferenceValue = sprites[i];
     }
 }
