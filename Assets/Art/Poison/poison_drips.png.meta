@@ -111,10 +111,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 88
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -140,7 +140,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -207,19 +207,19 @@ TextureImporter:
       name: poison_drips_0
       rect:
         serializedVersion: 2
-        x: 16
-        y: 53
-        width: 26
-        height: 209
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 320
+        height: 273
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: c71f41979641a56b0800000000000000
+      spriteID: 70aa7f77806c6b6418dd89d87bf104a0
       internalID: -5306906767667170948
       vertices: []
       indices: 
@@ -229,460 +229,20 @@ TextureImporter:
       name: poison_drips_1
       rect:
         serializedVersion: 2
-        x: 288
-        y: 261
-        width: 13
-        height: 12
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 320
+        y: 0
+        width: 320
+        height: 273
+      alignment: 9
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 325be13ef817e48a0800000000000000
+      spriteID: 89f8604cda2a27d48bb76577a315bd1d
       internalID: -6318988364349524701
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_2
-      rect:
-        serializedVersion: 2
-        x: 345
-        y: 98
-        width: 14
-        height: 170
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a2baae4ac1b5ad050800000000000000
-      internalID: 5826069246541212458
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_3
-      rect:
-        serializedVersion: 2
-        x: 489
-        y: 251
-        width: 14
-        height: 14
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 1205d739d88b36730800000000000000
-      internalID: 3991236612984754209
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_4
-      rect:
-        serializedVersion: 2
-        x: 160
-        y: 222
-        width: 20
-        height: 20
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 27686d54cb069afe0800000000000000
-      internalID: -1177303465838868878
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_5
-      rect:
-        serializedVersion: 2
-        x: 457
-        y: 133
-        width: 27
-        height: 90
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ffb3b0945116f6100800000000000000
-      internalID: 103408060500491263
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_6
-      rect:
-        serializedVersion: 2
-        x: 566
-        y: 210
-        width: 23
-        height: 23
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 964f2170da9dcb820800000000000000
-      internalID: 2935460394309973097
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_7
-      rect:
-        serializedVersion: 2
-        x: 592
-        y: 56
-        width: 26
-        height: 186
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c6fa5ceeeb2c81f20800000000000000
-      internalID: 3393676444529176428
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_8
-      rect:
-        serializedVersion: 2
-        x: 76
-        y: 162
-        width: 14
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e5f75ad8f5dbaa320800000000000000
-      internalID: 2570074755464265566
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_9
-      rect:
-        serializedVersion: 2
-        x: 256
-        y: 0
-        width: 55
-        height: 220
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7b7030c1ea2b53340800000000000000
-      internalID: 4842973435170850743
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_10
-      rect:
-        serializedVersion: 2
-        x: 409
-        y: 165
-        width: 14
-        height: 13
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 21d67e6307d69aa10800000000000000
-      internalID: 1921187044775128338
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_11
-      rect:
-        serializedVersion: 2
-        x: 524
-        y: 56
-        width: 52
-        height: 122
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 314c68865bbf91ff0800000000000000
-      internalID: -64743963058846701
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_12
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 82
-        width: 13
-        height: 39
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 8a01fd3e781204d20800000000000000
-      internalID: 3260642997743587496
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_13
-      rect:
-        serializedVersion: 2
-        x: 195
-        y: 50
-        width: 45
-        height: 112
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a20989546a4f63300800000000000000
-      internalID: 231641425825533994
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_14
-      rect:
-        serializedVersion: 2
-        x: 361
-        y: 69
-        width: 30
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 0954e52e48911b520800000000000000
-      internalID: 2715980108805326224
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_15
-      rect:
-        serializedVersion: 2
-        x: 28
-        y: 5
-        width: 46
-        height: 45
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ace4d2fafc56b0660800000000000000
-      internalID: 7353082759284084426
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_16
-      rect:
-        serializedVersion: 2
-        x: 96
-        y: 37
-        width: 20
-        height: 20
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e1c7b1c14d03a5120800000000000000
-      internalID: 2403287038718344222
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_17
-      rect:
-        serializedVersion: 2
-        x: 342
-        y: 37
-        width: 20
-        height: 20
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 85385a906336903e0800000000000000
-      internalID: -2087027868568288424
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_18
-      rect:
-        serializedVersion: 2
-        x: 364
-        y: 16
-        width: 60
-        height: 54
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 630735ed1cc14fb50800000000000000
-      internalID: 6625952570753118262
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_19
-      rect:
-        serializedVersion: 2
-        x: 367
-        y: 0
-        width: 255
-        height: 51
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: cbdb17989781bfcc0800000000000000
-      internalID: -3676317760541835844
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_20
-      rect:
-        serializedVersion: 2
-        x: 584
-        y: 10
-        width: 40
-        height: 40
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: dcca82d10727235c0800000000000000
-      internalID: -4237198473551106867
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_drips_21
-      rect:
-        serializedVersion: 2
-        x: 128
-        y: 0
-        width: 58
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d85207701544428c0800000000000000
-      internalID: -4025017052154550899
       vertices: []
       indices: 
       edges: []
@@ -691,7 +251,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 08f011c57672b204ab7229d7a089c5d4
     internalID: 0
     vertices: []
     indices: 
@@ -703,26 +263,6 @@ TextureImporter:
     nameFileIdTable:
       poison_drips_0: -5306906767667170948
       poison_drips_1: -6318988364349524701
-      poison_drips_10: 1921187044775128338
-      poison_drips_11: -64743963058846701
-      poison_drips_12: 3260642997743587496
-      poison_drips_13: 231641425825533994
-      poison_drips_14: 2715980108805326224
-      poison_drips_15: 7353082759284084426
-      poison_drips_16: 2403287038718344222
-      poison_drips_17: -2087027868568288424
-      poison_drips_18: 6625952570753118262
-      poison_drips_19: -3676317760541835844
-      poison_drips_2: 5826069246541212458
-      poison_drips_20: -4237198473551106867
-      poison_drips_21: -4025017052154550899
-      poison_drips_3: 3991236612984754209
-      poison_drips_4: -1177303465838868878
-      poison_drips_5: 103408060500491263
-      poison_drips_6: 2935460394309973097
-      poison_drips_7: 3393676444529176428
-      poison_drips_8: 2570074755464265566
-      poison_drips_9: 4842973435170850743
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

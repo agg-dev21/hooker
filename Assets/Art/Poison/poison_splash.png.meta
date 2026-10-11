@@ -66,10 +66,10 @@ TextureImporter:
   compressionQuality: 50
   spriteMode: 2
   spriteExtrude: 1
-  spriteMeshType: 1
+  spriteMeshType: 0
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 88
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -95,7 +95,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -162,19 +162,19 @@ TextureImporter:
       name: poison_splash_0
       rect:
         serializedVersion: 2
-        x: 3
-        y: 35
-        width: 13
-        height: 161
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 320
+        height: 207
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: cecd19181b77d7750800000000000000
+      spriteID: 0439e6d494d238a41b54b5d1bce77feb
       internalID: 6304326657655299308
       vertices: []
       indices: 
@@ -184,130 +184,20 @@ TextureImporter:
       name: poison_splash_1
       rect:
         serializedVersion: 2
-        x: 76
-        y: 108
-        width: 36
-        height: 43
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 320
+        y: 0
+        width: 320
+        height: 207
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 59c69d198277d9000800000000000000
+      spriteID: 2e934f7b1304ddd4c9301b5058063c49
       internalID: 44322587472915605
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_splash_2
-      rect:
-        serializedVersion: 2
-        x: 150
-        y: 82
-        width: 79
-        height: 62
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: d333edbe05dc68750800000000000000
-      internalID: 6306954075617243965
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_splash_3
-      rect:
-        serializedVersion: 2
-        x: 294
-        y: 38
-        width: 14
-        height: 74
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 98ec50fd137594bd0800000000000000
-      internalID: -2645487434396742007
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_splash_4
-      rect:
-        serializedVersion: 2
-        x: 319
-        y: 0
-        width: 321
-        height: 206
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: dd7e8875797c9d050800000000000000
-      internalID: 5825907045803026397
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_splash_5
-      rect:
-        serializedVersion: 2
-        x: 341
-        y: 27
-        width: 9
-        height: 180
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c0e48004442c01880800000000000000
-      internalID: -8642194086536131060
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: poison_splash_6
-      rect:
-        serializedVersion: 2
-        x: 25
-        y: 0
-        width: 251
-        height: 85
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 29bbf61db1734eec0800000000000000
-      internalID: -3538642814588961902
       vertices: []
       indices: 
       edges: []
@@ -316,7 +206,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 08bcf7971a1893f4fbfb8109f3587831
     internalID: 0
     vertices: []
     indices: 
@@ -328,11 +218,6 @@ TextureImporter:
     nameFileIdTable:
       poison_splash_0: 6304326657655299308
       poison_splash_1: 44322587472915605
-      poison_splash_2: 6306954075617243965
-      poison_splash_3: -2645487434396742007
-      poison_splash_4: 5825907045803026397
-      poison_splash_5: -8642194086536131060
-      poison_splash_6: -3538642814588961902
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

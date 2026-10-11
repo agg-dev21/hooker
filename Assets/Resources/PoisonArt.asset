@@ -1,0 +1,35 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a0f9926e1a5eeb34e90f53cdba9d0e32, type: 3}
+  m_Name: PoisonArt
+  m_EditorClassIdentifier: Assembly-CSharp::PoisonArt
+  drop: {fileID: -4770052807533358425, guid: 73831b61be8b108419c33d74cd32c8eb, type: 3}
+  splash:
+  - {fileID: 6304326657655299308, guid: 2ca4318f42d76134da5ab28690d2c198, type: 3}
+  - {fileID: 44322587472915605, guid: 2ca4318f42d76134da5ab28690d2c198, type: 3}
+  puddle: {fileID: 5944550928515616968, guid: e0973008458e5db4e8d35b2456158da8, type: 3}
+  drips:
+  - {fileID: -5306906767667170948, guid: e89fa8eb9ba4a674082c6e46c71d0981, type: 3}
+  - {fileID: -6318988364349524701, guid: e89fa8eb9ba4a674082c6e46c71d0981, type: 3}
+  dressDrops: 1
+  dressPuddles: 1
+  dressSlimeWalls: 1
+  showWhenPoisoned: 1
+  splashWhenDropsLand: 1
+  dropSize: 1.4
+  puddleHeight: 0.6
+  slimeWallWidth: 1.2
+  splashSize: 1.5
+  poisonedWidth: 1.3
+  poisonedAlpha: 0.85
+  splashFps: 10
+  dripFps: 6
