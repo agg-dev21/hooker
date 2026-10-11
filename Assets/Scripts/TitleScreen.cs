@@ -172,8 +172,17 @@ public class TitleScreen : MonoBehaviour
 
         // Title
         title = Text("Title", root, "HOOKER", 140f, Gold, TextAlignmentOptions.Center).rectTransform;
-        Anchor(title, new Vector2(0.2f, 1f), new Vector2(720f, 220f), new Vector2(0f, -150f));
+        // Spans the dark band (with a margin) so it always fits on one line, whatever the screen size
+        title.anchorMin = new Vector2(0f, 1f);
+        title.anchorMax = new Vector2(0.4f, 1f);
+        title.pivot = new Vector2(0.5f, 0.5f);
+        title.sizeDelta = new Vector2(-60f, 220f);
+        title.anchoredPosition = new Vector2(0f, -150f);
         var titleText = title.GetComponent<TextMeshProUGUI>();
+        titleText.textWrappingMode = TextWrappingModes.NoWrap; // never split HOOKER over two lines
+        titleText.enableAutoSizing = true;                     // shrink to fit if the band is narrow
+        titleText.fontSizeMin = 48f;
+        titleText.fontSizeMax = 140f;
         titleText.fontStyle = FontStyles.Bold;
         titleText.characterSpacing = 12f;
         titleText.outlineWidth = 0.22f;
