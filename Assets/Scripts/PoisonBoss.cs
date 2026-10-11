@@ -28,6 +28,7 @@ public class PoisonBoss : MonoBehaviour
 
     [Header("Flow")]
     [SerializeField] float startDelay = 2f;
+    [SerializeField] float maxTurnWait = 2f;     // fighting with another boss: longest he waits for it to finish attacking
     [SerializeField] float restTime = 0.6f;
     [SerializeField, Range(0f, 1f)] float phase2At = 0.6f;
     [SerializeField] float phase2SpeedUp = 1.5f;
@@ -193,7 +194,57 @@ public class PoisonBoss : MonoBehaviour
     }
 
     void OnEnable()  => PlayerRespawn.Respawned += ResetFight;
-    void OnDisable() => PlayerRespawn.Respawned -= ResetFight;
+    void OnDisable() { PlayerRespawn.Respawned -= ResetFight; BossTurns.End(this); }
+
+    // ---------------- Sprite animation ----------------
+    Sprite[] animFrames;
+    float animFps, animTime;
+    bool animLoop;
+    bool HasArt => artRenderer && idleFrame;
+
+    void Play(Sprite[] frames, float fps, bool loop)
+    {
+        if (!HasArt || frames == null || frames.Length == 0) return;
+        animFrames = frames;
+        animFps = Mathf.Max(fps, 0.01f);
+        animLoop = loop;
+        animTime = 0f;
+        artRenderer.sprite = frames[0];
+    }
+
+    void PlayIdle()
+    {
+        if (!HasArt) return;
+        animFrames = null;
+        artRenderer.sprite = idleFrame;
+    }
+
+    static Sprite[] Part(Sprite[] frames, int first, int count)
+    {
+        if (frames == null || frames.Length == 0) return null;
+        first = Mathf.Clamp(first, 0, frames.Length - 1);
+        count = Mathf.Clamp(count, 1, frames.Length - first);
+        var part = new Sprite[count];
+        System.Array.Copy(frames, first, part, 0, count);
+        return part;
+    }
+
+    void Face(float dir)
+    {
+        if (artRenderer && dir != 0f) artRenderer.flipX = artFacesRight ? dir < 0f : dir > 0f;
+    }
+
+    // Plays a wind-up (frames from first, count) once and waits for it; with no art it flashes instead
+    IEnumerator Windup(Sprite[] frames, int count, float fps, float flashTime)
+    {
+        Sprite[] part = Part(frames, 0, count);
+        if (HasArt && part != null)
+        {
+            Play(part, fps, false);
+            yield return new WaitForSeconds(part.Length / Mathf.Max(fps, 0.01f) / Speed);
+        }
+        else yield return Warn(flashTime);
+    }
 
     // ---------------- Sprite animation ----------------
     Sprite[] animFrames;
@@ -282,6 +333,10 @@ public class PoisonBoss : MonoBehaviour
                 continue;
             }
 
+            // Fighting together with another boss (Level 3): wait (up to Max Turn Wait) while it attacks
+            for (float w = 0f; w < maxTurnWait && BossTurns.OtherIsAttacking(this); w += Time.deltaTime) yield return null;
+            BossTurns.Begin(this);
+
             // Close: claws. Otherwise a random attack (never the same twice in a row)
             var options = new List<int>();
             if (useCharge) options.Add(0);
@@ -301,6 +356,7 @@ public class PoisonBoss : MonoBehaviour
                 case 3: yield return Vomit(); break;
                 default: yield return Claws(); break;
             }
+            BossTurns.End(this);
             Tint(bodyColor);
             yield return new WaitForSeconds(restTime / Speed);
         }
@@ -707,6 +763,7 @@ public class PoisonBoss : MonoBehaviour
     // The player died: full health, back to the start, fight starts over
     void ResetFight()
     {
+        BossTurns.End(this);
         if (!health || health.CurrentHealth <= 0) return;
         StopAllCoroutines();
         ClearSpawned();
@@ -724,6 +781,7 @@ public class PoisonBoss : MonoBehaviour
 
     void OnDied()
     {
+        BossTurns.End(this);
         PlayerUpgrades.UnlockPoisonHook(); // the player puts his teeth on the hook: hook hits poison
         StopAllCoroutines();
         ClearSpawned();

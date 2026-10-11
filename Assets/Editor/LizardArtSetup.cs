@@ -9,8 +9,8 @@ using UnityEngine.SceneManagement;
 
 // Editor-only helper. Adds Tools > Set Up Lizard Art.
 // 1) Slices the lizard's sheets in Assets/Art/Lizard into frames (feet at the bottom of each frame).
-// 2) Puts the drawing on the Level 2 boss (in Level_2_Boss): a child "Art" shows the frames,
-//    the old green box and its eyes are hidden. His hit box stays the same.
+// 2) Puts the drawing on the Level 2 and Level 3 bosses: a child "Art" shows the frames,
+//    the old green box and its eyes are hidden. Their hit boxes stay the same.
 // Sheets:
 //   lizard_idle     1 frame  480x480  standing
 //   lizard_dash     7 frames 560x560  wind-up (0-3), spinning roll (4-6)
@@ -19,7 +19,11 @@ using UnityEngine.SceneManagement;
 public static class LizardArtSetup
 {
     const string ArtFolder = "Assets/Art/Lizard";
-    const string BossScene = "Assets/Scenes/Level_2_Boss.unity";
+    static readonly string[] BossScenes =
+    {
+        "Assets/Scenes/Level_2_Boss.unity",
+        "Assets/Scenes/Level_3_Boss.unity"
+    };
     // 60 pixels per tile, same as Hardy: the standing lizard (316 px) is about 5.3 tiles tall, 7 wide.
     // Same sharpness as Hardy. A smaller number makes him bigger but blurrier.
     const float PixelsPerUnit = 60f;
@@ -38,16 +42,35 @@ public static class LizardArtSetup
             EditorUtility.DisplayDialog("Set Up Lizard Art", "Could not find " + ArtFolder + "/lizard_idle.png.", "OK");
             return;
         }
-        if (!File.Exists(BossScene) || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
-        Scene scene = EditorSceneManager.OpenScene(BossScene, OpenSceneMode.Single);
-        PoisonBoss boss = Object.FindAnyObjectByType<PoisonBoss>();
-        if (!boss)
+        int done = 0;
+        foreach (string scenePath in BossScenes)
         {
-            EditorUtility.DisplayDialog("Set Up Lizard Art", "Sheets sliced, but there is no lizard boss in Level_2_Boss.", "OK");
+            if (!File.Exists(scenePath)) continue;
+
+            Scene scene = EditorSceneManager.OpenScene(scenePath, OpenSceneMode.Single);
+            foreach (PoisonBoss boss in Object.FindObjectsByType<PoisonBoss>(FindObjectsInactive.Include))
+            {
+                ApplyArt(boss, idle[0], dash, spew, poison);
+                done++;
+            }
+            EditorSceneManager.MarkSceneDirty(scene);
+            EditorSceneManager.SaveScene(scene);
+        }
+
+        if (done == 0)
+        {
+            EditorUtility.DisplayDialog("Set Up Lizard Art", "Sheets sliced, but no lizard boss was found in Level_2_Boss or Level_3_Boss.", "OK");
             return;
         }
 
+        EditorUtility.DisplayDialog("Set Up Lizard Art",
+            "Done! The lizard now uses his drawings on " + done + " boss(es).\n\nIdle " + idle.Length + ", Dash " + dash.Length + ", Spew " + spew.Length + ", Poison " + poison.Length + " frames.", "OK");
+    }
+
+    static void ApplyArt(PoisonBoss boss, Sprite idle, Sprite[] dash, Sprite[] spew, Sprite[] poison)
+    {
         // Hit box to match the bigger drawing, feet on the floor
         boss.transform.localScale = new Vector3(BodySize.x, BodySize.y, 1f);
         var bossSo = new SerializedObject(boss);
@@ -79,12 +102,6 @@ public static class LizardArtSetup
         SetArray(so.FindProperty("spewFrames"), spew);
         SetArray(so.FindProperty("poisonFrames"), poison);
         so.ApplyModifiedPropertiesWithoutUndo();
-
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        Selection.activeGameObject = boss.gameObject;
-        EditorUtility.DisplayDialog("Set Up Lizard Art",
-            "Done! The lizard now uses his drawings.\n\nIdle " + idle.Length + ", Dash " + dash.Length + ", Spew " + spew.Length + ", Poison " + poison.Length + " frames.", "OK");
     }
 
     // Cuts a horizontal strip (ArtFolder/name.png) into equal frames, left to right. Empty if the file is missing.
