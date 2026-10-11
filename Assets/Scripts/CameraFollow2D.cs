@@ -3,6 +3,15 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public class CameraFollow2D : MonoBehaviour
 {
+    // A horizontal band of the level (a floor). The camera never shows above Top or below Bottom
+    // while the player is in it.
+    [System.Serializable]
+    public struct CameraZone
+    {
+        public float bottom; // lowest point the camera may show (include the floor tiles you stand on)
+        public float top;    // highest point the camera may show
+    }
+
     public static CameraFollow2D Instance { get; private set; }
 
     [SerializeField] Transform target;
@@ -25,6 +34,9 @@ public class CameraFollow2D : MonoBehaviour
     [SerializeField] bool lockToFloors;            // ON: the camera only shows the floor the player is on
     [SerializeField] float floorHeight = 10f;       // height of one floor (one screen)
     [SerializeField] float firstFloorCenterY = 0f;  // center of the bottom floor
+
+    [Header("Zones (optional, for floors of different heights)")]
+    [SerializeField] CameraZone[] zones; // bottom to top. The player is in the highest zone whose Bottom + 1 is below them.
 
     Camera cam;
     PlayerController2D player;
@@ -72,6 +84,16 @@ public class CameraFollow2D : MonoBehaviour
             desired.y = firstFloorCenterY + floor * floorHeight;
         }
 
+        // Zones: keep the camera inside the player's floor, so the floors above and below stay hidden
+        if (zones != null && zones.Length > 0 && !hasOverride)
+        {
+            CameraZone zone = zones[ZoneAt(target.position.y)];
+            float halfH = cam.orthographicSize;
+            desired.y = zone.top - zone.bottom <= halfH * 2f
+                ? (zone.bottom + zone.top) * 0.5f
+                : Mathf.Clamp(desired.y, zone.bottom + halfH, zone.top - halfH);
+        }
+
         Vector3 pos;
         if (snapNext)
         {
@@ -103,6 +125,15 @@ public class CameraFollow2D : MonoBehaviour
         }
 
         transform.position = pos;
+    }
+
+    // Highest zone the player has climbed into (a zone starts 1 unit above its Bottom, so standing on its floor counts)
+    int ZoneAt(float y)
+    {
+        int found = 0;
+        for (int i = 0; i < zones.Length; i++)
+            if (y >= zones[i].bottom + 1f) found = i;
+        return found;
     }
 
     // Show only this area (for example a secret room) until ClearBoundsOverride is called
