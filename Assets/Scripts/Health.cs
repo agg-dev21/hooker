@@ -94,6 +94,15 @@ public class Health : MonoBehaviour
         if (isPlayer) StartIFrames(Mathf.Max(invincibleTime, playerHitIFrames));
     }
 
+    // Damage over time (poison): ignores invincibility frames and does not start them, no flash or blink
+    public void TakeTickDamage(int amount)
+    {
+        if (CurrentHealth <= 0) return;
+        CurrentHealth -= amount;
+        onDamaged?.Invoke();
+        if (CurrentHealth <= 0) Die();
+    }
+
     public void Heal(int amount)
     {
         CurrentHealth = Mathf.Min(CurrentHealth + amount, maxHealth);
