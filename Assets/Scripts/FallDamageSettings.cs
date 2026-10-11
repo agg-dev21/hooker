@@ -20,7 +20,7 @@ public class FallDamageSettings : ScriptableObject
     {
         get
         {
-            if (!loaded)
+            if (!loaded || !current) // look again if it wasn't found (Unity keeps old values between plays here)
             {
                 current = Resources.Load<FallDamageSettings>("FallDamageSettings");
                 if (!current) current = CreateInstance<FallDamageSettings>();

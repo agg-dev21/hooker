@@ -11,6 +11,7 @@ public class WaterWave : MonoBehaviour
     bool hitPlayer;
     Transform body, crest;
     Transform art;          // the drawn water (when KK's art is set up)
+    float knockback, slowFactor = 1f, slowTime;
     float artScale;
 
     public void Setup(float dir, float waveSpeed, float waveWidth, float waveHeight, float floorY, float stopX,
@@ -33,6 +34,14 @@ public class WaterWave : MonoBehaviour
         var rb = gameObject.AddComponent<Rigidbody2D>(); // so the trigger works while it moves
         rb.bodyType = RigidbodyType2D.Kinematic;
         SetHeight(0.05f);
+    }
+
+    // What a hit does besides soaking: pushes the player along with the wave and slows them down
+    public void SetHitEffects(float push, float slow, float slowSeconds)
+    {
+        knockback = push;
+        slowFactor = slow;
+        slowTime = slowSeconds;
     }
 
     // Use a drawing instead of the plain boxes. scale = world size of the drawing (same for every wave,
@@ -94,6 +103,10 @@ public class WaterWave : MonoBehaviour
     void Touch(Collider2D other)
     {
         if (hitPlayer || !other.TryGetComponent(out PlayerController2D _)) return;
-        if (Soaked.Hit(other.gameObject, damagePerStack, firstTime, refreshTime)) hitPlayer = true; // one soak per wave
+        if (!Soaked.Hit(other.gameObject, damagePerStack, firstTime, refreshTime)) return;
+        hitPlayer = true; // one soak per wave
+        if (knockback > 0f && other.attachedRigidbody)
+            other.attachedRigidbody.linearVelocity = new Vector2(Mathf.Sign(speed) * knockback, knockback * 0.45f);
+        if (slowTime > 0f && other.TryGetComponent(out PlayerController2D pc)) pc.Slow(slowFactor, slowTime);
     }
 }

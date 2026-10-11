@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LevelKit;
 
-// Editor-only. Adds Tools > Build Level 4 Boss Room.
+// Editor-only. Adds Tools > Rebuild Levels > Level 4 Boss Room.
 // The final boss room at the end of the flooded hallway (Level_4): a big flooded hall.
 //   Arena inside x 0-40, floor top at y 0, ceiling at y 18. You come in on the left.
 //   Two low side ledges (top at y 4), one high middle ledge (top at y 8), two hook rings above.
@@ -22,7 +22,7 @@ public static class Level4BossRoomBuilder
     static readonly Color OneWayColor = new Color(0.4f, 0.45f, 0.5f);
     static readonly Color LanternColor = new Color(0.5f, 0.85f, 1f);
 
-    [MenuItem("Tools/Build Level 4 Boss Room")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 4 Boss Room")]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;
@@ -60,17 +60,17 @@ public static class Level4BossRoomBuilder
 
     // ---------------- The father ----------------
 
-    const int FatherHealth = 500;
+    const int FatherHealth = 800; // the toughest boss (see Tools > Level 4 Boss > Make KK Harder)
     static readonly Vector2 FatherSize = new Vector2(2f, 4f);
 
     // Puts the father (placeholder box) on "BossSpot (empty)" with his health bar. Running it again replaces him.
-    [MenuItem("Tools/Add Father To Level 4 Boss")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK")]
     static void AddFather()
     {
         string path = ScenesFolder + "/" + SceneName + ".unity";
         if (!System.IO.File.Exists(path))
         {
-            EditorUtility.DisplayDialog("Add Father", "Build the room first (Tools > Build Level 4 Boss Room).", "OK");
+            EditorUtility.DisplayDialog("Add Father", "Build the room first (Tools > Rebuild Levels > Level 4 Boss Room).", "OK");
             return;
         }
         if (!UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

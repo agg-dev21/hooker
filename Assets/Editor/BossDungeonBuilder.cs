@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using UnityEngine.UI;
 
-// Editor-only. Adds the menu item Tools > Build Level 2 Boss (Dungeon).
+// Editor-only. Adds the menu item Tools > Rebuild Levels > Level 2 Boss (Dungeon).
 // Builds Level_2_Boss: a dark stone dungeon under the poison tower, home of the Plague Warden (PoisonBoss).
 // The boss door in Level_2 leads here. Makes the scene from Room_Template and adds it to the Scene List.
 //
@@ -45,7 +45,7 @@ public static class BossDungeonBuilder
     static Sprite boxSprite;
     static int groundLayer;
 
-    [MenuItem("Tools/Build Level 2 Boss (Dungeon)")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 2 Boss (Dungeon)")]
     static void Build()
     {
         string path = $"{ScenesFolder}/{SceneName}.unity";

@@ -21,6 +21,20 @@ public class BoatExit : MonoBehaviour
         StartCoroutine(Sail(player));
     }
 
+    // Where the player stands in the middle of the boat (feet on top of it)
+    public static Vector3 MiddleOfBoat(Transform boat, Transform player)
+    {
+        float top = boat.position.y + 0.5f;
+        if (boat.TryGetComponent(out SpriteRenderer bsr)) top = bsr.bounds.max.y;
+        float feet = 1f; // from the player's middle down to their feet (from the collider's shape: works with physics off)
+        float sy = Mathf.Abs(player.lossyScale.y);
+        if (player.TryGetComponent(out BoxCollider2D box)) feet = (box.size.y * 0.5f - box.offset.y) * sy;
+        else if (player.TryGetComponent(out CapsuleCollider2D cap)) feet = (cap.size.y * 0.5f - cap.offset.y) * sy;
+        return new Vector3(boat.position.x, top + feet + 0.02f, player.position.z);
+    }
+
+    Vector3 MiddleOfBoat(PlayerController2D player) => MiddleOfBoat(transform, player.transform);
+
     IEnumerator Sail(PlayerController2D player)
     {
         sailing = true;
@@ -33,6 +47,15 @@ public class BoatExit : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             rb.simulated = false;
         }
+        // Slide to the middle of the boat, feet on its deck, then sail
+        Vector3 from = player.transform.position;
+        Vector3 to = MiddleOfBoat(player);
+        for (float m = 0f; m < 0.3f; m += Time.deltaTime)
+        {
+            player.transform.position = Vector3.Lerp(from, to, m / 0.3f);
+            yield return null;
+        }
+        player.transform.position = to;
         player.transform.SetParent(transform);
 
         float t = 0f;

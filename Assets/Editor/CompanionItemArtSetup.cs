@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.U2D.Sprites;
 using UnityEngine;
 
-// Editor-only helper. Adds Tools > Set Up Companion And Item Art.
+// Editor-only helper. Adds Tools > Art > Ariel And Items.
 // 1) Slices the companion's sheets in Assets/Art/Companion and puts them in Resources/CompanionSettings:
 //      companion_idle    2 frames 800x800    floating
 //      companion_appear  5 frames 800x800    popping in
@@ -28,7 +28,7 @@ public static class CompanionItemArtSetup
         (ItemType.Invulnerability, "item_ring_blue"),
     };
 
-    [MenuItem("Tools/Set Up Companion And Item Art")]
+    [MenuItem("Tools/Art/Ariel And Items")]
     static void SetUp()
     {
         // Companion: about 1.8 tiles tall (her drawing is about 750 px), the light column 5 x 10 tiles

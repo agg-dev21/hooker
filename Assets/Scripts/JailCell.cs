@@ -31,12 +31,27 @@ public class JailCell : MonoBehaviour
     void Start()
     {
         if (prompt) prompt.SetActive(false);
+        ShowAriel();
         if (Companion.Found)
         {
             open = true;
             if (bars) bars.position += Vector3.up * barsRise;
             if (prisoner) prisoner.SetActive(false);
         }
+    }
+
+    // The waiting prisoner shows Ariel's drawing (first idle frame) instead of the plain box, standing on the floor
+    void ShowAriel()
+    {
+        CompanionSettings s = CompanionSettings.Current;
+        if (!prisoner || !s || s.idleFrames == null || s.idleFrames.Length == 0) return;
+        if (!prisoner.TryGetComponent(out SpriteRenderer sr)) return;
+        Transform t = prisoner.transform;
+        float floorY = t.position.y - Mathf.Abs(t.lossyScale.y) * 0.5f; // bottom of the old box
+        sr.sprite = s.idleFrames[0];
+        sr.color = Color.white;
+        t.localScale = Vector3.one;
+        t.position = new Vector3(t.position.x, floorY + sr.sprite.bounds.extents.y - sr.sprite.bounds.center.y, t.position.z);
     }
 
     void Update()

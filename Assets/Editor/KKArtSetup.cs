@@ -4,19 +4,19 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Set Up KK Art.
+// Editor-only helper. Adds Tools > Art > KK.
 // Slices KK's sheets in Assets/Art/KK and puts them on the father (FatherBoss) in Level_4_Boss:
 //   kk_idle    4 frames 1600x1600  standing (when not attacking)
 //   kk_attack  5 frames 1600x1600  raising his arms to call the waves
 //   kk_surf    4 frames  800x800   the water he floats on while he moves
 //   kk_wave    4 frames  800x1200  the waves, small to tall (wave 1 = first drawing)
-// Run Tools > Add Father To Level 4 Boss first. His hit box stays the same.
+// Run Tools > Rebuild Levels > Level 4 Boss: Add KK first. His hit box stays the same.
 public static class KKArtSetup
 {
     const string Folder = "Assets/Art/KK";
     const string BossScene = "Assets/Scenes/Level_4_Boss.unity";
 
-    [MenuItem("Tools/Set Up KK Art")]
+    [MenuItem("Tools/Art/KK")]
     static void SetUp()
     {
         // About 4.5 tiles tall (he is drawn about 1420 px tall)
@@ -35,7 +35,7 @@ public static class KKArtSetup
         FatherBoss kk = Object.FindAnyObjectByType<FatherBoss>(FindObjectsInactive.Include);
         if (!kk)
         {
-            EditorUtility.DisplayDialog("Set Up KK Art", "Sheets sliced, but KK isn't in Level_4_Boss yet. Run Tools > Add Father To Level 4 Boss, then this again.", "OK");
+            EditorUtility.DisplayDialog("Set Up KK Art", "Sheets sliced, but KK isn't in Level_4_Boss yet. Run Tools > Rebuild Levels > Level 4 Boss: Add KK, then this again.", "OK");
             return;
         }
 

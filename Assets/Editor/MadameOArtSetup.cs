@@ -4,7 +4,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Set Up Madame O Art.
+// Editor-only helper. Adds Tools > Art > Madame O.
 // Slices Madame O's sheets in Assets/Art/MadameO and puts them on her (OctopusBoss) in Level_3_Boss:
 //   madameo_idle    7 frames 1500x1500  floating
 //   madameo_attack  7 frames 1500x1500  throwing
@@ -16,7 +16,7 @@ public static class MadameOArtSetup
     const string Folder = "Assets/Art/MadameO";
     const string BossScene = "Assets/Scenes/Level_3_Boss.unity";
 
-    [MenuItem("Tools/Set Up Madame O Art")]
+    [MenuItem("Tools/Art/Madame O")]
     static void SetUp()
     {
         // About 5.8 tiles tall (she is drawn about 1015 px tall)

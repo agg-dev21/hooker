@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.U2D.Sprites;
 using UnityEngine;
 
-// Editor-only helper. Adds Tools > Set Up Poison Art.
+// Editor-only helper. Adds Tools > Art > Poison.
 // Slices the poison sheets in Assets/Art/Poison and fills Assets/Resources/PoisonArt.asset,
 // which every poison hazard in every level uses when the game runs.
 // Sheets (cut from the lizard's poison sheet):
@@ -19,7 +19,7 @@ public static class PoisonArtSetup
     const string AssetPath = "Assets/Resources/PoisonArt.asset";
     const float PixelsPerUnit = 88f; // same as the lizard
 
-    [MenuItem("Tools/Set Up Poison Art")]
+    [MenuItem("Tools/Art/Poison")]
     static void SetUp()
     {
         Sprite[] drop = Slice("poison_drop", 39, new Vector2(0.5f, 0.5f));

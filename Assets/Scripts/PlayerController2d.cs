@@ -52,6 +52,7 @@ public class PlayerController2D : MonoBehaviour
     float dashTimer;
     float dashCooldownTimer;
     float rootTimer;     // chained: can't move, jump, dash or hook for this long
+    float slowTimer, slowFactor = 1f; // slowed down (KK's waves)
 
     public int FacingDirection { get; private set; } = 1;
     public float SpeedMultiplier { get; set; } = 1f; // items (speed boost) change this
@@ -70,6 +71,13 @@ public class PlayerController2D : MonoBehaviour
         jumpBufferCounter = 0f;
         moveInput = 0f;
         if (isDashing) EndDash();
+    }
+
+    // Moves slower for a while (factor 0.5 = half speed)
+    public void Slow(float factor, float seconds)
+    {
+        slowFactor = Mathf.Clamp(factor, 0.05f, 1f);
+        slowTimer = Mathf.Max(slowTimer, seconds);
     }
 
     // Free again right away (fight reset, respawn)
@@ -145,7 +153,8 @@ public class PlayerController2D : MonoBehaviour
             return;
         }
 
-        float target = moveInput * moveSpeed * SpeedMultiplier;
+        if (slowTimer > 0f) slowTimer -= Time.fixedDeltaTime;
+        float target = moveInput * moveSpeed * SpeedMultiplier * (slowTimer > 0f ? slowFactor : 1f);
         float rate = Mathf.Abs(target) > 0.01f ? acceleration : deceleration;
         if (!isGrounded) rate *= airControl;
 

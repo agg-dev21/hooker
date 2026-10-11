@@ -15,7 +15,7 @@ using UnityEngine.UI;
 public class PlayerChain : MonoBehaviour
 {
     public const string SirenChainSave = "ability.sirenChain";
-    public static bool SirenChainUnlocked => PlayerPrefs.GetInt(SirenChainSave, 0) == 1;
+    public static bool SirenChainUnlocked => !RunOrder.InTutorial && PlayerPrefs.GetInt(SirenChainSave, 0) == 1; // never in the tutorial
 
     // Called when the Siren dies
     public static void UnlockSirenChain()

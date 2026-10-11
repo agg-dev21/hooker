@@ -56,7 +56,7 @@ public class CompanionSettings : ScriptableObject
     public int strongDamageMin = 25;
     public int strongDamageMax = 60;
 
-    [Header("Art (filled by Tools > Set Up Companion And Item Art)")]
+    [Header("Art (filled by Tools > Art > Ariel And Items)")]
     public Sprite[] idleFrames;           // floating
     public float idleFps = 3f;
     public Sprite[] appearFrames;         // popping in
@@ -77,7 +77,7 @@ public class CompanionSettings : ScriptableObject
     {
         get
         {
-            if (!loaded)
+            if (!loaded || !current) // look again if it wasn't found (Unity keeps old values between plays here)
             {
                 current = Resources.Load<CompanionSettings>("CompanionSettings");
                 if (!current) current = CreateInstance<CompanionSettings>();

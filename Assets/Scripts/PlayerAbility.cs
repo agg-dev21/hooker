@@ -12,11 +12,11 @@ using UnityEngine.UI;
 //  - An icon in the bottom-right corner shows the key and a dark sweep while it recharges.
 //  - The unlock is saved, so it stays after quitting.
 // Nothing needs to be set up in scenes: this adds itself to the player in every scene.
-// The pictures come from Assets/Resources/AbilityArt.asset (made by Tools > Set Up Hardy Art).
+// The pictures come from Assets/Resources/AbilityArt.asset (made by Tools > Art > Hardy).
 public class PlayerAbility : MonoBehaviour
 {
     public const string HardySpikesSave = "ability.hardySpikes";
-    public static bool HardySpikesUnlocked => PlayerPrefs.GetInt(HardySpikesSave, 0) == 1;
+    public static bool HardySpikesUnlocked => !RunOrder.InTutorial && PlayerPrefs.GetInt(HardySpikesSave, 0) == 1; // never in the tutorial
 
     // Called when Hardy dies
     public static void UnlockHardySpikes()

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LevelKit;
 
-// Editor-only. Adds Tools > Build Level 3 Boss (Octopus).
+// Editor-only. Adds Tools > Rebuild Levels > Level 3 Boss.
 // Level_3_Boss: the Abyssal Throne. The Chain Siren (half woman, half octopus) sits on her throne on the
 // left side and never moves; she attacks with chains (see OctopusBoss.cs). You come in from the right.
 // The lizard from Level 2 is back too: he runs around the arena with his Level 2 moves (PoisonBoss).
@@ -17,7 +17,7 @@ public static class OctopusBossBuilder
 {
     const string SceneName = "Level_3_Boss";
     const string NextScene = "Level_4";
-    const int BossHealth = 600; // tougher than Hardy (see Tools > Make Level 3 Boss Harder)
+    const int BossHealth = 600; // tougher than Hardy (see Tools > Level 3 Boss > Make Harder)
     const int LizardHealth = 320;
     public const float SirenLift = 7f; // Madame O sits this high above the floor, on a ledge in the top-left
 
@@ -29,7 +29,7 @@ public static class OctopusBossBuilder
     static readonly Color ChainColor = new Color(0.5f, 0.5f, 0.56f);
     static readonly Color OneWayColor = new Color(0.4f, 0.45f, 0.5f);
 
-    [MenuItem("Tools/Build Level 3 Boss (Octopus)")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 3 Boss")]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;
@@ -145,7 +145,7 @@ public static class OctopusBossBuilder
 
     // Existing Level_3_Boss: moves Madame O up onto a high throne without rebuilding the room
     // (keeps everything else, like Oscar's art). Running it twice does nothing the second time.
-    [MenuItem("Tools/Raise Madame O (Level 3 Boss)")]
+    [MenuItem("Tools/Level 3 Boss/Raise Madame O")]
     static void RaiseInExistingScene()
     {
         string path = ScenesFolder + "/" + SceneName + ".unity";
@@ -182,7 +182,7 @@ public static class OctopusBossBuilder
     // The Level 2 lizard (same script, same moves), kept out of the throne area
     static Health BuildLizard(Transform parent)
     {
-        Vector2 size = new Vector2(5.9f, 4.1f); // same as Tools > Set Up Lizard Art (drawn at 60 pixels per tile)
+        Vector2 size = new Vector2(5.9f, 4.1f); // same as Tools > Art > Oscar (Lizard) (drawn at 60 pixels per tile)
         GameObject lizard = Box("Lizard", parent, new Vector2(20f, size.y * 0.5f), size, new Color(0.25f, 0.65f, 0.15f));
         lizard.GetComponent<SpriteRenderer>().sortingOrder = 5;
         foreach (float ex in new[] { -0.2f, 0.2f }) // placeholder eyes (hidden when the drawing is on)
@@ -210,13 +210,13 @@ public static class OctopusBossBuilder
         return lizard.GetComponent<Health>();
     }
 
-    // Same drawings as the Level 2 lizard (sliced by Tools > Set Up Lizard Art). Keeps the green box if they aren't sliced yet.
+    // Same drawings as the Level 2 lizard (sliced by Tools > Art > Oscar (Lizard)). Keeps the green box if they aren't sliced yet.
     static void PutLizardArt(PoisonBoss boss)
     {
         Sprite[] idle = Frames("lizard_idle"), dash = Frames("lizard_dash"), spew = Frames("lizard_spew"), poison = Frames("lizard_poison");
         if (idle.Length == 0)
         {
-            Debug.LogWarning("Level 3 Boss: the lizard drawings aren't sliced yet. Run Tools > Set Up Lizard Art, then build this again.");
+            Debug.LogWarning("Level 3 Boss: the lizard drawings aren't sliced yet. Run Tools > Art > Oscar (Lizard), then build this again.");
             return;
         }
         if (boss.TryGetComponent(out SpriteRenderer boxRenderer)) boxRenderer.enabled = false;

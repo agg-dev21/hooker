@@ -7,7 +7,7 @@ using UnityEngine;
 public class BoatDrive : MonoBehaviour
 {
     [SerializeField] PlayerController2D rider;     // empty = finds the player in the scene
-    [SerializeField] Vector2 riderOffset = new Vector2(0f, 1.5f); // where the player stands on the boat
+    [SerializeField] Vector2 riderOffset = new Vector2(0f, 1.5f); // (old: the player now always stands in the middle of the boat)
     [SerializeField] float maxSpeed = 7f;
     [SerializeField] float acceleration = 10f;
     [SerializeField] float deceleration = 8f;
@@ -35,13 +35,13 @@ public class BoatDrive : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
             rb.simulated = false;
         }
+        rider.transform.position = BoatExit.MiddleOfBoat(transform, rider.transform); // middle of the boat, feet on the deck
         rider.transform.SetParent(transform);
-        rider.transform.position = transform.position + (Vector3)riderOffset;
     }
 
     void Update()
     {
-        float input = leaving ? 0f : ReadInput();
+        float input = leaving || DialogueManager.Busy ? 0f : ReadInput(); // the boat waits while Raphael talks
         float target = input * maxSpeed;
         float rate = Mathf.Abs(target) > 0.01f ? acceleration : deceleration;
         speed = Mathf.MoveTowards(speed, target, rate * Time.deltaTime);

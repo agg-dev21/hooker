@@ -5,7 +5,7 @@ using UnityEditor;
 using UnityEditor.U2D.Sprites;
 using UnityEngine;
 
-// Editor-only helper. Adds Tools > Set Up Player Art.
+// Editor-only helper. Adds Tools > Art > Raphael (Player).
 // Slices the main character's sheets in Assets/Art/Player (1600 x 1600 frames, feet near the bottom)
 // and fills Assets/Resources/PlayerArtSet.asset. After that the player shows his drawings in every scene
 // (PlayerArt adds itself), nothing else to set up.
@@ -18,7 +18,7 @@ public static class PlayerArtSetup
     const float PixelsPerUnit = 460f;
     static readonly Vector2 Pivot = new Vector2(0.45f, 296f / 1600f); // between his feet
 
-    [MenuItem("Tools/Set Up Player Art")]
+    [MenuItem("Tools/Art/Raphael (Player)")]
     static void SetUp()
     {
         Sprite[] run = Slice("player_run");

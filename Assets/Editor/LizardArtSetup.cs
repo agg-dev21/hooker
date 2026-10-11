@@ -7,7 +7,7 @@ using UnityEditor.U2D.Sprites;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Set Up Lizard Art.
+// Editor-only helper. Adds Tools > Art > Oscar (Lizard).
 // 1) Slices the lizard's sheets in Assets/Art/Lizard into frames (feet at the bottom of each frame).
 // 2) Puts the drawing on the Level 2 and Level 3 bosses: a child "Art" shows the frames,
 //    the old green box and its eyes are hidden. Their hit boxes stay the same.
@@ -30,7 +30,7 @@ public static class LizardArtSetup
     // His hit box (world units), sized to fit the drawing. His feet stay on the floor (groundY).
     static readonly Vector2 BodySize = new Vector2(5.9f, 4.1f);
 
-    [MenuItem("Tools/Set Up Lizard Art")]
+    [MenuItem("Tools/Art/Oscar (Lizard)")]
     static void SetUp()
     {
         Sprite[] idle = Slice("lizard_idle", 480, 480, new Vector2(0.5f, 24f / 480f));

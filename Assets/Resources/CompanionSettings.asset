@@ -20,6 +20,9 @@ MonoBehaviour:
   dangerRadius: 12
   safeTimeToReturn: 1.2
   fadeTime: 0.4
+  joinStayTime: 5
+  minShowTime: 2
+  ignoreDangerBehindWalls: 1
   cooldown: 10
   chargeTime: 0.35
   beamLength: 18
@@ -30,6 +33,22 @@ MonoBehaviour:
   beamShowTime: 0.35
   beamFps: 14
   beamHitFrame: 4
+  aimTime: 1.5
+  tapTime: 0.25
+  maxChargeTime: 1.5
+  cursorSpeed: 14
+  maxAimDistance: 16
+  scatterRadius: 2.5
+  autoRadius: 6
+  shortBeamWidth: 1.5
+  shortBeamTime: 0.3
+  shortBeamDamage: 10
+  strongWidthMin: 2.5
+  strongWidthMax: 5
+  strongTimeMin: 0.5
+  strongTimeMax: 1.2
+  strongDamageMin: 25
+  strongDamageMax: 60
   idleFrames:
   - {fileID: -3410520495929146326, guid: 10aa309489f015a428bf556c42af7b8c, type: 3}
   - {fileID: 5662674913346694691, guid: 10aa309489f015a428bf556c42af7b8c, type: 3}

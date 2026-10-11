@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // The poison drawings used everywhere in the game (Assets/Resources/PoisonArt.asset).
-// Made and filled by Tools > Set Up Poison Art. Select the asset to change sizes and speeds.
+// Made and filled by Tools > Art > Poison. Select the asset to change sizes and speeds.
 //   Drop      - falling drops (drippers, the lizard's rain) and the lizard's vomit globs
 //   Splash    - plays once where poison lands
 //   Puddle    - poison puddles and poison floors (repeats along the whole width)
@@ -11,7 +11,7 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "PoisonArt", menuName = "Hooker/Poison Art")]
 public class PoisonArt : ScriptableObject
 {
-    [Header("Drawings (filled by Tools > Set Up Poison Art)")]
+    [Header("Drawings (filled by Tools > Art > Poison)")]
     public Sprite drop;
     public Sprite[] splash;
     public Sprite puddle;
@@ -45,7 +45,7 @@ public class PoisonArt : ScriptableObject
     {
         get
         {
-            if (!loaded)
+            if (!loaded || !current) // look again if it wasn't found (Unity keeps old values between plays here)
             {
                 current = Resources.Load<PoisonArt>("PoisonArt");
                 loaded = true;

@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LevelKit;
 
-// Editor-only. Adds Tools > Build Level 4 (Flooded Hall).
+// Editor-only. Adds Tools > Rebuild Levels > Level 4 (Flooded Hall).
 // Level 4: one straight flooded hallway, left to right, that leads straight to the boss room.
 // No enemies, just a few basic obstacles:
 //   low walls to jump, water pits to jump over, a crate wall to punch through.
@@ -28,7 +28,7 @@ public static class Level4Builder
     // Water pits (x from, x to). Everything else along the hallway is floor.
     static readonly Vector2Int[] Pits = { new Vector2Int(16, 20), new Vector2Int(36, 42), new Vector2Int(58, 62), new Vector2Int(64, 68) };
 
-    [MenuItem("Tools/Build Level 4 (Flooded Hall)")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 4 (Flooded Hall)")]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;

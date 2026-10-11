@@ -1,12 +1,12 @@
 using UnityEngine;
 
 // The main character's drawings and animation speeds (Assets/Resources/PlayerArtSet.asset).
-// Made and filled by Tools > Set Up Player Art. Select it to change the speeds. Used by PlayerArt.
+// Made and filled by Tools > Art > Raphael (Player). Select it to change the speeds. Used by PlayerArt.
 // Frame 0 of every sheet is the standing pose; the animations use the frames after it.
 [CreateAssetMenu(fileName = "PlayerArtSet", menuName = "Hooker/Player Art Set")]
 public class PlayerArtSet : ScriptableObject
 {
-    [Header("Frames (filled by Tools > Set Up Player Art)")]
+    [Header("Frames (filled by Tools > Art > Raphael (Player))")]
     public Sprite[] run;      // 0 standing, 1-4 running
     public Sprite[] jump;     // 0 standing, 1 going up, 2 falling, 3 landing
     public Sprite[] dash;     // 0 standing, 1 start, 2-3 speed blur, 4 stop, 5 standing
@@ -31,7 +31,7 @@ public class PlayerArtSet : ScriptableObject
     {
         get
         {
-            if (!loaded)
+            if (!loaded || !current) // look again if it wasn't found (Unity keeps old values between plays here)
             {
                 current = Resources.Load<PlayerArtSet>("PlayerArtSet");
                 loaded = true;

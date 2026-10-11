@@ -72,7 +72,7 @@ public class OctopusBoss : MonoBehaviour, IChainStunnable
     [SerializeField] int throwDamage = 12;
     [SerializeField] float throwWarnTime = 0.45f;
 
-    [Header("Art (filled by Tools > Set Up Madame O Art)")]
+    [Header("Art (filled by Tools > Art > Madame O)")]
     [SerializeField] SpriteRenderer artRenderer;    // child that shows her (the body box stays for hits)
     [SerializeField] bool artFacesRight = false;    // her drawing throws to the left
     [SerializeField] Sprite[] idleFrames;
@@ -176,6 +176,7 @@ public class OctopusBoss : MonoBehaviour, IChainStunnable
         resumeDelay = -1f;
         while (true)
         {
+            while (DialogueManager.Busy) yield return null; // people are talking: no attacks
             if (!player) { yield return null; continue; }
 
             // Fighting together with another boss: wait (up to Max Turn Wait) while it attacks

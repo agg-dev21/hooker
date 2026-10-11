@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-// Editor-only. Adds the menu item Tools > Build Level 2 (Poison).
+// Editor-only. Adds the menu item Tools > Rebuild Levels > Level 2 (Poison Tower).
 // Builds the poison level from the hand-drawn layout: a tall tower you go DOWN through.
 // Makes Level_2 from Room_Template (so the boat at the end of Level_1_Sail lands here), adds it to the Scene List.
 //
@@ -70,7 +70,7 @@ public static class PoisonLevelBuilder
     static Sprite boxSprite;
     static int groundLayer;
 
-    [MenuItem("Tools/Build Level 2 (Poison)")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 2 (Poison Tower)")]
     static void Build()
     {
         string path = $"{ScenesFolder}/{LevelName}.unity";
@@ -362,7 +362,7 @@ public static class PoisonLevelBuilder
     }
 
     // Menu item: apply the camera settings to the open Level_2 without rebuilding the level
-    [MenuItem("Tools/Level 2: Update Camera")]
+    // (menu removed: one-time fix, already done)
     static void UpdateCamera()
     {
         PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>(FindObjectsInactive.Include);

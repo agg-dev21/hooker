@@ -4,7 +4,7 @@ using UnityEngine.SceneManagement;
 // Shows the main character's drawings instead of the plain box, and picks the animation from what he is doing:
 // standing, running, jumping / falling / landing, dashing, slashing (punch) and throwing the hook.
 // Colour effects on the player (poison green, hit flash, blinking) show on the drawing too.
-// Adds itself to the player in every scene once Tools > Set Up Player Art has been run. His hit box is unchanged.
+// Adds itself to the player in every scene once Tools > Art > Raphael (Player) has been run. His hit box is unchanged.
 public class PlayerArt : MonoBehaviour
 {
     PlayerArtSet A => PlayerArtSet.Current;
@@ -101,7 +101,11 @@ public class PlayerArt : MonoBehaviour
         int hookFrames = Count(A.hook) - 1;
 
         Sprite frame;
-        if (attackFrames > 0 && sincePunch < attackFrames / A.attackFps)
+        if (controller && !controller.enabled)
+        {
+            frame = A.run[0]; // riding a boat or being carried: just stand
+        }
+        else if (attackFrames > 0 && sincePunch < attackFrames / A.attackFps)
         {
             frame = A.attack[1 + Mathf.Min(attackFrames - 1, Mathf.FloorToInt(sincePunch * A.attackFps))];
             facing = Side(combat.LastAttackDir.x, facing);

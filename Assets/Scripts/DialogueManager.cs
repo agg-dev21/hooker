@@ -26,6 +26,9 @@ public class DialogueManager : MonoBehaviour
 
     public bool IsOpen { get; private set; }
 
+    // True while any dialogue is showing (bosses wait instead of attacking)
+    public static bool Busy => Instance && Instance.IsOpen;
+
     List<DialogueLine> lines;
     int index;
     int openedFrame;

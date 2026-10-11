@@ -27,11 +27,11 @@ public class HardyBoss : MonoBehaviour, IChainStunnable
     [SerializeField] float restTime = 0.5f;   // pause between attacks
     [SerializeField] GameObject healthBarRoot; // hidden when the boss dies
     [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = ask to continue, then fade to this scene
-    [SerializeField] float sceneAfterDeathDelay = 120f; // seconds after he dies before the player is asked to continue (room for dialogue)
+    [SerializeField] float sceneAfterDeathDelay = 2f;   // seconds after he dies (and his last words) before the player is asked to continue
     [SerializeField] string continueMessage = "Hardy is defeated.\nSet sail?";
     [SerializeField] Animator animator;        // optional: pose triggers are sent here if you use an Animator
 
-    [Header("Art (sprite frames; filled by Tools > Set Up Hardy Art)")]
+    [Header("Art (sprite frames; filled by Tools > Art > Hardy)")]
     [SerializeField] bool artFacesRight = false;   // the drawings face left
     [SerializeField] Sprite blockSprite;           // plain square for attacks that have no art yet
     [SerializeField] Sprite[] walkFrames;          // first frame is also used when standing still
@@ -371,6 +371,7 @@ public class HardyBoss : MonoBehaviour, IChainStunnable
 
         while (true)
         {
+            while (DialogueManager.Busy) yield return null; // people are talking: no attacks
             var options = new List<int>();
             if (useTentacle) options.Add(0);
             if (useLeap) options.Add(1);

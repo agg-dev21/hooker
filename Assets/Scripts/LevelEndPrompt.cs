@@ -34,6 +34,8 @@ public class LevelEndPrompt : MonoBehaviour
     IEnumerator WaitThenAsk()
     {
         yield return new WaitForSeconds(delay);
+        while (DialogueManager.Busy) yield return null;   // let the boss's last words finish first
+        yield return new WaitForSeconds(0.5f);
         string key = GameInput.KeyName(GameInput.GetKey(GameAction.Interact));
         text.text = message + "\n<size=70%>Press " + key + " to continue</size>";
         panel.SetActive(true);

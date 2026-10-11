@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-// Editor-only helper. Adds Tools > Set Up Hardy Art.
+// Editor-only helper. Adds Tools > Art > Hardy.
 // 1) Slices Hardy's sprite sheets in Assets/Art/Hardy into frames.
 // 2) Puts the frames on Hardy (in Level_1_Deck) and sizes him and his attacks to match the art.
 // Sheets (all frames 400 px tall):
@@ -26,7 +26,7 @@ public static class HardyArtSetup
     const string SquareTile = "Assets/Tiles/Square.asset";
     const float PixelsPerUnit = 60f; // a 400 px frame is about 6.7 tiles tall: Hardy's body is about 6 tiles
 
-    [MenuItem("Tools/Set Up Hardy Art")]
+    [MenuItem("Tools/Art/Hardy")]
     static void SetUp()
     {
         Vector2 center = new Vector2(0.5f, 0.5f);
@@ -54,7 +54,7 @@ public static class HardyArtSetup
         HardyBoss boss = Object.FindAnyObjectByType<HardyBoss>();
         if (!boss)
         {
-            EditorUtility.DisplayDialog("Set Up Hardy Art", "Sheets sliced, but Hardy is not in the deck. Run Tools > Add Hardy To Deck first, then this again.", "OK");
+            EditorUtility.DisplayDialog("Set Up Hardy Art", "Sheets sliced, but Hardy is not in the deck. Run Tools > Rebuild Levels > Level 1 Deck: Add Hardy first, then this again.", "OK");
             return;
         }
 

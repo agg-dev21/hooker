@@ -34,7 +34,7 @@ public static class TutorialRoomBuilder
     const float HalfWidth = HalfHeight * 16f / 9f; // about 8.89
     const int FloorRows = 2;
 
-    [MenuItem("Tools/Build Tutorial Rooms")]
+    // (menu removed: replaced by Tools > Rebuild Tutorial)
     static void Build()
     {
         string templatePath = ScenePath(TemplateName);
@@ -159,7 +159,7 @@ public static class TutorialRoomBuilder
     static readonly Color HookDummyColor = new Color(1f, 0.55f, 0.1f);
     static readonly Color ShooterColor = new Color(0.85f, 0.15f, 0.15f);
 
-    [MenuItem("Tools/Build Tutorial Obstacles")]
+    // (menu removed: replaced by Tools > Rebuild Tutorial)
     static void BuildObstacles()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -289,7 +289,7 @@ public static class TutorialRoomBuilder
     const string JumpTutorialText = "SPACE to jump\nHold SPACE to jump higher";
 
     // Updates the existing Jump room: makes its first wall 5 tall and changes its guide text.
-    [MenuItem("Tools/Update Jump Tutorial")]
+    // (menu removed: replaced by Tools > Rebuild Tutorial)
     static void UpdateJumpTutorial()
     {
         string path = ScenePath("Tutorial_2_Jump");
@@ -313,7 +313,7 @@ public static class TutorialRoomBuilder
         EditorUtility.DisplayDialog("Update Jump Tutorial", "Tutorial_2_Jump now has a 5-tall wall and the 'hold to jump higher' text.", "OK");
     }
 
-    [MenuItem("Tools/Build Tutorial Text")]
+    // (menu removed: replaced by Tools > Rebuild Tutorial)
     static void BuildGuideText()
     {
         if (TMPro.TMP_Settings.defaultFontAsset == null)
@@ -392,7 +392,7 @@ public static class TutorialRoomBuilder
 
     // ---------------- FIX ----------------
     // Rebuilds the colliders in every room, and moves the Room 6 shooter down to the floor (removing its ledge).
-    [MenuItem("Tools/Fix Tutorial Rooms")]
+    // (menu removed: replaced by Tools > Rebuild Tutorial)
     static void FixRooms()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -499,7 +499,7 @@ public static class TutorialRoomBuilder
     // Left x of the 3-wide hole that leads up onto floor k (k = 1..4)
     static int HoleX(int k) => k % 2 == 1 ? 62 : -12;
 
-    [MenuItem("Tools/Build Level 1")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 (Ship)")]
     static void BuildLevel1()
     {
         string path = ScenePath(Level1Name);
@@ -757,7 +757,7 @@ public static class TutorialRoomBuilder
     }
 
     // Changes only the camera in the existing Level_1_Deck (keeps Hardy and everything else)
-    [MenuItem("Tools/Update Deck Camera")]
+    // (menu removed: one-time fix, already done)
     static void UpdateDeckCamera()
     {
         string path = ScenePath(DeckSceneName);
@@ -771,7 +771,7 @@ public static class TutorialRoomBuilder
         EditorUtility.DisplayDialog("Update Deck Camera", "The deck camera now follows the player left and right (same zoom as Level 1).", "OK");
     }
 
-    [MenuItem("Tools/Build Level 1 Deck")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Deck")]
     static void BuildLevel1Deck()
     {
         string path = ScenePath(DeckSceneName);
@@ -847,13 +847,13 @@ public static class TutorialRoomBuilder
     // Puts Hardy and his health bar (top middle of the screen) into Level_1_Deck.
     // All of Hardy's attack values are on the HardyBoss component in the Inspector.
 
-    [MenuItem("Tools/Add Hardy To Deck")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Deck: Add Hardy")]
     static void AddHardy()
     {
         string path = ScenePath(DeckSceneName);
         if (!File.Exists(path))
         {
-            EditorUtility.DisplayDialog("Add Hardy", "Build Level 1 Deck first (Tools > Build Level 1 Deck).", "OK");
+            EditorUtility.DisplayDialog("Add Hardy", "Build Level 1 Deck first (Tools > Rebuild Levels > Level 1 Deck).", "OK");
             return;
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -952,7 +952,7 @@ public static class TutorialRoomBuilder
     // Like the Level 2 secret rooms: each room has an obstacle guarding the chest, and a health potion as a reward.
     // Hardy-themed (goo tendrils, barrels, cannons, crates), no poison. You come in on the right; the chest is in the middle.
 
-    [MenuItem("Tools/Add Secret Room Obstacles (Level 1)")]
+    // (menu removed: one-time, already done)
     static void AddSecretRoomObstaclesToLevel1()
     {
         string path = ScenePath(Level1Name);
@@ -1091,7 +1091,7 @@ public static class TutorialRoomBuilder
     // ---------------- "Press E" pop-ups ----------------
     // Adds a "Press E" text above every SecretDoor and Chest in the open scene that does not have one yet.
 
-    [MenuItem("Tools/Add Press E Pop-ups")]
+    // (menu removed: one-time fix, already done)
     static void AddPromptsToScene()
     {
         int added = 0;
@@ -1135,7 +1135,7 @@ public static class TutorialRoomBuilder
     // fades to black and loads Level_2 (stays black until Level_2 exists).
     // Also sets Hardy (if he is in the deck) to fade to this scene when he dies.
 
-    [MenuItem("Tools/Build Level 1 Sail")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Sail")]
     static void BuildLevel1Sail()
     {
         string path = ScenePath(SailSceneName);
@@ -1215,7 +1215,7 @@ public static class TutorialRoomBuilder
 
         EditorUtility.DisplayDialog("Build Level 1 Sail",
             "Done! Level_1_Sail is built and in the Scene List.\n\n" +
-            (hardyLinked ? "Hardy now fades to it when he dies." : "Hardy is not in the deck yet: run Tools > Add Hardy To Deck (it links automatically)."), "OK");
+            (hardyLinked ? "Hardy now fades to it when he dies." : "Hardy is not in the deck yet: run Tools > Rebuild Levels > Level 1 Deck: Add Hardy (it links automatically)."), "OK");
     }
 
     // A pile of big cargo crates stacked on top of each other (too tall to jump over).
@@ -1309,7 +1309,7 @@ public static class TutorialRoomBuilder
     // ---------------- BOAT (Tutorial_7_Dock) ----------------
     // The dock ends, a boat waits at the end. Step on it: it sails off screen, fades to black, loads Level_1.
 
-    [MenuItem("Tools/Build Boat Scene")]
+    // (menu removed: replaced by Tools > Rebuild Tutorial)
     static void BuildBoat()
     {
         string path = ScenePath("Tutorial_7_Dock");

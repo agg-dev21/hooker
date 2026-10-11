@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LevelKit;
 
-// Editor-only. Adds Tools > Build Level 3 (Sunken Prison).
+// Editor-only. Adds Tools > Rebuild Levels > Level 3 (Sunken Prison).
 // Level 3: the Sunken Prison, the Chain Siren's flooded jail. A long sideways level, left to right:
 //   A) Flooded Docks   x 0-39   : small islands over deep water, a moving raft, crabs, a hook ring over the last pool
 //   B) Chain Gallery   x 40-63  : low corridor with swinging anchors and chains that slam down from the ceiling
@@ -26,7 +26,7 @@ public static class Level3Builder
     static readonly Color SeaweedColor = new Color(0.15f, 0.45f, 0.3f, 0.85f);
     static readonly Color LanternColor = new Color(0.5f, 0.85f, 1f);
 
-    [MenuItem("Tools/Build Level 3 (Sunken Prison)")]
+    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 3 (Sunken Prison)")]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;
@@ -55,7 +55,7 @@ public static class Level3Builder
         SetUpCamera(player, 6.5f, new Vector2(-1f, -2f), new Vector2(121f, 23f));
 
         Finish(scene, SceneName, "Done! " + SceneName + " is built, open, and in the Scene List.\n\n" +
-            "The door at the end loads '" + BossScene + "' (build it with Tools > Build Level 3 Boss (Octopus)).");
+            "The door at the end loads '" + BossScene + "' (build it with Tools > Rebuild Levels > Level 3 Boss).");
     }
 
     // ---------------- A) Flooded Docks ----------------

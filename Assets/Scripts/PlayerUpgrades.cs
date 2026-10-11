@@ -6,7 +6,7 @@ using UnityEngine;
 public static class PlayerUpgrades
 {
     public const string PoisonHookSave = "upgrade.poisonHook";
-    public static bool PoisonHook => PlayerPrefs.GetInt(PoisonHookSave, 0) == 1;
+    public static bool PoisonHook => !RunOrder.InTutorial && PlayerPrefs.GetInt(PoisonHookSave, 0) == 1; // never in the tutorial
 
     public static void UnlockPoisonHook()
     {

@@ -119,12 +119,13 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
     [Header("On Death")]
     [SerializeField] GameObject healthBarRoot;  // hidden when he dies
     [SerializeField] bool runsAwayWhenBeaten = false; // Level 2: at 0 health he flees instead of dying (he is back in Level 3)
-    [SerializeField] float runAwaySpeed = 18f;
+    [SerializeField] float fleeSpeed = 50f;        // how fast he bolts out of the room
+    [SerializeField] float fleeDelay = 0.15f;      // tiny pause before he bolts
     [SerializeField] string runAwayMessage = "Oscar runs away!";
     [SerializeField] GameObject[] removeOnDeath; // e.g. the exit gate
     [SerializeField] GameObject[] showOnDeath;   // e.g. the exit door
 
-    [Header("Art (sprite frames; filled by Tools > Set Up Lizard Art)")]
+    [Header("Art (sprite frames; filled by Tools > Art > Oscar (Lizard))")]
     [SerializeField] SpriteRenderer artRenderer;   // child that shows the drawing (the body box stays for hits)
     [SerializeField] bool artFacesRight = true;    // the drawings face right
     [SerializeField] Sprite idleFrame;
@@ -288,6 +289,7 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
         resumeDelay = -1f;
         while (true)
         {
+            while (DialogueManager.Busy) yield return null; // people are talking: no attacks
             if (!player) { yield return null; continue; }
 
             // The player is camping on a mast: go break it first
@@ -814,16 +816,16 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
 
         float dir = player && player.position.x > rb.position.x ? -1f : 1f; // away from the player
         Face(dir);
-        yield return new WaitForSeconds(0.6f); // a moment to see it
+        yield return new WaitForSeconds(fleeDelay);
         Play(Part(dashFrames, dashWindupFrames, (dashFrames != null ? dashFrames.Length : 0) - dashWindupFrames), dashFps, true);
-        float targetX = dir > 0f ? arenaMaxX + 6f : arenaMinX - 6f;
+        float targetX = dir > 0f ? arenaMaxX + 30f : arenaMinX - 30f; // far past the edge of the screen
         var renderers = GetComponentsInChildren<SpriteRenderer>();
         while (Mathf.Abs(rb.position.x - targetX) > 0.1f)
         {
-            rb.MovePosition(new Vector2(Mathf.MoveTowards(rb.position.x, targetX, runAwaySpeed * Time.deltaTime), startPos.y));
+            rb.MovePosition(new Vector2(Mathf.MoveTowards(rb.position.x, targetX, fleeSpeed * Time.deltaTime), startPos.y));
             // Fades out as he leaves the arena
             float outside = dir > 0f ? rb.position.x - arenaMaxX : arenaMinX - rb.position.x;
-            float a = Mathf.Clamp01(1f - outside / 5f);
+            float a = Mathf.Clamp01(1f - (outside - 15f) / 10f); // only fades once he is well off screen
             foreach (SpriteRenderer r in renderers) if (r && r.enabled) { Color c = r.color; c.a = a; r.color = c; }
             yield return null;
         }

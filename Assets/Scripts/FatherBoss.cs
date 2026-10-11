@@ -18,21 +18,24 @@ public class FatherBoss : MonoBehaviour, IChainStunnable
 
     [Header("Flow")]
     [SerializeField] float startDelay = 2f;
-    [SerializeField] float restTime = 1.5f;     // pause after each attack
-    [SerializeField] float glideSpeed = 7f;     // how fast he moves over the water
+    [SerializeField] float restTime = 0.8f;     // pause after each attack
+    [SerializeField] float glideSpeed = 9f;     // how fast he moves over the water
     [SerializeField] float minGlide = 4f;       // he moves at least this far before each attack
 
     [Header("Wave lines")]
     [SerializeField] float[] waveHeights = { 1f, 2f, 3f, 4.5f }; // one line: small to tall, in this order
     [SerializeField] float waveWidth = 1.2f;
-    [SerializeField] float waveSpeed = 9f;
-    [SerializeField] float timeBetweenWaves = 0.45f; // gap between the waves in one line
-    [SerializeField] float warnTime = 0.6f;          // he flashes before releasing a line
-    [SerializeField] int linesPerAttack = 1;
-    [SerializeField] float timeBetweenLines = 1.2f;
+    [SerializeField] float waveSpeed = 12f;
+    [SerializeField] float timeBetweenWaves = 0.35f; // gap between the waves in one line
+    [SerializeField] float warnTime = 0.45f;         // he flashes before releasing a line
+    [SerializeField] int linesPerAttack = 2;
+    [SerializeField] float timeBetweenLines = 0.9f;
+    [SerializeField] float waveKnockback = 12f;      // a hit pushes you along with the wave
+    [SerializeField] float waveSlow = 0.5f;          // and slows you down (0.5 = half speed)...
+    [SerializeField] float waveSlowTime = 1.5f;      // ...for this long
 
     [Header("Soaked (stacks on the player)")]
-    [SerializeField] int[] soakDamage = { 5, 10, 15, 40 }; // damage of the 1st, 2nd, 3rd and 4th (heavy) soak
+    [SerializeField] int[] soakDamage = { 8, 14, 20, 50 }; // damage of the 1st, 2nd, 3rd and 4th (heavy) soak
     [SerializeField] float firstSoakTime = 4f;   // timer after the first soak
     [SerializeField] float soakRefreshTime = 3f; // timer goes back to this on every soak after that
 
@@ -43,7 +46,7 @@ public class FatherBoss : MonoBehaviour, IChainStunnable
     [SerializeField] Color foamColor = new Color(0.85f, 0.95f, 1f, 0.95f);
     [SerializeField] GameObject healthBarRoot;   // boss bar, hidden when he dies
 
-    [Header("Art (filled by Tools > Set Up KK Art)")]
+    [Header("Art (filled by Tools > Art > KK)")]
     [SerializeField] SpriteRenderer artRenderer;  // child that shows him (the body box stays for hits)
     [SerializeField] SpriteRenderer surfRenderer; // child under his feet: the water he floats on while moving
     [SerializeField] Sprite[] idleFrames;
@@ -123,6 +126,7 @@ public class FatherBoss : MonoBehaviour, IChainStunnable
         resumeDelay = -1f;
         while (true)
         {
+            while (DialogueManager.Busy) yield return null; // people are talking: no attacks
             if (!player) { yield return null; continue; }
             yield return GlideToNewSpot();
             yield return WaveAttack();
@@ -180,6 +184,7 @@ public class FatherBoss : MonoBehaviour, IChainStunnable
         var wave = go.AddComponent<WaterWave>();
         wave.Setup(dir, waveSpeed, waveWidth, height, groundY, stopX,
             soakDamage, firstSoakTime, soakRefreshTime, sr ? sr.sprite : null, waterColor, foamColor);
+        wave.SetHitEffects(waveKnockback, waveSlow, waveSlowTime);
         if (waveFrames != null && waveFrames.Length > 0) // small to tall: wave 1 uses the first drawing, and so on
             wave.UseArt(waveFrames[Mathf.Min(index, waveFrames.Length - 1)], waveArtScale);
         spawned.Add(go);
