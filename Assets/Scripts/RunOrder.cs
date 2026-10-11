@@ -2,11 +2,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // The order of the levels, the boat trips between them, and going back to explore.
+// The whole game, in order:
+//   Title screen (MainMenu) -> Tutorial 1-7 -> Level_1 (Hardy) -> boat -> Level_2 (Oscar) -> boat
+//   -> Level_3 (Madame O) -> boat -> Level_4 (the hall) -> Level_4_Boss (KK) -> Ending_Grave -> THE END -> title.
 //   Leaving the tutorial (the dock's boat) -> always Hardy's level (Level_1) first.
-//   After EVERY boss you sail away in the boat scene (Level_1_Sail), then arrive at the next level:
+//   After the first three bosses you sail away in the boat scene (Level_1_Sail), then arrive at the next level:
 //     Hardy beaten    -> Oscar's level if he is still left, otherwise Level_3.
 //     Oscar beaten    -> Hardy's level if he is still left, otherwise Level_3.
 //     Madame O beaten -> Level_4 (KK).
+//     KK beaten       -> no boat: KK's last words, then straight to Mom's grave (Ending_Grave).
+//   After THE END the game counts as finished: the title screen offers New Game (no Continue).
 //   Exploring: on the boat you can also pick any level whose boss you already beat (SailMenu), until you go to KK.
 //     Beaten bosses stay beaten there, and a spot at the level's start takes you back to the boat (Revisit).
 // Ariel's jail is in Oscar's level. A new game (Tutorial 1) resets everything: bosses, powers, Ariel, chests.
@@ -17,25 +22,31 @@ public static class RunOrder
     const string HardyDoneKey = "run.hardyDone";
     const string OscarDoneKey = "run.oscarDone";
     const string MadameDoneKey = "run.madameDone";
+    const string KkDoneKey = "run.kkDone";
+    const string FinishedKey = "run.finished";   // saw THE END
     const string AfterSailKey = "run.afterSail"; // where the boat goes this time
     const string LastBossKey = "run.lastBoss";   // who you just beat (for the boat ride's talk)
     const string RunIdKey = "run.id";            // a new number every new game (chests remember per game)
     public const string SailScene = "Level_1_Sail"; // the boat scene used between all bosses
+    public const string EndingScene = "Ending_Grave"; // Mom's grave, after KK
 
     public static bool HardyDone => PlayerPrefs.GetInt(HardyDoneKey, 0) == 1;
     public static bool OscarDone => PlayerPrefs.GetInt(OscarDoneKey, 0) == 1;
     public static bool MadameDone => PlayerPrefs.GetInt(MadameDoneKey, 0) == 1;
+    public static bool KkDone => PlayerPrefs.GetInt(KkDoneKey, 0) == 1;
+    public static bool Finished => PlayerPrefs.GetInt(FinishedKey, 0) == 1;
     public static string LastBoss => PlayerPrefs.GetString(LastBossKey, "");
     public static int RunId => PlayerPrefs.GetInt(RunIdKey, 0);
 
     // A game has been started and got past the tutorial (the title screen shows "Continue")
-    public static bool HasProgress => PlayerPrefs.HasKey(FirstKey) && RunId > 0;
+    public static bool HasProgress => PlayerPrefs.HasKey(FirstKey) && RunId > 0 && !Finished;
 
     // In the tutorial rooms: no boss powers and no Ariel (you haven't earned them yet)
     public static bool InTutorial => SceneManager.GetActiveScene().name.StartsWith("Tutorial");
 
     // Where the story goes next
     public static string NextLevel =>
+        KkDone ? EndingScene :
         MadameDone ? "Level_4" :
         HardyDone && OscarDone ? "Level_3" :
         HardyDone ? "Level_2" :
@@ -44,7 +55,8 @@ public static class RunOrder
 
     // The boss of a level is beaten (so it can be explored freely)
     public static bool LevelDone(string level) =>
-        level == "Level_1" ? HardyDone : level == "Level_2" ? OscarDone : level == "Level_3" ? MadameDone : false;
+        level == "Level_1" ? HardyDone : level == "Level_2" ? OscarDone : level == "Level_3" ? MadameDone :
+        level == "Level_4" ? KkDone : false;
 
     // A new game (Tutorial 1): everything from the last game is forgotten
     public static void NewGame()
@@ -53,6 +65,8 @@ public static class RunOrder
         PlayerPrefs.SetInt(HardyDoneKey, 0);
         PlayerPrefs.SetInt(OscarDoneKey, 0);
         PlayerPrefs.SetInt(MadameDoneKey, 0);
+        PlayerPrefs.SetInt(KkDoneKey, 0);
+        PlayerPrefs.SetInt(FinishedKey, 0);
         PlayerPrefs.DeleteKey(FirstKey); // set again (to Level_1) when you leave the tutorial
         PlayerPrefs.DeleteKey(AfterSailKey);
         PlayerPrefs.DeleteKey(LastBossKey);
@@ -63,6 +77,14 @@ public static class RunOrder
         PlayerPrefs.DeleteKey(PlayerUpgrades.PoisonHookSave);
         PlayerPrefs.DeleteKey(PlayerChain.SirenChainSave);
         PlayerPrefs.DeleteKey(PlayerChain.SirenChainSave + ".new");
+        PlayerPrefs.Save();
+    }
+
+    // THE END was shown: the game is finished (the title screen won't offer Continue)
+    public static void FinishGame()
+    {
+        PlayerPrefs.SetInt(KkDoneKey, 1);
+        PlayerPrefs.SetInt(FinishedKey, 1);
         PlayerPrefs.Save();
     }
 
@@ -97,6 +119,14 @@ public static class RunOrder
         if (current == "Level_1_Deck" && requested == SailScene) return ToBoat(HardyDoneKey, "Hardy");
         if (current == "Level_2_Boss" && requested == "Level_3") return ToBoat(OscarDoneKey, "Oscar");
         if (current == "Level_3_Boss" && requested == "Level_4") return ToBoat(MadameDoneKey, "Madame O");
+
+        // KK beaten: no boat this time, straight up the cliff to Mom's grave
+        if (current == "Level_4_Boss" && requested == EndingScene)
+        {
+            PlayerPrefs.SetInt(KkDoneKey, 1);
+            PlayerPrefs.Save();
+            return EndingScene;
+        }
 
         // The boat reached the edge of the screen: arrive where the boat was told to go
         if (current == SailScene)
