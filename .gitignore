@@ -44,3 +44,13 @@ crashlytics-buildid.txt
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Windows builds made into the project folder
+/*_Data/
+/MonoBleedingEdge/
+/D3D12/
+/*_BackUpThisFolder_ButDontShipItWithYourGame/
+/*_BurstDebugInformation_DoNotShip/
+/*.exe
+/*.dll
+/UnityCrashHandler*.exe

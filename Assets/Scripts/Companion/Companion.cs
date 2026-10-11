@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -92,6 +93,14 @@ public partial class Companion : MonoBehaviour
     float idleTime, appearTime = 99f;
     float stayUntil; // no hiding before this time
 
+    // Found once per scene instead of searching every script 4 times a second
+    Health[] bossHealth = new Health[0];
+    // Reused by the danger check, so it creates no garbage
+    static readonly List<Collider2D> nearby = new List<Collider2D>();
+    static readonly List<RaycastHit2D> lineHits = new List<RaycastHit2D>();
+    static ContactFilter2D nearbyFilter, groundFilter;
+    static int groundMask;
+
     GameObject iconRoot;
     Image cooldownSweep;
     TMP_Text keyText, newText;
@@ -122,15 +131,40 @@ public partial class Companion : MonoBehaviour
 
         BuildIcon();
 
+        FindBosses();
+
         // A boss room: she starts hidden (no free 5 seconds out)
-        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
-            if (mb is IChainStunnable && mb.TryGetComponent(out Health bh) && bh.CurrentHealth > 0)
-            {
-                hidden = true;
-                visible = 0f;
-                stayUntil = 0f;
-                break;
-            }
+        if (AnyBossStanding())
+        {
+            hidden = true;
+            visible = 0f;
+            stayUntil = 0f;
+        }
+    }
+
+    // Remembers every boss in this scene (anything the Siren's Chain can stun) and sets up the physics filters.
+    // Bosses are never spawned during play, so once per scene is enough.
+    void FindBosses()
+    {
+        var list = new List<Health>();
+        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            if (mb is IChainStunnable && mb.TryGetComponent(out Health h)) list.Add(h);
+        bossHealth = list.ToArray();
+
+        if (groundMask == 0) groundMask = LayerMask.GetMask("Ground");
+        // Same results as before: OverlapCircleAll / LinecastAll used these layers and the project's trigger setting
+        nearbyFilter.SetLayerMask(Physics2D.DefaultRaycastLayers);
+        nearbyFilter.useTriggers = Physics2D.queriesHitTriggers;
+        groundFilter.SetLayerMask(groundMask);
+        groundFilter.useTriggers = Physics2D.queriesHitTriggers;
+    }
+
+    // Is any boss in this scene still standing? (Beaten or removed bosses don't count.)
+    bool AnyBossStanding()
+    {
+        foreach (Health h in bossHealth)
+            if (h && h.gameObject.activeInHierarchy && h.CurrentHealth > 0) return true;
+        return false;
     }
 
     void OnDestroy()
@@ -204,15 +238,14 @@ public partial class Companion : MonoBehaviour
     bool DangerNear()
     {
         // A boss fight: she always stays hidden while any boss is still standing
-        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
-            if (mb is IChainStunnable && mb.TryGetComponent(out Health bh) && bh.CurrentHealth > 0) return true;
+        if (AnyBossStanding()) return true;
 
-        int ground = LayerMask.GetMask("Ground");
         Vector2 me = player.transform.position;
-        foreach (Collider2D hit in Physics2D.OverlapCircleAll(me, S.dangerRadius))
+        Physics2D.OverlapCircle(me, S.dangerRadius, nearbyFilter, nearby); // fills the reused list
+        foreach (Collider2D hit in nearby)
         {
             if (hit.transform.IsChildOf(player.transform) || hit.transform.IsChildOf(transform)) continue;
-            if (S.ignoreDangerBehindWalls && BehindWall(me, hit, ground)) continue;
+            if (S.ignoreDangerBehindWalls && BehindWall(me, hit)) continue;
             if (hit.GetComponentInParent<IChainStunnable>() != null) return true; // a boss
             if (hit.GetComponentInParent<PoisonHazard>() || hit.GetComponentInParent<DamageZone>()
                 || hit.GetComponentInParent<ContactDamage>() || hit.GetComponentInParent<EnemyChase>()
@@ -226,9 +259,10 @@ public partial class Companion : MonoBehaviour
     }
 
     // Is there a wall or floor between the player and this thing? (Its own collider doesn't count.)
-    static bool BehindWall(Vector2 from, Collider2D target, int ground)
+    static bool BehindWall(Vector2 from, Collider2D target)
     {
-        foreach (RaycastHit2D h in Physics2D.LinecastAll(from, target.bounds.center, ground))
+        Physics2D.Linecast(from, target.bounds.center, groundFilter, lineHits); // fills the reused list
+        foreach (RaycastHit2D h in lineHits)
             if (h.collider != target && !h.collider.transform.IsChildOf(target.transform.root)) return true;
         return false;
     }

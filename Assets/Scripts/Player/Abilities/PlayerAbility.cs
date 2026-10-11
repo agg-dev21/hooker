@@ -17,6 +17,7 @@ using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 public class PlayerAbility : MonoBehaviour
 {
     public const string HardySpikesSave = "ability.hardySpikes";
+    const string HardySpikesNewSave = HardySpikesSave + ".new"; // built once, not every frame
     public static bool HardySpikesUnlocked => !RunOrder.InTutorial && PlayerPrefs.GetInt(HardySpikesSave, 0) == 1; // never in the tutorial
 
     // Called when Hardy dies
@@ -24,7 +25,7 @@ public class PlayerAbility : MonoBehaviour
     {
         if (HardySpikesUnlocked) return;
         PlayerPrefs.SetInt(HardySpikesSave, 1);
-        PlayerPrefs.SetInt(HardySpikesSave + ".new", 1); // show "NEW!" on the icon until it is used once
+        PlayerPrefs.SetInt(HardySpikesNewSave, 1); // show "NEW!" on the icon until it is used once
         PlayerPrefs.Save();
         PlayerItems.Toast(TutorialSign.Fill("New power: HARDY'S SPIKES!\nPress {Ability} to shoot his spikes. They set enemies on fire."), 6f);
     }
@@ -119,7 +120,7 @@ public class PlayerAbility : MonoBehaviour
         if (cooldownLeft > 0f) cooldownLeft -= Time.deltaTime;
         cooldownSweep.fillAmount = Mathf.Clamp01(cooldownLeft / cooldown);
         keyText.text = GameInput.KeyName(GameInput.GetKey(GameAction.Ability));
-        newText.gameObject.SetActive(PlayerPrefs.GetInt(HardySpikesSave + ".new", 0) == 1);
+        newText.gameObject.SetActive(PlayerPrefs.GetInt(HardySpikesNewSave, 0) == 1);
 
         if (Time.timeScale == 0f || casting || cooldownLeft > 0f) return;
         if (controller && !controller.enabled) return; // being pulled by the hook, riding the boat...
@@ -132,7 +133,7 @@ public class PlayerAbility : MonoBehaviour
     {
         casting = true;
         cooldownLeft = cooldown;
-        PlayerPrefs.SetInt(HardySpikesSave + ".new", 0);
+        PlayerPrefs.SetInt(HardySpikesNewSave, 0);
 
         float dir = controller ? controller.FacingDirection : 1f;
         float feet = playerCol ? playerCol.bounds.min.y : transform.position.y - 1f;

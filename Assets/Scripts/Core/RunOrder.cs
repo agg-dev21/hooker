@@ -42,7 +42,23 @@ public static class RunOrder
     public static bool HasProgress => PlayerPrefs.HasKey(FirstKey) && RunId > 0 && !Finished;
 
     // In the tutorial rooms: no boss powers and no Ariel (you haven't earned them yet)
-    public static bool InTutorial => SceneManager.GetActiveScene().name.StartsWith("Tutorial");
+    // Checked every frame by the ability icons, so the answer is worked out once per scene:
+    // reading a scene's name creates a new string each time, comparing scenes does not.
+    public static bool InTutorial
+    {
+        get
+        {
+            Scene scene = SceneManager.GetActiveScene();
+            if (scene != tutorialCheckScene)
+            {
+                tutorialCheckScene = scene;
+                inTutorial = scene.name.StartsWith("Tutorial", System.StringComparison.Ordinal);
+            }
+            return inTutorial;
+        }
+    }
+    static Scene tutorialCheckScene; // starts as "no scene", so the first check always runs
+    static bool inTutorial;
 
     // Where the story goes next
     public static string NextLevel =>

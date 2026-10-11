@@ -122,10 +122,12 @@ public class TutorialSign : MonoBehaviour
             label.raycastTarget = false;
         }
 
+        PlayerController2D player; // remembered; only searched for again when it is gone (a new scene)
+
         void Update()
         {
-            PlayerController2D pc = FindAnyObjectByType<PlayerController2D>();
-            TutorialSign sign = pc ? Nearest(pc.transform.position) : null;
+            if (!player) player = FindAnyObjectByType<PlayerController2D>();
+            TutorialSign sign = player ? Nearest(player.transform.position) : null;
             if (sign && sign != showing) { showing = sign; refresh = 0f; }
 
             refresh -= Time.unscaledDeltaTime;

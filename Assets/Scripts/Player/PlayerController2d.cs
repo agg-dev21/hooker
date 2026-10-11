@@ -37,6 +37,10 @@ public class PlayerController2D : MonoBehaviour
     [SerializeField] LayerMask groundLayer;
     [SerializeField] bool standOnAnything = true; // ON: crates, barrels, cannons, enemies and bosses count as ground too
 
+    // Reused by the ground check every frame, so it never creates garbage
+    static readonly Collider2D[] groundHits = new Collider2D[16];
+    static ContactFilter2D solidFilter;
+
     Rigidbody2D rb;
     Health health;
     float baseGravity;
@@ -282,8 +286,16 @@ public class PlayerController2D : MonoBehaviour
     // Is there any solid (non-trigger) collider under the feet that is not part of the player?
     bool TouchingSolid(Vector2 checkPos)
     {
-        foreach (Collider2D hit in Physics2D.OverlapBoxAll(checkPos, groundCheckSize, 0f))
-            if (!hit.isTrigger && !hit.transform.IsChildOf(transform)) return true;
+        // Set up once: same layers as before (everything except Ignore Raycast), triggers skipped
+        if (!solidFilter.useLayerMask)
+        {
+            solidFilter.SetLayerMask(Physics2D.DefaultRaycastLayers);
+            solidFilter.useTriggers = false;
+        }
+
+        int count = Physics2D.OverlapBox(checkPos, groundCheckSize, 0f, solidFilter, groundHits);
+        for (int i = 0; i < count; i++)
+            if (!groundHits[i].transform.IsChildOf(transform)) return true;
         return false;
     }
 

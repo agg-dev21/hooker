@@ -32,6 +32,7 @@ public class DialogueManager : MonoBehaviour
     List<DialogueLine> lines;
     int index;
     int openedFrame;
+    PlayerController2D player; // remembered; only searched for again when it is gone (a new scene)
 
     void Awake()
     {
@@ -112,8 +113,8 @@ public class DialogueManager : MonoBehaviour
         if (!IsOpen || Time.frameCount == openedFrame || Time.timeScale == 0f) return;
 
         // The player waits while people talk
-        PlayerController2D pc = FindAnyObjectByType<PlayerController2D>();
-        if (pc) pc.Root(0.15f);
+        if (!player) player = FindAnyObjectByType<PlayerController2D>();
+        if (player) player.Root(0.15f);
 
         if (GameInput.InteractPressed) // E or controller Y
         {

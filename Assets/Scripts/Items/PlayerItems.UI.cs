@@ -38,8 +38,30 @@ public partial class PlayerItems
         toastTimer = seconds;
     }
 
+    // What the effects text is currently showing: shield amount, then the whole seconds left on each effect
+    // (0 = not active, -1 = lasts until death), then the number of revivals. Only when one of these changes
+    // is the text rebuilt, so normally this costs nothing (it used to build a new string every frame).
+    readonly int[] effectsShown = new int[7];
+    readonly int[] effectsNow = new int[7];
+
+    static int SecondsShown(float t) => t <= 0f ? 0 : float.IsInfinity(t) ? -1 : Mathf.CeilToInt(t);
+
     void ShowEffects()
     {
+        bool shield = shieldTime > 0f && shieldLeft > 0;
+        effectsNow[0] = shield ? shieldLeft : 0;
+        effectsNow[1] = shield ? SecondsShown(shieldTime) : 0;
+        effectsNow[2] = SecondsShown(resistTime);
+        effectsNow[3] = SecondsShown(flyTime);
+        effectsNow[4] = SecondsShown(speedTime);
+        effectsNow[5] = SecondsShown(invulnerableTime);
+        effectsNow[6] = Inventory.Count(ItemType.InstantRevival);
+
+        bool changed = false;
+        for (int i = 0; i < effectsNow.Length; i++)
+            if (effectsNow[i] != effectsShown[i]) { effectsShown[i] = effectsNow[i]; changed = true; }
+        if (!changed) return; // same text as last frame
+
         string s = "";
         if (shieldTime > 0f && shieldLeft > 0) s += "Shield " + shieldLeft + TimeLeft(shieldTime) + "\n";
         if (resistTime > 0f) s += "Poison resist" + TimeLeft(resistTime) + "\n";

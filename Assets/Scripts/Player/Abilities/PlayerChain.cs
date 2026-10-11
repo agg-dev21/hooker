@@ -16,6 +16,7 @@ using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 public class PlayerChain : MonoBehaviour
 {
     public const string SirenChainSave = "ability.sirenChain";
+    const string SirenChainNewSave = SirenChainSave + ".new"; // built once, not every frame
     public static bool SirenChainUnlocked => !RunOrder.InTutorial && PlayerPrefs.GetInt(SirenChainSave, 0) == 1; // never in the tutorial
 
     // Called when the Siren dies
@@ -23,7 +24,7 @@ public class PlayerChain : MonoBehaviour
     {
         if (SirenChainUnlocked) return;
         PlayerPrefs.SetInt(SirenChainSave, 1);
-        PlayerPrefs.SetInt(SirenChainSave + ".new", 1); // "NEW!" on the icon until it is used once
+        PlayerPrefs.SetInt(SirenChainNewSave, 1); // "NEW!" on the icon until it is used once
         PlayerPrefs.Save();
         PlayerItems.Toast(TutorialSign.Fill("New power: MADAME O'S CHAIN!\nPress {ChainAbility} to pull an enemy to you and hold it still."), 6f);
     }
@@ -100,7 +101,7 @@ public class PlayerChain : MonoBehaviour
         if (cooldownLeft > 0f) cooldownLeft -= Time.deltaTime;
         cooldownSweep.fillAmount = Mathf.Clamp01(cooldownLeft / cooldown);
         keyText.text = GameInput.KeyName(GameInput.GetKey(GameAction.ChainAbility));
-        newText.gameObject.SetActive(PlayerPrefs.GetInt(SirenChainSave + ".new", 0) == 1);
+        newText.gameObject.SetActive(PlayerPrefs.GetInt(SirenChainNewSave, 0) == 1);
 
         if (Time.timeScale == 0f || casting || cooldownLeft > 0f) return;
         if (controller && (!controller.enabled || controller.IsRooted)) return; // hooked, on the boat, or chained yourself
@@ -113,7 +114,7 @@ public class PlayerChain : MonoBehaviour
     {
         casting = true;
         cooldownLeft = cooldown;
-        PlayerPrefs.SetInt(SirenChainSave + ".new", 0);
+        PlayerPrefs.SetInt(SirenChainNewSave, 0);
 
         float dir = controller ? controller.FacingDirection : 1f;
         LineRenderer line = MakeLine();
