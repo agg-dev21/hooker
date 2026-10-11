@@ -10,6 +10,7 @@ public class CameraFollow2D : MonoBehaviour
     {
         public float bottom; // lowest point the camera may show (include the floor tiles you stand on)
         public float top;    // highest point the camera may show
+        public float size;   // camera size (zoom) in this zone; 0 = the camera's normal size
     }
 
     public static CameraFollow2D Instance { get; private set; }
@@ -37,6 +38,7 @@ public class CameraFollow2D : MonoBehaviour
 
     [Header("Zones (optional, for floors of different heights)")]
     [SerializeField] CameraZone[] zones; // bottom to top. The player is in the highest zone whose Bottom + 1 is below them.
+    [SerializeField] float zoomSpeed = 6f; // how fast the camera zooms when a zone has its own size
 
     Camera cam;
     PlayerController2D player;
@@ -50,11 +52,13 @@ public class CameraFollow2D : MonoBehaviour
     Vector2 overrideMin;
     Vector2 overrideMax;
     bool snapNext;          // jump straight to the target next frame instead of sliding
+    float normalSize;       // the camera's size when no zone changes it
 
     void Awake()
     {
         Instance = this;
         cam = GetComponent<Camera>();
+        normalSize = cam.orthographicSize;
         if (target) player = target.GetComponent<PlayerController2D>();
         if (target) trackedY = target.position.y;
     }
@@ -85,14 +89,20 @@ public class CameraFollow2D : MonoBehaviour
         }
 
         // Zones: keep the camera inside the player's floor, so the floors above and below stay hidden
+        float wantedSize = normalSize;
         if (zones != null && zones.Length > 0 && !hasOverride)
         {
             CameraZone zone = zones[ZoneAt(target.position.y)];
-            float halfH = cam.orthographicSize;
+            if (zone.size > 0f) wantedSize = zone.size;
+            float halfH = wantedSize;
             desired.y = zone.top - zone.bottom <= halfH * 2f
                 ? (zone.bottom + zone.top) * 0.5f
                 : Mathf.Clamp(desired.y, zone.bottom + halfH, zone.top - halfH);
         }
+
+        // Zoom toward the zone's size (or back to normal)
+        if (!Mathf.Approximately(cam.orthographicSize, wantedSize))
+            cam.orthographicSize = snapNext ? wantedSize : Mathf.MoveTowards(cam.orthographicSize, wantedSize, zoomSpeed * Time.deltaTime);
 
         Vector3 pos;
         if (snapNext)

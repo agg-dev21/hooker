@@ -37,7 +37,7 @@ EditorBuildSettings:
     guid: fc963d19fd3601548b2939c6f4ff677d
   - enabled: 1
     path: Assets/Scenes/Level_2.unity
-    guid: 6e8d9a00b04433745834fcddd386e12c
+    guid: bfdabd5b8553ce4409e075e84709ce5e
   - enabled: 1
     path: Assets/Scenes/Level_2_Boss.unity
     guid: 46038838395fef04eb512bc8e99f5a0d
