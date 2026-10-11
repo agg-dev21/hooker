@@ -26,8 +26,9 @@ public class HardyBoss : MonoBehaviour
     [SerializeField] float startDelay = 1.5f; // delay before the first attack
     [SerializeField] float restTime = 0.5f;   // pause between attacks
     [SerializeField] GameObject healthBarRoot; // hidden when the boss dies
-    [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = fade to this scene
-    [SerializeField] float sceneAfterDeathDelay = 2f; // seconds to watch him crumble before the fade starts
+    [SerializeField] string sceneAfterDeath;   // empty = nothing, filled = ask to continue, then fade to this scene
+    [SerializeField] float sceneAfterDeathDelay = 120f; // seconds after he dies before the player is asked to continue (room for dialogue)
+    [SerializeField] string continueMessage = "Hardy is defeated.\nSet sail?";
     [SerializeField] Animator animator;        // optional: pose triggers are sent here if you use an Animator
 
     [Header("Art (sprite frames; filled by Tools > Set Up Hardy Art)")]
@@ -887,7 +888,7 @@ public class HardyBoss : MonoBehaviour
             Destroy(piece, crumbleLifetime);
         }
 
-        if (!string.IsNullOrEmpty(sceneAfterDeath)) ScreenFade.FadeToScene(sceneAfterDeath, 0.6f, 0.6f, sceneAfterDeathDelay);
+        if (!string.IsNullOrEmpty(sceneAfterDeath)) LevelEndPrompt.Show(sceneAfterDeath, sceneAfterDeathDelay, continueMessage);
     }
 
     void OnDrawGizmosSelected()

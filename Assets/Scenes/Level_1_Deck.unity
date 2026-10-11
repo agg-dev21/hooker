@@ -2860,7 +2860,7 @@ MonoBehaviour:
   restTime: 0.5
   healthBarRoot: {fileID: 1683544917}
   sceneAfterDeath: Level_1_Sail
-  sceneAfterDeathDelay: 2
+  sceneAfterDeathDelay: 120
   animator: {fileID: 0}
   artFacesRight: 0
   blockSprite: {fileID: 7482667652216324306, guid: 241043a192bb9224c8c879ef7e08a292, type: 3}
