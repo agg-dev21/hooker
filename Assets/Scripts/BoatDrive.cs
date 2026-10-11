@@ -24,7 +24,7 @@ public class BoatDrive : MonoBehaviour
     {
         cam = Camera.main;
         sr = GetComponent<SpriteRenderer>();
-        if (!rider) rider = FindFirstObjectByType<PlayerController2D>();
+        if (!rider) rider = FindAnyObjectByType<PlayerController2D>();
         if (!rider) return;
 
         // The player stops moving on their own and rides the boat

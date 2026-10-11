@@ -51,7 +51,7 @@ public static class HardyArtSetup
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
 
         Scene scene = EditorSceneManager.OpenScene(DeckScene, OpenSceneMode.Single);
-        HardyBoss boss = Object.FindFirstObjectByType<HardyBoss>();
+        HardyBoss boss = Object.FindAnyObjectByType<HardyBoss>();
         if (!boss)
         {
             EditorUtility.DisplayDialog("Set Up Hardy Art", "Sheets sliced, but Hardy is not in the deck. Run Tools > Add Hardy To Deck first, then this again.", "OK");
@@ -92,6 +92,7 @@ public static class HardyArtSetup
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
+        SaveAbilityArt(tentacleFx);
         Selection.activeGameObject = boss.gameObject;
         EditorUtility.DisplayDialog("Set Up Hardy Art",
             "Done! Hardy is now about 6 tiles tall and uses the new art.\n\n" +
@@ -146,6 +147,41 @@ public static class HardyArtSetup
         return AssetDatabase.LoadAllAssetsAtPath(path).OfType<Sprite>()
             .OrderBy(s => int.Parse(s.name.Substring(s.name.LastIndexOf('_') + 1)))
             .ToArray();
+    }
+
+    // The player's Hardy's Spikes ability uses the same animation; keep it in Resources so every scene can load it
+    static void SaveAbilityArt(Sprite[] spikes)
+    {
+        const string path = "Assets/Resources/AbilityArt.asset";
+        if (!AssetDatabase.IsValidFolder("Assets/Resources")) AssetDatabase.CreateFolder("Assets", "Resources");
+        var abilityArt = AssetDatabase.LoadAssetAtPath<AbilityArt>(path);
+        if (!abilityArt)
+        {
+            abilityArt = ScriptableObject.CreateInstance<AbilityArt>();
+            AssetDatabase.CreateAsset(abilityArt, path);
+        }
+        abilityArt.hardySpikesFrames = spikes;
+        abilityArt.hardySpikesIcon = spikes.Length > 9 ? spikes[9] : spikes.Length > 0 ? spikes[spikes.Length - 1] : null; // spikes fully out
+        EditorUtility.SetDirty(abilityArt);
+        AssetDatabase.SaveAssets();
+    }
+
+    // Testing helpers for the ability unlock
+    [MenuItem("Tools/Abilities/Unlock Hardy's Spikes (testing)")]
+    static void UnlockForTesting()
+    {
+        PlayerPrefs.SetInt(PlayerAbility.HardySpikesSave, 1);
+        PlayerPrefs.Save();
+        EditorUtility.DisplayDialog("Abilities", "Hardy's Spikes unlocked. Press Q (or LB) in Play mode.", "OK");
+    }
+
+    [MenuItem("Tools/Abilities/Lock All Abilities Again")]
+    static void LockForTesting()
+    {
+        PlayerPrefs.DeleteKey(PlayerAbility.HardySpikesSave);
+        PlayerPrefs.DeleteKey(PlayerAbility.HardySpikesSave + ".new");
+        PlayerPrefs.Save();
+        EditorUtility.DisplayDialog("Abilities", "All abilities are locked again (like a new game).", "OK");
     }
 
     static void SetArray(SerializedProperty prop, Sprite[] sprites)

@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-// The Plague Warden: a huge poison slime that rules the dungeon under the poison tower.
-// Attacks (picked at random, never the same twice in a row):
-//   1) Charge   - glows, then rams across the arena. Phase 2: leaves a poison trail.
-//   2) Slam     - leaps onto the player and lands with a poison splash.
-//   3) Rain     - poison drops fall from the ceiling all over the arena.
-//   4) Spit     - spits a fan of globs at the player.
-// Below Phase 2 At (50% health) he gets faster and angrier.
+// The Level 2 boss: a poison lizard that rules the dungeon under the poison tower.
+// Attacks (picked at random, never the same twice in a row; each can be switched off under "Attacks Used"):
+//   1) Lizard Dash - glows, then dashes at the player. If it hits: big damage (no poison) and he stops.
+//                    If the player dodges: he crashes into the wall, is stunned, and poison bursts all over the arena.
+//                    Phase 2: leaves a poison trail.
+//   2) Slam        - leaps onto the player and lands with a poison splash. (off by default)
+//   3) Rain        - poison drops fall from the ceiling all over the arena. (off by default)
+//   4) Vomit       - sprays poison globs in an arc at the player; each leaves a puddle where it lands.
+//   5) Claws       - when the player is close he steps in and swipes with his claws (off by default: he has contact damage instead).
+// Below Phase 2 At (50% health) he gets faster and angrier, and poison keeps spawning all over the arena.
 // If the player dies he gets all his health back and the fight starts over.
 // Needs: Health, a BoxCollider2D (his body) and a SpriteRenderer.
 [RequireComponent(typeof(Health), typeof(BoxCollider2D))]
@@ -26,14 +29,28 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField, Range(0f, 1f)] float phase2At = 0.5f;
     [SerializeField] float phase2SpeedUp = 1.35f;
 
+    [Header("Attacks Used")]
+    [SerializeField] bool useCharge = true;
+    [SerializeField] bool useSlam = false;
+    [SerializeField] bool useRain = false;
+    [SerializeField] bool useVomit = true;
+    [SerializeField] bool useClaws = false;     // claws are off: touching him hurts instead
+
     [Header("Touch")]
-    [SerializeField] int touchDamage = 10;
+    [SerializeField] bool touchHurts = true;    // ON: touching him hurts (contact damage)
+    [SerializeField] bool touchPoisons = false; // ON: touching him also poisons
+    [SerializeField] int touchDamage = 8;
     [SerializeField] float touchKnockback = 10f;
 
     [Header("1) Charge")]
     [SerializeField] float chargeWarnTime = 0.7f;
     [SerializeField] float chargeSpeed = 17f;
-    [SerializeField] int chargeDamage = 14;
+    [SerializeField] int chargeDamage = 14;      // (old touch-based charge damage, not used by the lizard dash)
+    [SerializeField] int dashHitDamage = 18;     // lizard dash: hitting the player hurts a lot (no poison)
+    [SerializeField] float dashKnockback = 16f;
+    [SerializeField] float crashStunTime = 1.2f; // dodged: he hits the wall and is stunned this long
+    [SerializeField] int crashPuddles = 8;       // dodged: poison puddles that appear all over the floor
+    [SerializeField] int crashDrops = 10;        // dodged: poison drops that fall all over the arena
 
     [Header("2) Slam")]
     [SerializeField] float slamAirTime = 0.9f;
@@ -47,10 +64,36 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField] int rainDrops = 9;
     [SerializeField] float rainTime = 2.5f;
 
-    [Header("4) Spit")]
+    [Header("4) Spit (old, replaced by Vomit)")]
     [SerializeField] Projectile spitPrefab;
     [SerializeField] int spitCount = 3;
     [SerializeField] float spitSpread = 18f; // degrees between globs
+
+    [Header("4) Vomit")]
+    [SerializeField] float vomitWarnTime = 0.5f;
+    [SerializeField] int vomitGlobs = 7;
+    [SerializeField] float vomitSpeed = 11f;
+    [SerializeField] float vomitArc = 35f;       // degrees: globs spread between flat and this far up
+    [SerializeField] int vomitDamage = 5;        // per glob, plus poison
+    [SerializeField] float vomitGlobSize = 0.5f;
+    [SerializeField] float vomitPuddleWidth = 2.5f;
+
+    [Header("5) Claws (close range, not poisonous)")]
+    [SerializeField] float clawTriggerDistance = 5f; // uses the claws when the player is this close (from his edge)
+    [SerializeField] float clawApproachTime = 0.6f;  // steps in for up to this long before swiping
+    [SerializeField] float clawStepSpeed = 6f;
+    [SerializeField] float clawReach = 3f;           // how far in front of him a swipe hits
+    [SerializeField] float clawHeight = 3.5f;
+    [SerializeField] int clawSwipes = 2;
+    [SerializeField] float clawWindup = 0.3f;        // flash before each swipe
+    [SerializeField] float clawSwipeTime = 0.15f;    // how long each swipe can hit
+    [SerializeField] int clawDamage = 7;
+    [SerializeField] float clawKnockback = 10f;
+
+    [Header("Phase 2 poison everywhere")]
+    [SerializeField] float phase2PoisonInterval = 1.4f;
+    [SerializeField] int phase2PuddlesPerWave = 2;
+    [SerializeField] int phase2DropsPerWave = 2;
 
     [Header("Poison")]
     [SerializeField] int poisonDamage = 2;
@@ -127,6 +170,7 @@ public class PoisonBoss : MonoBehaviour
         {
             phase2 = true;
             if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.5f, 0.3f);
+            StartCoroutine(PoisonEverywhere());
         }
     }
 
@@ -139,8 +183,15 @@ public class PoisonBoss : MonoBehaviour
         {
             if (!player) { yield return null; continue; }
 
-            int attack;
-            do attack = Random.Range(0, 4); while (attack == lastAttack);
+            // Close: claws. Otherwise a random attack (never the same twice in a row)
+            var options = new List<int>();
+            if (useCharge) options.Add(0);
+            if (useSlam) options.Add(1);
+            if (useRain) options.Add(2);
+            if (useVomit) options.Add(3);
+            bool close = useClaws && Mathf.Abs(player.position.x - rb.position.x) - halfWidth <= clawTriggerDistance;
+            if (options.Count > 1) options.Remove(lastAttack);
+            int attack = close ? 4 : options.Count > 0 ? options[Random.Range(0, options.Count)] : 4;
             lastAttack = attack;
 
             switch (attack)
@@ -148,7 +199,8 @@ public class PoisonBoss : MonoBehaviour
                 case 0: yield return Charge(); break;
                 case 1: yield return Slam(); break;
                 case 2: yield return Rain(); break;
-                default: yield return Spit(); break;
+                case 3: yield return Vomit(); break;
+                default: yield return Claws(); break;
             }
             Tint(bodyColor);
             yield return new WaitForSeconds(restTime / Speed);
@@ -162,9 +214,9 @@ public class PoisonBoss : MonoBehaviour
         float dir = DirToPlayer;
         yield return Warn(chargeWarnTime / Speed);
 
-        SetTouchDamage(chargeDamage); // ramming hurts more than touching
         float targetX = dir > 0 ? arenaMaxX - halfWidth : arenaMinX + halfWidth;
         float nextTrail = rb.position.x;
+        bool hitPlayer = false;
         while (Mathf.Abs(rb.position.x - targetX) > 0.05f)
         {
             float x = Mathf.MoveTowards(rb.position.x, targetX, chargeSpeed * Speed * Time.fixedDeltaTime);
@@ -174,10 +226,131 @@ public class PoisonBoss : MonoBehaviour
                 nextTrail = x;
                 SpawnPuddle(x, 2.5f, puddleLifetime);
             }
+
+            // Ran into the player: big hit, and the dash stops there
+            foreach (Collider2D hit in Physics2D.OverlapBoxAll(new Vector2(x, rb.position.y), new Vector2(halfWidth * 2f, halfHeight * 2f), 0f))
+                if (HitPlayer(hit, dashHitDamage, new Vector2(dir, 0.6f).normalized * dashKnockback, false)) { hitPlayer = true; break; }
+            if (hitPlayer) break;
+
             yield return new WaitForFixedUpdate();
         }
-        SetTouchDamage(touchDamage);
-        if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.25f, 0.25f); // hits the wall
+        if (hitPlayer) yield break;
+
+        // The player dodged: he slams into the wall, is stunned, and poison bursts all over the arena
+        if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.45f, 0.45f);
+        for (int i = 0; i < crashPuddles; i++)
+            SpawnPuddle(Random.Range(arenaMinX + 1f, arenaMaxX - 1f), Random.Range(2f, 3.5f), puddleLifetime);
+        StartCoroutine(DropsAllOver(crashDrops, 1.2f));
+        Tint(Color.Lerp(bodyColor, Color.gray, 0.5f)); // dazed
+        yield return new WaitForSeconds(crashStunTime);
+        Tint(bodyColor);
+    }
+
+    // Poison drops falling at random spots across the arena over a short time
+    IEnumerator DropsAllOver(int count, float overTime)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            SpawnDrop(new Vector2(Random.Range(arenaMinX + 0.5f, arenaMaxX - 0.5f), ceilingY - 0.5f));
+            yield return new WaitForSeconds(overTime / Mathf.Max(count, 1));
+        }
+    }
+
+    // ---------------- 4) Vomit ----------------
+
+    IEnumerator Vomit()
+    {
+        float dir = DirToPlayer;
+        yield return Warn(vomitWarnTime / Speed);
+        Vector2 mouth = rb.position + new Vector2(dir * halfWidth, halfHeight * 0.4f);
+        int globs = phase2 ? vomitGlobs + 3 : vomitGlobs;
+        for (int i = 0; i < globs; i++)
+        {
+            float angle = Mathf.Lerp(5f, vomitArc, globs > 1 ? i / (float)(globs - 1) : 0.5f);
+            Vector2 v = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad) * dir, Mathf.Sin(angle * Mathf.Deg2Rad));
+            float speed = vomitSpeed * Random.Range(0.75f, 1.15f);
+            StartCoroutine(Glob(mouth, v * speed));
+            yield return new WaitForSeconds(0.05f);
+        }
+    }
+
+    // One poison glob: flies in an arc, hurts and poisons the player, and leaves a puddle where it lands
+    IEnumerator Glob(Vector2 from, Vector2 velocity)
+    {
+        var glob = new GameObject("VomitGlob");
+        glob.transform.position = from;
+        glob.transform.localScale = Vector3.one * vomitGlobSize;
+        var gsr = glob.AddComponent<SpriteRenderer>();
+        gsr.sprite = sr ? sr.sprite : null;
+        gsr.color = poisonColor;
+        gsr.sortingOrder = 3;
+        var col = glob.AddComponent<CircleCollider2D>();
+        col.isTrigger = true;
+        col.radius = 0.5f;
+        glob.AddComponent<PoisonHazard>().Setup(vomitDamage, 6f, poisonDamage, poisonDuration, 0.5f, true);
+        spawned.Add(glob);
+
+        Vector2 pos = from;
+        float g = Mathf.Abs(Physics2D.gravity.y) * 1.5f;
+        while (glob && pos.y > groundY + vomitGlobSize * 0.5f)
+        {
+            velocity.y -= g * Time.deltaTime;
+            pos += velocity * Time.deltaTime;
+            glob.transform.position = pos;
+            if (pos.x < arenaMinX || pos.x > arenaMaxX) break;
+            yield return null;
+        }
+        if (glob)
+        {
+            SpawnPuddle(Mathf.Clamp(pos.x, arenaMinX + 1f, arenaMaxX - 1f), vomitPuddleWidth, puddleLifetime);
+            spawned.Remove(glob);
+            Destroy(glob);
+        }
+    }
+
+    // ---------------- 5) Claws ----------------
+
+    IEnumerator Claws()
+    {
+        float dir = DirToPlayer;
+        // Step in until the player is within reach (or time runs out)
+        for (float t = 0f; t < clawApproachTime; t += Time.fixedDeltaTime)
+        {
+            float gap = Mathf.Abs(player.position.x - rb.position.x) - halfWidth;
+            if (gap <= clawReach * 0.8f) break;
+            dir = DirToPlayer;
+            float x = Mathf.Clamp(rb.position.x + dir * clawStepSpeed * Speed * Time.fixedDeltaTime, arenaMinX + halfWidth, arenaMaxX - halfWidth);
+            rb.MovePosition(new Vector2(x, rb.position.y));
+            yield return new WaitForFixedUpdate();
+        }
+
+        for (int s = 0; s < clawSwipes; s++)
+        {
+            dir = DirToPlayer;
+            yield return Warn(clawWindup / Speed);
+            Vector2 center = new Vector2(rb.position.x + dir * (halfWidth + clawReach * 0.5f), groundY + clawHeight * 0.5f);
+            bool landed = false;
+            for (float t = 0f; t < clawSwipeTime && !landed; t += Time.deltaTime)
+            {
+                foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, new Vector2(clawReach, clawHeight), 0f))
+                    if (HitPlayer(hit, clawDamage, new Vector2(dir, 0.5f).normalized * clawKnockback, false)) { landed = true; break; }
+                yield return null;
+            }
+        }
+    }
+
+    // ---------------- Phase 2: poison everywhere ----------------
+
+    IEnumerator PoisonEverywhere()
+    {
+        while (true)
+        {
+            for (int i = 0; i < phase2PuddlesPerWave; i++)
+                SpawnPuddle(Random.Range(arenaMinX + 1f, arenaMaxX - 1f), Random.Range(2f, 3f), puddleLifetime);
+            for (int i = 0; i < phase2DropsPerWave; i++)
+                SpawnDrop(new Vector2(Random.Range(arenaMinX + 0.5f, arenaMaxX - 0.5f), ceilingY - 0.5f));
+            yield return new WaitForSeconds(phase2PoisonInterval);
+        }
     }
 
     // ---------------- 2) Slam ----------------
@@ -262,17 +435,20 @@ public class PoisonBoss : MonoBehaviour
 
     void SetTouchDamage(int damage)
     {
-        if (touchHazard) touchHazard.Setup(damage, touchKnockback, poisonDamage, poisonDuration, 0.5f, false);
+        if (!touchHazard) return;
+        // Turn the hitbox itself on/off (a switched-off script would still get touch events)
+        if (touchHazard.TryGetComponent(out Collider2D touchCol)) touchCol.enabled = touchHurts;
+        touchHazard.Setup(damage, touchKnockback, touchPoisons ? poisonDamage : 0, touchPoisons ? poisonDuration : 0f, 0.5f, false);
     }
 
-    bool HitPlayer(Collider2D hit, int damage, Vector2 knockback)
+    bool HitPlayer(Collider2D hit, int damage, Vector2 knockback, bool poisons = true)
     {
         if (!hit.TryGetComponent(out PlayerController2D _) || !hit.TryGetComponent(out Health h)) return false;
         int before = h.CurrentHealth;
         h.TakeDamage(damage);
         if (h.CurrentHealth >= before) return false; // dashing or invincible
         if (hit.attachedRigidbody) hit.attachedRigidbody.linearVelocity = knockback;
-        Poison.Apply(hit.gameObject, poisonDamage, poisonDuration, 0.5f);
+        if (poisons) Poison.Apply(hit.gameObject, poisonDamage, poisonDuration, 0.5f);
         return true;
     }
 

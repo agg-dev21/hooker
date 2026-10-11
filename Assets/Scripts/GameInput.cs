@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.LowLevel;
 public enum GameAction
 {
     MoveLeft, MoveRight, Jump, Dash, Punch, Hook,
-    AimUp, AimDown, AimLeft, AimRight, Interact, Pause
+    AimUp, AimDown, AimLeft, AimRight, Interact, Pause, Ability
 }
 
 // One place for all player input: keyboard + mouse + Xbox controller (any gamepad works).
@@ -23,6 +23,7 @@ public enum GameAction
 //   Aim hook/punch    Arrow keys              Left stick / D-pad (8 directions), right stick (free aim) (fixed)
 //   Interact / talk   E                       Y
 //   Pause             Esc                     Start (Menu button)
+//   Ability           Q                       LB (special ability unlocked from bosses)
 public static class GameInput
 {
     const float MoveDeadzone = 0.2f; // left stick: ignore tiny drift when moving
@@ -38,6 +39,7 @@ public static class GameInput
         { GameAction.AimUp, Key.UpArrow },     { GameAction.AimDown, Key.DownArrow },
         { GameAction.AimLeft, Key.LeftArrow }, { GameAction.AimRight, Key.RightArrow },
         { GameAction.Interact, Key.E },        { GameAction.Pause, Key.Escape },
+        { GameAction.Ability, Key.Q },
     };
 
     // Actions that have a controller button (moving and aiming use the sticks / D-pad instead)
@@ -49,6 +51,7 @@ public static class GameInput
         { GameAction.Hook, GamepadButton.RightShoulder },  // RB
         { GameAction.Interact, GamepadButton.North },      // Y
         { GameAction.Pause, GamepadButton.Start },         // Start / Menu
+        { GameAction.Ability, GamepadButton.LeftShoulder }, // LB
     };
 
     // Controller buttons that can be picked when rebinding
@@ -189,6 +192,7 @@ public static class GameInput
     public static bool JumpReleased => Released(GameAction.Jump);
     public static bool JumpHeld     => Held(GameAction.Jump);
     public static bool DashPressed  => Pressed(GameAction.Dash);
+    public static bool AbilityPressed => Pressed(GameAction.Ability);
 
     // ---------------- Combat ----------------
 
@@ -265,6 +269,7 @@ public static class GameInput
             case GameAction.AimLeft:   return "Aim Left";
             case GameAction.AimRight:  return "Aim Right";
             case GameAction.Interact:  return "Interact / Talk";
+            case GameAction.Ability:   return "Special Ability";
             default:                   return a.ToString();
         }
     }

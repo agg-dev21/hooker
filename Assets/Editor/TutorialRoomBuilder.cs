@@ -71,7 +71,7 @@ public static class TutorialRoomBuilder
             Scene room = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
 
             string next = i + 1 < Rooms.Length ? Rooms[i + 1] : ""; // last room: no next scene yet
-            SceneExit exit = Object.FindFirstObjectByType<SceneExit>();
+            SceneExit exit = Object.FindAnyObjectByType<SceneExit>();
             var so = new SerializedObject(exit);
             so.FindProperty("nextScene").stringValue = next;
             so.ApplyModifiedPropertiesWithoutUndo();
@@ -97,11 +97,11 @@ public static class TutorialRoomBuilder
         DestroyByName("Checkpoint");
 
         // Rename the KillZone object
-        foreach (KillZone kz in Object.FindObjectsByType<KillZone>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (KillZone kz in Object.FindObjectsByType<KillZone>(FindObjectsInactive.Include))
             if (kz.gameObject.name == "GameObject") kz.gameObject.name = "KillZone";
 
         // Camera: no follow, at (0,0), size 5
-        Camera cam = Object.FindFirstObjectByType<Camera>();
+        Camera cam = Object.FindAnyObjectByType<Camera>();
         if (cam.TryGetComponent(out CameraFollow2D follow)) follow.enabled = false;
         cam.transform.position = new Vector3(0f, 0f, cam.transform.position.z);
         cam.orthographic = true;
@@ -133,14 +133,14 @@ public static class TutorialRoomBuilder
         exitObj.AddComponent<SceneExit>();
 
         // Player on the left, standing on the floor
-        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
         float feetOffset = 0.5f;
         if (player.TryGetComponent(out CapsuleCollider2D capsule))
             feetOffset = (capsule.size.y * 0.5f - capsule.offset.y) * player.transform.lossyScale.y;
         player.transform.position = new Vector3(-HalfWidth + 1.5f, floorTop + feetOffset + 0.05f, 0f);
 
         // HealthBar still targets the Player
-        HealthBar bar = Object.FindFirstObjectByType<HealthBar>(FindObjectsInactive.Include);
+        HealthBar bar = Object.FindAnyObjectByType<HealthBar>(FindObjectsInactive.Include);
         if (bar && player.TryGetComponent(out Health health))
         {
             var so = new SerializedObject(bar);
@@ -213,7 +213,7 @@ public static class TutorialRoomBuilder
     {
         FillTiles(map, null, -3, -HalfHeightInt, 8, FloorRows, false); // remove floor from x -3 to 5
 
-        KillZone kz = Object.FindFirstObjectByType<KillZone>(FindObjectsInactive.Include);
+        KillZone kz = Object.FindAnyObjectByType<KillZone>(FindObjectsInactive.Include);
         if (!kz) kz = new GameObject("KillZone").AddComponent<KillZone>();
         kz.transform.position = new Vector3(1f, -HalfHeight - 1.5f, 0f);
         kz.transform.localScale = Vector3.one;
@@ -259,7 +259,7 @@ public static class TutorialRoomBuilder
         so.FindProperty("fireRate").floatValue = 1f;
         so.ApplyModifiedPropertiesWithoutUndo();
 
-        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
         if (player && player.TryGetComponent(out Health health))
         {
             var hso = new SerializedObject(health);
@@ -571,80 +571,85 @@ public static class TutorialRoomBuilder
 
 
         // ---- Obstacles (no enemies). Each floor is 3 screens wide (x -13 to 66). ----
+        // Tuned for the current movement: held jump about 8.5 tiles high, running jump about 8.3 tiles far,
+        // jump + dash about 13.6 tiles. Walls are 7 tall (hold jump), crate stacks 10 tall (break them),
+        // dash pits 12 wide (jump + dash), floor gaps 7-8 wide (a real jump).
+        const int Stack = 5; // crates per stack (each crate is 2 tall)
+
         // Floor 1 (start left, hole up on the right):
-        // small pit, big pit (jump + dash), crate stack, ceiling tendril, barrel next to a crate stack, two more tendrils
+        // jump pit, dash pit, crate stack, ceiling tendril, barrel next to a crate stack, two more tendrils
         int t = FloorTop(0);
-        FillTiles(map, null, -9, bottom, 3, 1, false);  // small pit
-        FillTiles(map, null, -4, bottom, 8, 1, false);  // big pit
-        KillZone kz = Object.FindFirstObjectByType<KillZone>(FindObjectsInactive.Include);
+        FillTiles(map, null, -9, bottom, 6, 1, false);  // jump pit (6 wide)
+        FillTiles(map, null, 0, bottom, 12, 1, false);  // dash pit (12 wide: jump + dash)
+        KillZone kz = Object.FindAnyObjectByType<KillZone>(FindObjectsInactive.Include);
         if (!kz) kz = new GameObject("KillZone").AddComponent<KillZone>();
-        kz.transform.position = new Vector3(-2.5f, bottom - 1.5f, 0f);
+        kz.transform.position = new Vector3(1.5f, bottom - 1.5f, 0f);
         kz.transform.localScale = Vector3.one;
         if (!kz.TryGetComponent(out BoxCollider2D kzCol)) kzCol = kz.gameObject.AddComponent<BoxCollider2D>();
-        kzCol.size = new Vector2(15f, 1f);
+        kzCol.size = new Vector2(24f, 1f);
         kzCol.offset = Vector2.zero;
         kzCol.isTrigger = true;
-        MakeCrateStack("CrateStack_F1a", obstacles, map, 7f, t, 3);
-        MakeTendril("Tendril_F1a", obstacles, map, new Vector2(13f, t + FloorInside), Vector2.down, FloorInside, 0f);
-        MakeBarrel("Barrel_F1", obstacles, map, new Vector2(19.5f, t + 0.6f));     // touch it, run, it blows the crates
-        MakeCrateStack("CrateStack_F1b", obstacles, map, 22f, t, 3);
-        MakeTendril("Tendril_F1b", obstacles, map, new Vector2(27f, t + FloorInside), Vector2.down, FloorInside, 0.8f);
-        MakeTendril("Tendril_F1c", obstacles, map, new Vector2(30f, t + FloorInside), Vector2.down, FloorInside, 1.6f);
+        MakeCrateStack("CrateStack_F1a", obstacles, map, 16f, t, Stack);
+        MakeTendril("Tendril_F1a", obstacles, map, new Vector2(18.5f, t + FloorInside), Vector2.down, FloorInside, 0f);
+        MakeBarrel("Barrel_F1", obstacles, map, new Vector2(21.5f, t + 0.6f));     // touch it, run, it blows the crates
+        MakeCrateStack("CrateStack_F1b", obstacles, map, 24f, t, Stack);
+        MakeTendril("Tendril_F1b", obstacles, map, new Vector2(28f, t + FloorInside), Vector2.down, FloorInside, 0.8f);
+        MakeTendril("Tendril_F1c", obstacles, map, new Vector2(31f, t + FloorInside), Vector2.down, FloorInside, 1.6f);
         // third screen: dash pit, low beam, barrels, ceiling tendril
-        FillTiles(map, null, 41, bottom, 8, 1, false);    // pit (jump + dash)
-        MakeKillZone("KillZone_F1b", obstacles, new Vector2(45f, bottom - 1.5f), new Vector2(10f, 1f));
-        FillTiles(map, tile, 51, t + 3, 3, FloorInside - 3, true); // low beam
-        MakeBarrel("Barrel_F1b", obstacles, map, new Vector2(56.5f, t + 0.6f));
-        MakeBarrel("Barrel_F1c", obstacles, map, new Vector2(57.5f, t + 0.6f));
-        MakeTendril("Tendril_F1d", obstacles, map, new Vector2(59.5f, t + FloorInside), Vector2.down, FloorInside, 0.4f);
+        FillTiles(map, null, 40, bottom, 12, 1, false);   // dash pit (12 wide)
+        MakeKillZone("KillZone_F1b", obstacles, new Vector2(46f, bottom - 1.5f), new Vector2(14f, 1f));
+        FillTiles(map, tile, 54, t + 3, 3, FloorInside - 3, true); // low beam
+        MakeBarrel("Barrel_F1b", obstacles, map, new Vector2(58.5f, t + 0.6f));
+        MakeBarrel("Barrel_F1c", obstacles, map, new Vector2(59.5f, t + 0.6f));
+        MakeTendril("Tendril_F1d", obstacles, map, new Vector2(61f, t + FloorInside), Vector2.down, FloorInside, 0.4f);
 
         // Floor 2 (arrive right, hole up on the left):
         // third screen: tendrils bursting from the floor, crate stack, ceiling cannon, gap (falls to floor 1)
-        // then: 3-tall wall, row of barrels to jump over, ceiling cannon, two tendrils, another 3-tall wall, low beam, wall cannon
+        // then: 7-tall wall, row of barrels to jump over, ceiling cannon, two tendrils, another 7-tall wall, low beam, wall cannon
         t = FloorTop(1);
-        MakeTendril("Tendril_F2c", obstacles, map, new Vector2(57.5f, t), Vector2.up, 6f, 0f);
-        MakeTendril("Tendril_F2d", obstacles, map, new Vector2(54.5f, t), Vector2.up, 6f, 0.6f);
-        MakeCrateStack("CrateStack_F2", obstacles, map, 50f, t, 3);
-        MakeCannon("Cannon_F2_Ceiling2", obstacles, map, new Vector2(45.5f, t + FloorInside - 0.5f));
-        FillTiles(map, null, 41, t - 2, 4, 2, false);     // gap
-        FillTiles(map, tile, 30, t, 1, 3, true);          // 3-tall wall
+        MakeTendril("Tendril_F2c", obstacles, map, new Vector2(57.5f, t), Vector2.up, 10f, 0f);
+        MakeTendril("Tendril_F2d", obstacles, map, new Vector2(54.5f, t), Vector2.up, 10f, 0.6f);
+        MakeCrateStack("CrateStack_F2", obstacles, map, 50.5f, t, Stack);
+        MakeCannon("Cannon_F2_Ceiling2", obstacles, map, new Vector2(44.5f, t + FloorInside - 0.5f));
+        FillTiles(map, null, 39, t - 2, 8, 2, false);     // gap (8 wide)
+        FillTiles(map, tile, 30, t, 1, 7, true);          // 7-tall wall (hold jump)
         MakeBarrel("Barrel_F2a", obstacles, map, new Vector2(25.5f, t + 0.6f));
         MakeBarrel("Barrel_F2b", obstacles, map, new Vector2(24.5f, t + 0.6f));
+        MakeBarrel("Barrel_F2c", obstacles, map, new Vector2(23.5f, t + 0.6f));
         MakeCannon("Cannon_F2_Ceiling", obstacles, map, new Vector2(20.5f, t + FloorInside - 0.5f));
         MakeTendril("Tendril_F2a", obstacles, map, new Vector2(15f, t + FloorInside), Vector2.down, FloorInside, 0f);
         MakeTendril("Tendril_F2b", obstacles, map, new Vector2(10f, t + FloorInside), Vector2.down, FloorInside, 1.2f);
-        FillTiles(map, tile, 3, t, 1, 3, true);           // 3-tall wall
+        FillTiles(map, tile, 3, t, 1, 7, true);           // 7-tall wall (hold jump)
         FillTiles(map, tile, -6, t + 3, 3, FloorInside - 3, true); // low beam hanging from the ceiling, 3-tall gap under it
         MakeCannon("Cannon_F2_Wall", obstacles, map, new Vector2(-12.5f, t + 1f));
 
         // Floor 3 (arrive left, hole up on the right):
-        // platform up onto a tall wall, gap (falls to floor 2), tendrils bursting up from the floor,
+        // platform up onto a 10-tall wall, gap (falls to floor 2), tendrils bursting up from the floor,
         // barrel next to a crate stack, second gap, cannon on the right wall
         t = FloorTop(2);
         FillTiles(map, tile, -7, t + 2, 4, 1, true);      // platform, top 3 above the floor, touching the wall (no 1-tile gap to get stuck in)
-        FillTiles(map, tile, -3, t, 1, 6, true);          // 6-tall wall, only reachable from the platform
-        FillTiles(map, null, 2, t - 2, 3, 2, false);      // gap
-        MakeTendril("Tendril_F3a", obstacles, map, new Vector2(10f, t), Vector2.up, 6f, 0f);
-        MakeTendril("Tendril_F3b", obstacles, map, new Vector2(13f, t), Vector2.up, 6f, 0.7f);
+        FillTiles(map, tile, -3, t, 1, 10, true);         // 10-tall wall: too high from the floor, reachable from the platform
+        FillTiles(map, null, 2, t - 2, 7, 2, false);      // gap (7 wide)
+        MakeTendril("Tendril_F3a", obstacles, map, new Vector2(12f, t), Vector2.up, 10f, 0f);
+        MakeTendril("Tendril_F3b", obstacles, map, new Vector2(15f, t), Vector2.up, 10f, 0.7f);
         MakeBarrel("Barrel_F3", obstacles, map, new Vector2(19.5f, t + 0.6f));
-        MakeCrateStack("CrateStack_F3", obstacles, map, 22f, t, 3);
-        FillTiles(map, null, 26, t - 2, 4, 2, false);     // second gap
-        MakeCannon("Cannon_F3", obstacles, map, new Vector2(WallRight - 0.5f, t + 1f));
-        // third screen: wide gap with two floating platforms, two ceiling tendrils, barrel next to a crate stack
-        FillTiles(map, null, 40, t - 2, 9, 2, false);     // wide gap (falls to floor 2)
-        FillTiles(map, tile, 42, t + 2, 2, 1, true);      // floating platform
-        FillTiles(map, tile, 46, t + 2, 2, 1, true);      // floating platform
-        MakeTendril("Tendril_F3c", obstacles, map, new Vector2(52f, t + FloorInside), Vector2.down, FloorInside, 0f);
-        MakeTendril("Tendril_F3d", obstacles, map, new Vector2(54.5f, t + FloorInside), Vector2.down, FloorInside, 0.7f);
-        MakeBarrel("Barrel_F3b", obstacles, map, new Vector2(56.5f, t + 0.6f));
-        MakeCrateStack("CrateStack_F3b", obstacles, map, 58.5f, t, 3);
+        MakeCrateStack("CrateStack_F3", obstacles, map, 22f, t, Stack);
+        FillTiles(map, null, 26, t - 2, 7, 2, false);     // second gap (7 wide)
+        MakeCannon("Cannon_F3", obstacles, map, new Vector2(WallRight - 0.5f, t + 2f)); // a bit higher: its top is the step up to the secret ledge
+        // third screen: 14-wide gap with one small high platform, two ceiling tendrils, barrel next to a crate stack
+        FillTiles(map, null, 38, t - 2, 14, 2, false);    // wide gap (falls to floor 2)
+        FillTiles(map, tile, 44, t + 4, 2, 1, true);      // small platform, top 5 above the floor
+        MakeTendril("Tendril_F3c", obstacles, map, new Vector2(54f, t + FloorInside), Vector2.down, FloorInside, 0f);
+        MakeTendril("Tendril_F3d", obstacles, map, new Vector2(56.5f, t + FloorInside), Vector2.down, FloorInside, 0.7f);
+        MakeBarrel("Barrel_F3b", obstacles, map, new Vector2(57.5f, t + 0.6f));
+        MakeCrateStack("CrateStack_F3b", obstacles, map, 59.5f, t, Stack);
 
         // Floor 4 (arrive right, hole up on the left):
-        // gap (falls to floor 3), crate stack, barrels under a tendril, sideways tendril sweeping the floor near the hole,
+        // gaps (fall to floor 3), crate stacks, barrels under a tendril, sideways tendril sweeping the floor near the hole,
         // low beam, cannons on both walls
         t = FloorTop(3);
-        FillTiles(map, null, 28, t - 2, 4, 2, false);     // gap
-        MakeCrateStack("CrateStack_F4", obstacles, map, 22f, t, 3);
+        FillTiles(map, null, 27, t - 2, 7, 2, false);     // gap (7 wide)
+        MakeCrateStack("CrateStack_F4", obstacles, map, 22f, t, Stack);
         MakeBarrel("Barrel_F4a", obstacles, map, new Vector2(18.5f, t + 0.6f));
         MakeBarrel("Barrel_F4b", obstacles, map, new Vector2(17.5f, t + 0.6f));
         MakeTendril("Tendril_F4a", obstacles, map, new Vector2(14f, t + FloorInside), Vector2.down, FloorInside, 0f);
@@ -657,16 +662,16 @@ public static class TutorialRoomBuilder
         MakeBarrel("Barrel_F4d", obstacles, map, new Vector2(55.5f, t + 0.6f));
         MakeTendril("Tendril_F4c", obstacles, map, new Vector2(52f, t + FloorInside), Vector2.down, FloorInside, 0f);
         MakeTendril("Tendril_F4d", obstacles, map, new Vector2(49f, t + FloorInside), Vector2.down, FloorInside, 0.6f);
-        FillTiles(map, null, 43, t - 2, 4, 2, false);     // gap
-        MakeCrateStack("CrateStack_F4b", obstacles, map, 39f, t, 3);
+        FillTiles(map, null, 41, t - 2, 7, 2, false);     // gap (7 wide)
+        MakeCrateStack("CrateStack_F4b", obstacles, map, 37f, t, Stack);
 
         // ---- Secret rooms: outside the ship, one per floor, reached through a visible but hard-to-reach door ----
         var secrets = new GameObject("SecretRooms").transform;
 
         // Floor 1: door on a small ledge high on the left wall, reached by hooking a small ring in the corner
         t = FloorTop(0);
-        FillTiles(map, tile, -13, t + 8, 2, 1, true); // ledge
-        GameObject cornerRing = MakeBox("SecretRing_F1", secrets, map, new Vector2(-11.5f, t + 11.5f), new Vector2(0.4f, 0.4f), RingColor);
+        FillTiles(map, tile, -13, t + 9, 2, 1, true); // ledge, top 10 above the floor (too high to jump to)
+        GameObject cornerRing = MakeBox("SecretRing_F1", secrets, map, new Vector2(-11.5f, t + 11.9f), new Vector2(0.4f, 0.4f), RingColor);
         Object.DestroyImmediate(cornerRing.GetComponent<BoxCollider2D>());
         var cornerCol = cornerRing.AddComponent<CircleCollider2D>();
         cornerCol.radius = 1.5f;
@@ -674,8 +679,8 @@ public static class TutorialRoomBuilder
         var cornerHook = new SerializedObject(cornerRing.AddComponent<HookPoint>());
         cornerHook.FindProperty("launchSpeed").floatValue = 2f; // just drop onto the ledge
         cornerHook.ApplyModifiedPropertiesWithoutUndo();
-        MakeOutsideRoom(0, secrets, map, tile, new Vector2(-12.4f, t + 10.1f));
-        MakeTendril("Guard_F1", secrets, map, new Vector2(-13f, t + 10.2f), Vector2.right, 4f, 0.3f); // sweeps the ledge
+        MakeOutsideRoom(0, secrets, map, tile, new Vector2(-12.4f, t + 11.1f));
+        MakeTendril("Guard_F1", secrets, map, new Vector2(-13f, t + 11.2f), Vector2.right, 4f, 0.3f); // sweeps the ledge
 
         // Floor 2: door on the 1-tile strip between the hole down and the right wall (miss and you fall)
         MakeOutsideRoom(1, secrets, map, tile, new Vector2(WallRight - 0.5f, FloorTop(1) + 1.1f));
@@ -683,9 +688,11 @@ public static class TutorialRoomBuilder
 
         // Floor 3: door on a high ledge in the right corner, reached by jumping off the cannon
         t = FloorTop(2);
-        FillTiles(map, tile, 62, t + 4, 2, 1, true); // ledge (leaves a 2-tile gap by the wall so you cannot get stuck)
-        MakeOutsideRoom(2, secrets, map, tile, new Vector2(63f, t + 6.1f));
-        MakeTendril("Guard_F3", secrets, map, new Vector2(WallRight, t + 6.2f), Vector2.left, 4f, 0.5f); // sweeps the ledge
+        // Narrow perch by the wall, top 10 above the floor: out of the way of the hook to the ring above,
+        // too high to jump to from the floor, reachable by jumping straight up off the cannon
+        FillTiles(map, tile, 64, t + 9, 1, 1, true);
+        MakeOutsideRoom(2, secrets, map, tile, new Vector2(64.5f, t + 11.1f));
+        MakeTendril("Guard_F3", secrets, map, new Vector2(WallRight, t + 11.2f), Vector2.left, 4f, 0.5f); // sweeps the ledge
 
         // Floor 4: door at the bottom of the left wall, right where the sideways tendril comes out
         MakeOutsideRoom(3, secrets, map, tile, new Vector2(-12.4f, FloorTop(3) + 1.1f));
@@ -694,14 +701,14 @@ public static class TutorialRoomBuilder
         RebuildColliders(map);
 
         // Player at the bottom left
-        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
         float feet = 1f;
         if (player.TryGetComponent(out CapsuleCollider2D capsule))
             feet = (capsule.size.y * 0.5f - capsule.offset.y) * player.transform.lossyScale.y;
         player.transform.position = new Vector3(-11f, FloorTop(0) + feet + 0.05f, 0f);
 
         // Camera scrolls left/right inside the floor, shows only the floor you are on, and slides to the next floor when you go up or down
-        Camera cam = Object.FindFirstObjectByType<Camera>();
+        Camera cam = Object.FindAnyObjectByType<Camera>();
         cam.transform.position = new Vector3(0f, L1FirstFloorCenterY, cam.transform.position.z);
         cam.orthographicSize = L1HalfHeight;
         if (cam.TryGetComponent(out CameraFollow2D follow))
@@ -734,7 +741,7 @@ public static class TutorialRoomBuilder
     const float DeckCameraSize = 9f;
     static void SetDeckCamera(Transform player)
     {
-        Camera cam = Object.FindFirstObjectByType<Camera>();
+        Camera cam = Object.FindAnyObjectByType<Camera>();
         cam.orthographicSize = DeckCameraSize;
         float deckBottom = L1FirstFloorCenterY - L1HalfHeight;
         cam.transform.position = new Vector3(DeckLeft + 0.67f + DeckCameraSize * 16f / 9f, deckBottom + DeckCameraSize, cam.transform.position.z);
@@ -757,7 +764,7 @@ public static class TutorialRoomBuilder
         if (!File.Exists(path)) return;
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
         Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
         SetDeckCamera(player.transform);
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -821,7 +828,7 @@ public static class TutorialRoomBuilder
         new GameObject("BossArena (empty)").transform.position = new Vector3((left + right) * 0.5f, deckTop + 3f, 0f);
 
         // Player starts on the hatch
-        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
         float feet = 1f;
         if (player.TryGetComponent(out CapsuleCollider2D capsule))
             feet = (capsule.size.y * 0.5f - capsule.offset.y) * player.transform.lossyScale.y;
@@ -875,7 +882,7 @@ public static class TutorialRoomBuilder
         var boss = hardy.AddComponent<HardyBoss>();
 
         // Boss health bar, top middle of the screen
-        Canvas canvas = Object.FindFirstObjectByType<Canvas>();
+        Canvas canvas = Object.FindAnyObjectByType<Canvas>();
         Sprite uiSprite = AssetDatabase.GetBuiltinExtraResource<Sprite>("UI/Skin/UISprite.psd");
 
         var barRoot = new GameObject("BossBar", typeof(RectTransform), typeof(Image));
@@ -941,6 +948,81 @@ public static class TutorialRoomBuilder
     // A secret room outside the ship (x -50 to -24), at the same height as floor k, one screen big.
     // The main camera never goes there. The entrance door (at doorPos, in the level) brings you in and the
     // camera switches to the room; the exit door inside brings you back. An empty chest sits in the middle.
+    // ---------------- Secret room obstacles ----------------
+    // Like the Level 2 secret rooms: each room has an obstacle guarding the chest, and a health potion as a reward.
+    // Hardy-themed (goo tendrils, barrels, cannons, crates), no poison. You come in on the right; the chest is in the middle.
+
+    [MenuItem("Tools/Add Secret Room Obstacles (Level 1)")]
+    static void AddSecretRoomObstaclesToLevel1()
+    {
+        string path = ScenePath(Level1Name);
+        if (!File.Exists(path)) return;
+        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
+        Tilemap map = FindGroundTilemap();
+
+        int done = 0;
+        for (int k = 0; k < Floors; k++)
+        {
+            // The real room lives under "SecretRooms" (the decoration has groups with the same name)
+            GameObject secrets = GameObject.Find("SecretRooms");
+            Transform room = secrets ? secrets.transform.Find("SecretRoom_F" + (k + 1)) : null;
+            if (!room) continue;
+            AddSecretRoomObstacles(k, room, map);
+            done++;
+        }
+
+        EditorSceneManager.MarkSceneDirty(scene);
+        EditorSceneManager.SaveScene(scene);
+        EditorUtility.DisplayDialog("Secret Room Obstacles", "Added obstacles and a health potion to " + done + " secret rooms.\n\nRun it again any time: it replaces the old ones.", "OK");
+    }
+
+    static void AddSecretRoomObstacles(int k, Transform room, Tilemap map)
+    {
+        // Replace any obstacles from an earlier run
+        Transform old = room.Find("RoomObstacles");
+        if (old) Object.DestroyImmediate(old.gameObject);
+        var g = new GameObject("RoomObstacles").transform;
+        g.SetParent(room);
+
+        const float wallInside = -48.5f; // just inside the room's left wall (x -50 to -49)
+        int t = FloorTop(k);
+
+        if (k == 0)
+        {
+            // Three goo tendrils dropping from the ceiling one after another
+            MakeTendril("RoomTendril_1", g, map, new Vector2(-31f, t + FloorInside), Vector2.down, FloorInside, 0f);
+            MakeTendril("RoomTendril_2", g, map, new Vector2(-34f, t + FloorInside), Vector2.down, FloorInside, 0.5f);
+            MakeTendril("RoomTendril_3", g, map, new Vector2(-41f, t + FloorInside), Vector2.down, FloorInside, 1f);
+        }
+        else if (k == 1)
+        {
+            // A tendril sweeping the floor from the far wall, and a barrel to jump over without touching
+            MakeTendril("RoomSweeper", g, map, new Vector2(wallInside - 0.5f, t + 1f), Vector2.right, 11f, 0.3f);
+            MakeBarrel("RoomBarrel", g, map, new Vector2(-33.5f, t + 0.6f));
+        }
+        else if (k == 2)
+        {
+            // Two tendrils bursting up from the floor, and a cannon on the far wall
+            MakeTendril("RoomTendril_Up1", g, map, new Vector2(-31f, t), Vector2.up, 10f, 0f);
+            MakeTendril("RoomTendril_Up2", g, map, new Vector2(-41f, t), Vector2.up, 10f, 0.7f);
+            MakeCannon("RoomCannon", g, map, new Vector2(wallInside, t + 1f));
+        }
+        else
+        {
+            // Crate stack in front of the chest (punch it, or touch the barrel and run), a cannon and a ceiling tendril
+            MakeCrateStack("RoomCrates", g, map, -33f, t, 5);
+            MakeBarrel("RoomBarrel", g, map, new Vector2(-30.5f, t + 0.6f));
+            MakeCannon("RoomCannon", g, map, new Vector2(wallInside, t + 6f));
+            MakeTendril("RoomTendril", g, map, new Vector2(-42f, t + FloorInside), Vector2.down, FloorInside, 0.4f);
+        }
+
+        // Reward: a health potion on the far side (heals 30)
+        GameObject potion = MakeBox("HealthPotion", g, map, new Vector2(-45f, t + 1f), new Vector2(0.6f, 0.6f), new Color(0.9f, 0.15f, 0.2f));
+        potion.GetComponent<BoxCollider2D>().isTrigger = true;
+        potion.AddComponent<HealthPickup>();
+    }
+
     static void MakeOutsideRoom(int k, Transform parent, Tilemap map, TileBase tile, Vector2 doorPos)
     {
         const int left = -50, right = -24;
@@ -991,6 +1073,8 @@ public static class TutorialRoomBuilder
         AddPrompt(entrance, entrance.GetComponent<SecretDoor>());
         AddPrompt(exitDoor, exitDoor.GetComponent<SecretDoor>());
         AddPrompt(chest, chest.GetComponent<Chest>());
+
+        AddSecretRoomObstacles(k, room, map);
     }
 
     // ---------------- "Press E" pop-ups ----------------
@@ -1000,9 +1084,9 @@ public static class TutorialRoomBuilder
     static void AddPromptsToScene()
     {
         int added = 0;
-        foreach (SecretDoor door in Object.FindObjectsByType<SecretDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (SecretDoor door in Object.FindObjectsByType<SecretDoor>(FindObjectsInactive.Include))
             if (AddPrompt(door.gameObject, door)) added++;
-        foreach (Chest chest in Object.FindObjectsByType<Chest>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (Chest chest in Object.FindObjectsByType<Chest>(FindObjectsInactive.Include))
             if (AddPrompt(chest.gameObject, chest)) added++;
 
         if (added > 0) EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
@@ -1073,7 +1157,7 @@ public static class TutorialRoomBuilder
         RebuildColliders(map);
 
         // Fixed camera, same zoom as Level_1
-        Camera cam = Object.FindFirstObjectByType<Camera>();
+        Camera cam = Object.FindAnyObjectByType<Camera>();
         cam.transform.position = new Vector3(0f, L1FirstFloorCenterY, cam.transform.position.z);
         cam.orthographicSize = L1HalfHeight;
         if (cam.TryGetComponent(out CameraFollow2D follow)) follow.enabled = false;
@@ -1092,7 +1176,7 @@ public static class TutorialRoomBuilder
         drive.FindProperty("nextScene").stringValue = NextLevelName;
         drive.ApplyModifiedPropertiesWithoutUndo();
 
-        PlayerController2D player = Object.FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
         if (player) player.transform.position = boat.transform.position + new Vector3(0f, 1.5f, 0f);
 
         EditorSceneManager.MarkSceneDirty(scene);
@@ -1105,7 +1189,7 @@ public static class TutorialRoomBuilder
         if (File.Exists(deckPath))
         {
             Scene deck = EditorSceneManager.OpenScene(deckPath, OpenSceneMode.Single);
-            HardyBoss boss = Object.FindFirstObjectByType<HardyBoss>();
+            HardyBoss boss = Object.FindAnyObjectByType<HardyBoss>();
             if (boss)
             {
                 var so = new SerializedObject(boss);
@@ -1241,7 +1325,7 @@ public static class TutorialRoomBuilder
         board.offset = new Vector2(0f, 1f);
 
         // Black fade image over the whole screen, invisible at start
-        Canvas canvas = Object.FindFirstObjectByType<Canvas>();
+        Canvas canvas = Object.FindAnyObjectByType<Canvas>();
         var fadeGo = new GameObject("Fade", typeof(RectTransform), typeof(Image));
         fadeGo.transform.SetParent(canvas.transform, false);
         fadeGo.transform.SetAsLastSibling();
@@ -1277,14 +1361,14 @@ public static class TutorialRoomBuilder
 
     static void DestroyByName(string name)
     {
-        foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (Transform t in Object.FindObjectsByType<Transform>(FindObjectsInactive.Include))
             if (t && t.name == name) Object.DestroyImmediate(t.gameObject);
     }
 
     static Tilemap FindGroundTilemap()
     {
         int ground = LayerMask.NameToLayer("Ground");
-        Tilemap[] maps = Object.FindObjectsByType<Tilemap>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        Tilemap[] maps = Object.FindObjectsByType<Tilemap>(FindObjectsInactive.Include);
         foreach (Tilemap map in maps)
             if (map.gameObject.layer == ground) return map;
         return maps[0];

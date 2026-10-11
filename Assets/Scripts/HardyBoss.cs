@@ -888,6 +888,7 @@ public class HardyBoss : MonoBehaviour
             Destroy(piece, crumbleLifetime);
         }
 
+        PlayerAbility.UnlockHardySpikes(); // the player gets Hardy's sideways spike attack
         if (!string.IsNullOrEmpty(sceneAfterDeath)) LevelEndPrompt.Show(sceneAfterDeath, sceneAfterDeathDelay, continueMessage);
     }
 

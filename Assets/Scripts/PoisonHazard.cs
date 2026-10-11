@@ -45,7 +45,9 @@ public class PoisonHazard : MonoBehaviour
             }
         }
 
-        Poison.Apply(other.gameObject, poisonDamage, poisonDuration, poisonTickInterval);
+        // No poison set (for example the lizard's plain contact damage): don't touch the player's current poison
+        if (poisonDamage > 0 && poisonDuration > 0f)
+            Poison.Apply(other.gameObject, poisonDamage, poisonDuration, poisonTickInterval);
         if (destroyOnHit) Destroy(gameObject);
     }
 }

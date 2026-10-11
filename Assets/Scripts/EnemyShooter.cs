@@ -13,7 +13,7 @@ public class EnemyShooter : MonoBehaviour
 
     void Start()
     {
-        PlayerController2D pc = FindFirstObjectByType<PlayerController2D>();
+        PlayerController2D pc = FindAnyObjectByType<PlayerController2D>();
         if (pc) player = pc.transform;
         timer = fireRate;
     }

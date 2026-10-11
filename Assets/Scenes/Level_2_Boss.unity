@@ -15402,7 +15402,7 @@ MonoBehaviour:
   restTime: 0.9
   phase2At: 0.5
   phase2SpeedUp: 1.35
-  touchDamage: 10
+  touchDamage: 8
   touchKnockback: 10
   chargeWarnTime: 0.7
   chargeSpeed: 17
@@ -15440,7 +15440,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f472946da460bf1429391a8a1fc59e69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Health
-  maxHealth: 300
+  maxHealth: 340
   invincibleTime: 0.1
   flashOnHit: 1
   flashColor: {r: 1, g: 1, b: 1, a: 1}
