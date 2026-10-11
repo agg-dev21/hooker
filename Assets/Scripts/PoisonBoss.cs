@@ -246,56 +246,6 @@ public class PoisonBoss : MonoBehaviour
         else yield return Warn(flashTime);
     }
 
-    // ---------------- Sprite animation ----------------
-    Sprite[] animFrames;
-    float animFps, animTime;
-    bool animLoop;
-    bool HasArt => artRenderer && idleFrame;
-
-    void Play(Sprite[] frames, float fps, bool loop)
-    {
-        if (!HasArt || frames == null || frames.Length == 0) return;
-        animFrames = frames;
-        animFps = Mathf.Max(fps, 0.01f);
-        animLoop = loop;
-        animTime = 0f;
-        artRenderer.sprite = frames[0];
-    }
-
-    void PlayIdle()
-    {
-        if (!HasArt) return;
-        animFrames = null;
-        artRenderer.sprite = idleFrame;
-    }
-
-    static Sprite[] Part(Sprite[] frames, int first, int count)
-    {
-        if (frames == null || frames.Length == 0) return null;
-        first = Mathf.Clamp(first, 0, frames.Length - 1);
-        count = Mathf.Clamp(count, 1, frames.Length - first);
-        var part = new Sprite[count];
-        System.Array.Copy(frames, first, part, 0, count);
-        return part;
-    }
-
-    void Face(float dir)
-    {
-        if (artRenderer && dir != 0f) artRenderer.flipX = artFacesRight ? dir < 0f : dir > 0f;
-    }
-
-    // Plays a wind-up (frames from first, count) once and waits for it; with no art it flashes instead
-    IEnumerator Windup(Sprite[] frames, int count, float fps, float flashTime)
-    {
-        Sprite[] part = Part(frames, 0, count);
-        if (HasArt && part != null)
-        {
-            Play(part, fps, false);
-            yield return new WaitForSeconds(part.Length / Mathf.Max(fps, 0.01f) / Speed);
-        }
-        else yield return Warn(flashTime);
-    }
-
     void Update()
     {
         if (HasArt && animFrames != null && animFrames.Length > 0)
