@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // The order of the levels, the boat trips between them, and going back to explore.
-//   Leaving the tutorial (the dock's boat) -> Hardy's level (Level_1) or Oscar's level (Level_2), 50 / 50.
+//   Leaving the tutorial (the dock's boat) -> always Hardy's level (Level_1) first.
 //   After EVERY boss you sail away in the boat scene (Level_1_Sail), then arrive at the next level:
 //     Hardy beaten    -> Oscar's level if he is still left, otherwise Level_3.
 //     Oscar beaten    -> Hardy's level if he is still left, otherwise Level_3.
@@ -14,7 +14,6 @@ using UnityEngine.SceneManagement;
 public static class RunOrder
 {
     const string FirstKey = "run.first";
-    const string FirstStreakKey = "run.firstStreak"; // how many games in a row started with the same boss
     const string HardyDoneKey = "run.hardyDone";
     const string OscarDoneKey = "run.oscarDone";
     const string MadameDoneKey = "run.madameDone";
@@ -54,6 +53,7 @@ public static class RunOrder
         PlayerPrefs.SetInt(HardyDoneKey, 0);
         PlayerPrefs.SetInt(OscarDoneKey, 0);
         PlayerPrefs.SetInt(MadameDoneKey, 0);
+        PlayerPrefs.DeleteKey(FirstKey); // set again (to Level_1) when you leave the tutorial
         PlayerPrefs.DeleteKey(AfterSailKey);
         PlayerPrefs.DeleteKey(LastBossKey);
         PlayerPrefs.DeleteKey(Companion.FoundSave);
@@ -85,20 +85,12 @@ public static class RunOrder
     {
         string current = SceneManager.GetActiveScene().name;
 
-        // Leaving the tutorial: pick the first boss level at random
-        if (requested == "Level_1" && current.StartsWith("Tutorial"))
+        // Leaving the tutorial (or the boat from the tutorial's dock): always Hardy's level (Level_1) first
+        if (current.StartsWith("Tutorial") && (requested == "Level_1" || requested == "Level_2"))
         {
-            // A fresh coin flip every time (Unity's own Random can repeat itself between plays in the editor),
-            // and never the same first boss more than 2 games in a row
-            string last = PlayerPrefs.GetString(FirstKey, "");
-            int streak = PlayerPrefs.GetInt(FirstStreakKey, 0);
-            string first = new System.Random(System.Guid.NewGuid().GetHashCode()).Next(2) == 0 ? "Level_1" : "Level_2";
-            if (first == last && streak >= 2) first = first == "Level_1" ? "Level_2" : "Level_1";
-            PlayerPrefs.SetInt(FirstStreakKey, first == last ? streak + 1 : 1);
-            Debug.Log("RunOrder: first boss level this game is " + first);
-            PlayerPrefs.SetString(FirstKey, first);
+            PlayerPrefs.SetString(FirstKey, "Level_1");
             PlayerPrefs.Save();
-            return first;
+            return "Level_1";
         }
 
         // Leaving a boss room for the boat (the first time it also marks the boss as beaten)
