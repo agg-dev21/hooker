@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.SceneManagement;
 
 // A chest. Stand next to it and press Interact (E / controller Y by default) to open it.
 // It can give an item (pick it below); a scroll gets the Title and Text you type here.
@@ -33,7 +34,18 @@ public class Chest : MonoBehaviour
     {
         sr = GetComponent<SpriteRenderer>();
         if (prompt) prompt.SetActive(false);
+        // Already opened earlier in this game (you came back to explore): stays open and empty
+        if (PlayerPrefs.GetInt(SaveKey, 0) == 1)
+        {
+            IsOpen = true;
+            if (sr) sr.color = openedColor;
+            transform.localScale = openedScale;
+        }
     }
+
+    // One save per chest per game: the game number, the scene, and where the chest is
+    string SaveKey => "chest." + RunOrder.RunId + "." + SceneManager.GetActiveScene().name + "." + name + "."
+        + Mathf.RoundToInt(transform.position.x) + "," + Mathf.RoundToInt(transform.position.y);
 
     void Update()
     {
@@ -45,15 +57,16 @@ public class Chest : MonoBehaviour
     {
         if (IsOpen) return;
         IsOpen = true;
+        if (!RunOrder.InTutorial) { PlayerPrefs.SetInt(SaveKey, 1); PlayerPrefs.Save(); }
         if (sr) sr.color = openedColor;
         transform.localScale = openedScale;
         if (prompt) prompt.SetActive(false);
         if (givesItem)
         {
             string itemName = ItemSettings.Current.Look(item).name;
-            PlayerItems.Toast(Inventory.Add(item, amount, scrollTitle, scrollText)
-                ? "Got: " + itemName + (amount > 1 ? " x" + amount : "")
-                : itemName + " is full");
+            bool added = Inventory.Add(item, amount, scrollTitle, scrollText);
+            if (added && item == ItemType.Scroll) PlayerItems.Read(scrollTitle, scrollText); // read it now (game paused), kept in the inventory
+            else PlayerItems.Toast(added ? "Got: " + itemName + (amount > 1 ? " x" + amount : "") : itemName + " is full");
         }
         if (givesBonus)
         {

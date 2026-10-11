@@ -2,7 +2,7 @@ using UnityEngine;
 
 // Anything poisonous the player can touch: puddles, slimy walls, spiked balls, drops, enemies.
 // Needs a trigger Collider2D. Touching it poisons the player (refreshed while they stay in it).
-// Optionally also deals a direct hit with knockback (that one respects dash and invincibility frames).
+// Optionally also deals a direct hit with knockback. Dashing or invincible: nothing happens.
 [RequireComponent(typeof(Collider2D))]
 public class PoisonHazard : MonoBehaviour
 {
@@ -34,6 +34,7 @@ public class PoisonHazard : MonoBehaviour
     {
         if (!enabled) return;
         if (!other.TryGetComponent(out PlayerController2D _) || !other.TryGetComponent(out Health health)) return;
+        if (health.IsInvincible) return; // dashing or invincible: no hit and no poison
 
         if (hitDamage > 0)
         {

@@ -98,6 +98,7 @@ public class Companion : MonoBehaviour
 
     void Awake()
     {
+        if (RunOrder.InTutorial) { Destroy(gameObject); return; } // never in the tutorial rooms
         if (!whiteSprite) whiteSprite = Sprite.Create(Texture2D.whiteTexture, new Rect(0, 0, 4, 4), new Vector2(0.5f, 0.5f), 4f);
         player = FindAnyObjectByType<PlayerController2D>();
         if (player) playerCol = player.GetComponent<Collider2D>();
@@ -121,6 +122,16 @@ public class Companion : MonoBehaviour
         glow.pointLightInnerRadius = 0.3f;
 
         BuildIcon();
+
+        // A boss room: she starts hidden (no free 5 seconds out)
+        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
+            if (mb is IChainStunnable && mb.TryGetComponent(out Health bh) && bh.CurrentHealth > 0)
+            {
+                hidden = true;
+                visible = 0f;
+                stayUntil = 0f;
+                break;
+            }
     }
 
     void OnDestroy()
@@ -134,6 +145,7 @@ public class Companion : MonoBehaviour
 
     void Update()
     {
+        if (!body) return; // removed (tutorial room)
         if (!player) { player = FindAnyObjectByType<PlayerController2D>(); return; }
 
         Follow();
@@ -156,7 +168,7 @@ public class Companion : MonoBehaviour
         float target = hidden && !attacking ? 0f : 1f;
         visible = Mathf.MoveTowards(visible, target, Time.deltaTime / Mathf.Max(S.fadeTime, 0.01f));
         Color c = body.color; c.a = visible; body.color = c;
-        body.transform.localScale = Drawn ? Vector3.one * Mathf.Lerp(0.6f, 1f, visible)
+        body.transform.localScale = Drawn ? Vector3.one * S.drawScale * Mathf.Lerp(0.6f, 1f, visible)
                                           : new Vector3(S.size.x, S.size.y * Mathf.Lerp(0.3f, 1f, visible), 1f);
         if (HasArt) Animate();
         glow.intensity = 0.8f * visible;
@@ -192,6 +204,10 @@ public class Companion : MonoBehaviour
     // Enemies, obstacles and bosses within the danger radius (pits and walls don't count)
     bool DangerNear()
     {
+        // A boss fight: she always stays hidden while any boss is still standing
+        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
+            if (mb is IChainStunnable && mb.TryGetComponent(out Health bh) && bh.CurrentHealth > 0) return true;
+
         int ground = LayerMask.GetMask("Ground");
         Vector2 me = player.transform.position;
         foreach (Collider2D hit in Physics2D.OverlapCircleAll(me, S.dangerRadius))

@@ -18,7 +18,7 @@ public static class OctopusBossBuilder
     const string SceneName = "Level_3_Boss";
     const string NextScene = "Level_4";
     const int BossHealth = 600; // tougher than Hardy (see Tools > Level 3 Boss > Make Harder)
-    const int LizardHealth = 320;
+    const int LizardHealth = 460; // see Tools > Level 3 Boss > Make Harder for the rest of his numbers
     public const float SirenLift = 7f; // Madame O sits this high above the floor, on a ledge in the top-left
 
     static readonly Color StoneColor = new Color(0.3f, 0.38f, 0.45f);

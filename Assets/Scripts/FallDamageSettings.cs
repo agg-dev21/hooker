@@ -6,10 +6,10 @@ using UnityEngine;
 public class FallDamageSettings : ScriptableObject
 {
     public bool fallDamageOn = true;
-    public float safeHeight = 10f;      // falls up to this many tiles do nothing (a full held jump is about 8.5)
-    public int damagePerTile = 3;       // damage for every tile fallen past the safe height
-    public int minDamage = 5;           // smallest hit once a fall counts
-    public int maxDamage = 40;          // biggest hit from one fall (the player has 100 health)
+    public float safeHeight = 12f;      // falls up to this many tiles do nothing (a full held jump is about 8.5)
+    public int damagePerTile = 2;       // damage for every tile fallen past the safe height
+    public int minDamage = 3;           // smallest hit once a fall counts
+    public int maxDamage = 25;          // biggest hit from one fall (the player has 100 health)
     public bool dashDodgesFallDamage = false; // landing while dash-invincible skips the damage
 
     static FallDamageSettings current;

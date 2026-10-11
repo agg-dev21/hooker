@@ -99,7 +99,7 @@ public class Health : MonoBehaviour
         if (CurrentHealth <= 0) { Die(); return; }
 
         // Player: invincibility frames after a hit, with blinking
-        if (isPlayer) StartIFrames(Mathf.Max(invincibleTime, playerHitIFrames));
+        if (isPlayer) StartIFrames(Mathf.Max(invincibleTime, playerHitIFrames, PlayerBalance.Current.hitInvincibleTime));
     }
 
     // Damage over time (poison): ignores invincibility frames and does not start them, no flash or blink

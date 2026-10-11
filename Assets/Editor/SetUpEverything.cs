@@ -20,8 +20,12 @@ public static class SetUpEverything
         "Tools/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK",
         "Tools/Art/KK",
         "Tools/Art/Ocean And Dock",
+        "Tools/Art/Health Bars",
         "Tools/Companion/Add Jail To Level 2",
         "Tools/Add Story Dialogue",
+        "Tools/Tutorial/Hook Lesson In Jump Room",
+        "Tools/Art/Tutorial Backgrounds",
+        "Tools/Story/Place Hint Scrolls",
     };
 
     [MenuItem("Tools/Set Up All Art And Jail", priority = 0)]

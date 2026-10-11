@@ -58,7 +58,8 @@ public class CameraFollow2D : MonoBehaviour
     {
         Instance = this;
         cam = GetComponent<Camera>();
-        normalSize = cam.orthographicSize;
+        normalSize = cam.orthographicSize * Zoom; // a little closer than the scene says (PlayerBalance)
+        cam.orthographicSize = normalSize;
         if (target) player = target.GetComponent<PlayerController2D>();
         if (target) trackedY = target.position.y;
     }
@@ -85,7 +86,10 @@ public class CameraFollow2D : MonoBehaviour
         {
             float bottom = firstFloorCenterY - floorHeight * 0.5f;
             int floor = Mathf.FloorToInt((target.position.y - bottom) / floorHeight);
-            desired.y = firstFloorCenterY + floor * floorHeight;
+            float floorCenter = firstFloorCenterY + floor * floorHeight;
+            // Zoomed in closer than one floor: follow the player but never show the next floor
+            float room = floorHeight * 0.5f - cam.orthographicSize;
+            desired.y = room > 0f ? Mathf.Clamp(desired.y, floorCenter - room, floorCenter + room) : floorCenter;
         }
 
         // Zones: keep the camera inside the player's floor, so the floors above and below stay hidden
@@ -93,7 +97,7 @@ public class CameraFollow2D : MonoBehaviour
         if (zones != null && zones.Length > 0 && !hasOverride)
         {
             CameraZone zone = zones[ZoneAt(target.position.y)];
-            if (zone.size > 0f) wantedSize = zone.size;
+            if (zone.size > 0f) wantedSize = zone.size * Zoom;
             float halfH = wantedSize;
             desired.y = zone.top - zone.bottom <= halfH * 2f
                 ? (zone.bottom + zone.top) * 0.5f
@@ -136,6 +140,8 @@ public class CameraFollow2D : MonoBehaviour
 
         transform.position = pos;
     }
+
+    static float Zoom => Mathf.Clamp(PlayerBalance.Current.cameraZoom, 0.3f, 2f);
 
     // Highest zone the player has climbed into (a zone starts 1 unit above its Bottom, so standing on its floor counts)
     int ZoneAt(float y)

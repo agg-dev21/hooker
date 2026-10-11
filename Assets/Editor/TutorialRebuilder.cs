@@ -42,8 +42,7 @@ public static class TutorialRebuilder
 
         // Delete the old rooms first (so the builder doesn't ask about each one)
         EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
-        foreach (string room in new[] { "Tutorial_1_Move", "Tutorial_2_Jump", "Tutorial_3_Dash", "Tutorial_4_Punch",
-                                        "Tutorial_5_Hook", "Tutorial_6_DashThroughBullets", "Tutorial_7_Dock" })
+        foreach (string room in new[] { "Tutorial_1_Move", "Tutorial_2_Jump", "Tutorial_3_Dash", "Tutorial_4_Punch", "Tutorial_7_Dock" })
         {
             string path = ScenesFolder + "/" + room + ".unity";
             if (File.Exists(path)) AssetDatabase.DeleteAsset(path);
@@ -52,9 +51,7 @@ public static class TutorialRebuilder
         Room("Tutorial_1_Move", "Tutorial_2_Jump", 40, 12, MoveRoom);
         Room("Tutorial_2_Jump", "Tutorial_3_Dash", 44, 12, JumpRoom);
         Room("Tutorial_3_Dash", "Tutorial_4_Punch", 50, 12, DashRoom);
-        Room("Tutorial_4_Punch", "Tutorial_5_Hook", 52, 12, PunchRoom);
-        Room("Tutorial_5_Hook", "Tutorial_6_DashThroughBullets", 48, 16, HookRoom);
-        Room("Tutorial_6_DashThroughBullets", "Tutorial_7_Dock", 46, 12, BulletRoom);
+        Room("Tutorial_4_Punch", "Tutorial_7_Dock", 52, 12, PunchRoom); // the Hook and Bullets rooms are no longer used
         Room("Tutorial_7_Dock", null, 34, 12, DockRoom);
 
         EditorSceneManager.OpenScene(ScenesFolder + "/Tutorial_1_Move.unity", OpenSceneMode.Single);
@@ -148,8 +145,9 @@ public static class TutorialRebuilder
         Sign(root, 26f, 10f, "Fall into a pit: back to the last checkpoint.");
 
         Checkpoint("Checkpoint_2", root, new Vector2(36f, 0.75f));
-        Sign(root, 36f, 9.5f, "Long falls hurt. Now hold {Jump} all the way.");
+        Sign(root, 36f, 9.5f, "Long falls hurt.\nToo tall to jump? {Hook} or RIGHT CLICK throws your hook: hook the gold ring to fly up to it.");
         Fill(40, 0, 2, 7);    // 7 tall: almost a full jump
+        Ring("Ring_HookLesson", root, new Vector2(38.5f, 10.5f), 3f); // the hook lesson: hook it to float over the wall
     }
 
     // ---------------- 3 Dash ----------------
@@ -252,7 +250,7 @@ public static class TutorialRebuilder
     {
         Sign(root, 5f, 6f, "Chests hold items.\nStand at one and press {Interact}.", 9f);
         Chest("Chest_Dock", root, new Vector2(9f, 0.5f), ItemType.Healing, 2);
-        Sign(root, 16f, 6f, "{NextItem} opens your inventory (the game pauses).\n{UseItem} uses the item you picked.", 9.5f);
+        Sign(root, 16f, 6f, "Press 1-4 to pick an item on your bar, {UseItem} to use it.\n{NextItem} opens your inventory: drag items onto your 4 slots.", 9.5f);
         Sign(root, 25.5f, 6.5f, "Beat a boss: take its power.\nPowers show bottom right.\nGood luck, Raphael. Step on the boat.", 9f);
 
         Fill(30, -1, w - 27, 1, false);           // the dock ends, water after

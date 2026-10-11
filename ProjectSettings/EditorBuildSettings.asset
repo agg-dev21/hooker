@@ -20,10 +20,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Tutorial_4_Punch.unity
     guid: 775847407df1c2c4185e981c3ebb10fe
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Tutorial_5_Hook.unity
     guid: 22d3c6ba6c3151c4f90d79351446c7b2
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/Tutorial_6_DashThroughBullets.unity
     guid: 174ad1fda7f89ce4b9d3010a9f75c9db
   - enabled: 1

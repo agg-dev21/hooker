@@ -23,10 +23,12 @@ public class ItemSettings : ScriptableObject
     [Header("Shield (absorbs damage)")]
     public int shieldAmount = 40;          // damage it soaks up before breaking
     public float shieldDuration = 15f;     // seconds before it fades even if not used up
+    public bool shieldUntilDeath = true;   // ON: lasts until it breaks or you die (the seconds above are ignored)
 
     [Header("Poison Resistance")]
     [Range(0f, 1f)] public float poisonResistance = 0.75f; // part of poison damage blocked (1 = immune)
     public float poisonResistanceDuration = 20f;
+    public bool poisonResistanceUntilDeath = true; // ON: lasts until you die (the seconds above are ignored)
     public bool curesPoisonOnUse = true;
 
     [Header("Healing")]
@@ -45,6 +47,7 @@ public class ItemSettings : ScriptableObject
     public float moveSpeedMultiplier = 1.4f;
     public float attackSpeedMultiplier = 1.5f; // attacks recharge this many times faster
     public float speedDuration = 10f;
+    public bool speedUntilDeath = true;    // ON: lasts until you die (the seconds above are ignored)
 
     [Header("Invulnerability")]
     public float invulnerableDuration = 4f;

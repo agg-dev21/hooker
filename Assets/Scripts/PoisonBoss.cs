@@ -55,6 +55,7 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
     [SerializeField] float crashStunTime = 0.8f; // dodged: he hits the wall and is stunned this long
     [SerializeField] int crashPuddles = 10;       // dodged: poison puddles that appear all over the floor
     [SerializeField] int crashDrops = 14;        // dodged: poison drops that fall all over the arena
+    [SerializeField] float phase2TrailGap = 2.5f; // phase 2: his dash leaves a puddle every this many tiles (0 = no trail)
     [SerializeField] bool useLedgeDash = true;   // after the crash: climb onto the side ledge and dash across up there
     [SerializeField] float ledgeTopY = 3.5f;     // top of the two side ledges (the first level)
     [SerializeField] float climbTime = 0.45f;
@@ -118,7 +119,8 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
 
     [Header("On Death")]
     [SerializeField] GameObject healthBarRoot;  // hidden when he dies
-    [SerializeField] bool runsAwayWhenBeaten = false; // Level 2: at 0 health he flees instead of dying (he is back in Level 3)
+    [SerializeField] bool runsAwayWhenBeaten = false; // Level 2: he flees instead of dying (he is back in Level 3)
+    [SerializeField, Range(0f, 1f)] float runAwayAt = 0.3f; // with runsAwayWhenBeaten: the fight ends when his health drops below this
     [SerializeField] float fleeSpeed = 50f;        // how fast he bolts out of the room
     [SerializeField] float fleeDelay = 0.15f;      // tiny pause before he bolts
     [SerializeField] string runAwayMessage = "Oscar runs away!";
@@ -159,6 +161,7 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
     Vector2 startPos;
     float halfWidth, halfHeight;
     bool phase2;
+    bool fled;           // Level 2: already ran away
     int lastAttack = -1;
     readonly List<GameObject> spawned = new List<GameObject>();
 
@@ -179,9 +182,8 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
         health.BeforeDeath = () =>
         {
             if (!runsAwayWhenBeaten) return false; // normal death
-            OnDied();                              // gate opens, poison hook unlocks, bar hides...
-            StartCoroutine(RunAway());
-            return true;                           // ...but he isn't destroyed
+            Flee();
+            return true;                           // he isn't destroyed
         };
     }
 
@@ -279,6 +281,10 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
             if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.5f, 0.3f);
             StartCoroutine(PoisonEverywhere());
         }
+
+        // Level 2: the fight ends early, he runs off before he is beaten all the way
+        if (runsAwayWhenBeaten && health.CurrentHealth > 0 && health.CurrentHealth < health.MaxHealth * runAwayAt)
+            Flee();
     }
 
     // ---------------- Fight loop ----------------
@@ -376,7 +382,7 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
         {
             float x = Mathf.MoveTowards(rb.position.x, targetX, chargeSpeed * Speed * Time.fixedDeltaTime);
             rb.MovePosition(new Vector2(x, rb.position.y));
-            if (trail && phase2 && Mathf.Abs(x - nextTrail) >= 2.5f) // phase 2: poison trail behind him
+            if (trail && phase2 && phase2TrailGap > 0f && Mathf.Abs(x - nextTrail) >= phase2TrailGap) // phase 2: poison trail behind him
             {
                 nextTrail = x;
                 SpawnPuddle(x, 2.5f, puddleLifetime);
@@ -780,7 +786,7 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
     void ResetFight()
     {
         BossTurns.End(this);
-        if (!health || health.CurrentHealth <= 0) return;
+        if (!health || health.CurrentHealth <= 0 || fled) return;
         StopAllCoroutines();
         ClearSpawned();
         health.Heal(health.MaxHealth);
@@ -805,6 +811,15 @@ public class PoisonBoss : MonoBehaviour, IChainStunnable
         foreach (GameObject go in removeOnDeath) if (go) go.SetActive(false);
         foreach (GameObject go in showOnDeath) if (go) go.SetActive(true);
         if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.6f, 0.5f);
+    }
+
+    // Beaten in Level 2: gate opens, poison hook unlocks, bar hides, and he runs off (only once)
+    void Flee()
+    {
+        if (fled) return;
+        fled = true;
+        OnDied();
+        StartCoroutine(RunAway());
     }
 
     // Beaten in Level 2: he spins off out of the arena, away from the player, and is gone

@@ -18,8 +18,10 @@ public static class DecorationSwitch
     {
         ("Level_1",      "ShipDecor",           0.42f),
         ("Level_1_Deck", "DeckDecor",           0.55f),
+        ("Level_2",      "PoisonDecor",         0.6f),
         ("Level_2_Boss", "Dungeon/Decor",       0.4f),
         ("Level_3",      "SunkenPrison/Decor",  0.55f),
+        ("Level_3",      "SecretRoomDecor",     0.55f),
         ("Level_3_Boss", "AbyssalThrone/Decor", 0.45f),
         ("Level_4",      "FloodedHall/Decor",   0.6f),
         ("Level_4_Boss", "FloodedThrone/Decor", 0.55f),
@@ -78,7 +80,7 @@ public static class DecorationSwitch
         if (!string.IsNullOrEmpty(startScene) && File.Exists(startScene))
             EditorSceneManager.OpenScene(startScene, OpenSceneMode.Single);
         EditorUtility.DisplayDialog("Decorations", "Decorations " + (on ? "turned on" : "turned off") + ":\n\n" + report +
-            "\nLevel 2 and the sail scene have no decoration group, so they are not changed.", "OK");
+            "\nThe sail scene has no decoration group, so it is not changed.", "OK");
     }
 
     static string Key(string scene) => "Hooker.DecorLight." + scene;

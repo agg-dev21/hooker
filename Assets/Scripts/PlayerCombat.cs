@@ -229,7 +229,7 @@ public class PlayerCombat : MonoBehaviour
             if (!hit.TryGetComponent(out Health health) || alreadyHit.Contains(health)) continue;
             alreadyHit.Add(health);
 
-            health.TakeDamage(punchDamage);
+            health.TakeDamage(Mathf.RoundToInt(punchDamage * PlayerBalance.Current.punchDamageMultiplier));
 
             // Light knockback: nudge the enemy in the punch direction
             Vector2 push = dir * punchKnockback;
@@ -325,9 +325,9 @@ public class PlayerCombat : MonoBehaviour
         // 2) Hit an enemy: deal damage and pull it in
         if (target)
         {
-            target.TakeDamage(traveled <= mediumRange ? mediumRangeDamage : longRangeDamage);
+            target.TakeDamage(Mathf.RoundToInt((traveled <= mediumRange ? mediumRangeDamage : longRangeDamage) * PlayerBalance.Current.hookDamageMultiplier));
             if (PlayerUpgrades.PoisonHook) // the lizard's teeth on the hook
-                Poison.Apply(target.gameObject, poisonHookDamage, poisonHookDuration, poisonHookTickInterval);
+                Poison.Apply(target.gameObject, poisonHookDamage + PlayerBalance.Current.poisonHookTickBonus, poisonHookDuration, poisonHookTickInterval);
 
             Rigidbody2D rb = target.GetComponent<Rigidbody2D>();
             if (rb && rb.bodyType == RigidbodyType2D.Dynamic)

@@ -24,13 +24,30 @@ public static class Level3Balance
     const int AnchorDamage = 22;          // was 16
     const int SirenTouchDamage = 14;      // was 10
 
-    // Oscar
-    const int OscarHealth = 320;          // was 220
-    const float OscarRest = 0.8f;         // was 1.5
-    const float OscarTurnWait = 0.7f;     // was 2
-    const float OscarStartDelay = 2f;     // was 3.5: joins in sooner
-    const int VomitDamage = 8;            // was 6 per glob
-    const int OscarPoison = 4;            // was 3 per tick
+    // Oscar: everything he has in Level 2, about 20% stronger, in both phases
+    const int OscarHealth = 460;          // Level 2: 380
+    const float OscarRest = 0.5f;         // Level 2: 0.6
+    const float OscarTurnWait = 0.7f;     // waits less for Madame O
+    const float OscarStartDelay = 2f;     // joins in soon after the fight starts
+    const float ChargeSpeed = 25f;        // Level 2: 22
+    const float ChargeWarn = 0.42f;       // Level 2: 0.5
+    const int DashHitDamage = 26;         // Level 2: 22
+    const float CrashStun = 0.65f;        // Level 2: 0.8 (shorter = less time to hit him)
+    const int CrashDrops = 16;            // Level 2: 14
+    const int CrashPuddles = 12;          // Level 2: 10
+    const int VomitGlobs = 11;            // Level 2: 9
+    const float VomitSpeed = 14f;         // Level 2: 13
+    const float VomitWarn = 0.3f;         // Level 2: 0.35
+    const int VomitDamage = 8;            // Level 2: 6 per glob
+    const int OscarPoison = 4;            // Level 2: 3 per tick
+    const float PuddleLife = 5.5f;        // Level 2: 5
+    const int OscarTouchDamage = 12;      // Level 2: 10
+    // Oscar's phase 2
+    const float OscarPhase2At = 0.6f;     // same as Level 2
+    const float OscarPhase2Speed = 1.65f; // Level 2: 1.5
+    const int Phase2Puddles = 4;          // Level 2: 3 per wave
+    const int Phase2Drops = 4;            // Level 2: 3 per wave
+    const float Phase2PoisonEvery = 0.85f; // Level 2: 1 second
 
     [MenuItem("Tools/Level 3 Boss/Make Harder")]
     static void Apply()
@@ -66,8 +83,24 @@ public static class Level3Balance
             Set(so, "restTime", OscarRest);
             Set(so, "maxTurnWait", OscarTurnWait);
             Set(so, "startDelay", OscarStartDelay);
+            Set(so, "chargeSpeed", ChargeSpeed);
+            Set(so, "chargeWarnTime", ChargeWarn);
+            Set(so, "dashHitDamage", DashHitDamage);
+            Set(so, "crashStunTime", CrashStun);
+            Set(so, "crashDrops", CrashDrops);
+            Set(so, "crashPuddles", CrashPuddles);
+            Set(so, "vomitGlobs", VomitGlobs);
+            Set(so, "vomitSpeed", VomitSpeed);
+            Set(so, "vomitWarnTime", VomitWarn);
             Set(so, "vomitDamage", VomitDamage);
             Set(so, "poisonDamage", OscarPoison);
+            Set(so, "puddleLifetime", PuddleLife);
+            Set(so, "touchDamage", OscarTouchDamage);
+            Set(so, "phase2At", OscarPhase2At);
+            Set(so, "phase2SpeedUp", OscarPhase2Speed);
+            Set(so, "phase2PuddlesPerWave", Phase2Puddles);
+            Set(so, "phase2DropsPerWave", Phase2Drops);
+            Set(so, "phase2PoisonInterval", Phase2PoisonEvery);
             so.ApplyModifiedPropertiesWithoutUndo();
         }
 
@@ -75,7 +108,7 @@ public static class Level3Balance
         EditorSceneManager.SaveScene(scene);
         EditorUtility.DisplayDialog("Make Level 3 Boss Harder",
             (siren ? "Madame O: " + SirenHealth + " health, faster and harder hitting.\n" : "Madame O not found.\n") +
-            (oscar ? "Oscar: " + OscarHealth + " health, rests less, joins in sooner.\n" : "Oscar not found.\n") +
+            (oscar ? "Oscar: " + OscarHealth + " health, all his Level 2 moves about 20% stronger in both phases.\n" : "Oscar not found.\n") +
             "They wait less for each other, so their attacks overlap more.", "OK");
     }
 

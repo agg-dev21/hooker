@@ -68,7 +68,8 @@ public class PlayerArt : MonoBehaviour
         Vector3 s = transform.lossyScale;
         float sx = Mathf.Abs(s.x) < 0.0001f ? 1f : Mathf.Abs(s.x);
         float sy = Mathf.Abs(s.y) < 0.0001f ? 1f : Mathf.Abs(s.y);
-        art.transform.localScale = new Vector3(1f / sx, 1f / sy, 1f);
+        float k = Mathf.Max(A.drawScale, 0.1f); // bigger drawing, same hit box
+        art.transform.localScale = new Vector3(k / sx, k / sy, 1f);
         float feet = transform.position.y - 1f;
         if (TryGetComponent(out Collider2D col)) feet = col.bounds.min.y;
         art.transform.localPosition = new Vector3(0f, (feet - transform.position.y + A.heightOffset) / sy, 0f);

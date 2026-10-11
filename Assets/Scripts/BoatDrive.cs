@@ -41,7 +41,7 @@ public class BoatDrive : MonoBehaviour
 
     void Update()
     {
-        float input = leaving || DialogueManager.Busy ? 0f : ReadInput(); // the boat waits while Raphael talks
+        float input = leaving || DialogueManager.Busy || SailMenu.IsOpen ? 0f : ReadInput(); // the boat waits while Raphael talks or you choose
         float target = input * maxSpeed;
         float rate = Mathf.Abs(target) > 0.01f ? acceleration : deceleration;
         speed = Mathf.MoveTowards(speed, target, rate * Time.deltaTime);

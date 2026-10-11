@@ -28,10 +28,15 @@ public class SailMonologue : MonoBehaviour
     {
         yield return new WaitForSeconds(1.2f); // let the scene fade in first
         List<DialogueLine> lines = LinesFor(RunOrder.LastBoss);
-        if (lines.Count == 0) yield break;
-        DialogueManager dm = DialogueManager.Ensure();
-        while (dm.IsOpen) yield return null;
-        dm.StartDialogue(lines);
+        RunOrder.ClearLastBoss(); // said once, not again when you come back by boat
+        if (lines.Count > 0)
+        {
+            DialogueManager dm = DialogueManager.Ensure();
+            while (dm.IsOpen) yield return null;
+            dm.StartDialogue(lines);
+            while (dm.IsOpen) yield return null;
+        }
+        SailMenu.Show(); // then: where to?
     }
 
     static List<DialogueLine> LinesFor(string boss)

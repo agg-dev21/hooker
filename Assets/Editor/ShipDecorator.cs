@@ -11,8 +11,8 @@ using UnityEngine.Tilemaps;
 // with purple veins, dripping strands, cocoons and pulsing purple glows. The infestation gets heavier
 // on each floor up, and the deck (his arena) is overrun.
 // Decoration only: no colliders, nothing that changes gameplay. Running it again replaces the old decoration.
-//   Tools > Rebuild Levels > Level 1: Decorate Ship  - inside the ship: plank walls, ribs, beams, portholes, lanterns, ropes, cargo
-//   Tools > Rebuild Levels > Level 1: Decorate Deck  - the boss deck: night sky, moon, stars, sea, mast, sails, rigging, lanterns
+//   Tools > Decorate > Level 1 Ship  - inside the ship: plank walls, ribs, beams, portholes, lanterns, ropes, cargo
+//   Tools > Decorate > Level 1 Deck  - the boss deck: night sky, moon, stars, sea, mast, sails, rigging, lanterns
 public static class ShipDecorator
 {
     const string ShipScene = "Assets/Scenes/Level_1.unity";
@@ -50,7 +50,7 @@ public static class ShipDecorator
 
     // ---------------- Inside the ship ----------------
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1: Decorate Ship")]
+    [MenuItem("Tools/Decorate/Level 1 Ship")]
     static void DecorateShip()
     {
         if (!Open(ShipScene, out Scene scene)) return;
@@ -147,7 +147,7 @@ public static class ShipDecorator
 
     // ---------------- The deck ----------------
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1: Decorate Deck")]
+    [MenuItem("Tools/Decorate/Level 1 Deck")]
     static void DecorateDeck()
     {
         if (!Open(DeckScene, out Scene scene)) return;

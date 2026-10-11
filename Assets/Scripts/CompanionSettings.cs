@@ -65,6 +65,7 @@ public class CompanionSettings : ScriptableObject
 
     [Header("Look (placeholder until her art is in)")]
     public Vector2 size = new Vector2(0.8f, 1.6f);
+    public float drawScale = 1.65f; // size of her drawing (1.65 = as tall as Raphael)
     public Color color = new Color(1f, 0.92f, 0.65f);
     public Color beamColor = new Color(1f, 0.97f, 0.75f, 0.9f);
     public Color glowColor = new Color(1f, 0.9f, 0.6f);

@@ -10,6 +10,8 @@ using UnityEngine.SceneManagement;
 //   kk_attack  5 frames 1600x1600  raising his arms to call the waves
 //   kk_surf    4 frames  800x800   the water he floats on while he moves
 //   kk_wave    4 frames  800x1200  the waves, small to tall (wave 1 = first drawing)
+//   kk2_idle   4 frames 1600x1600  phase 2: the monster form
+//   kk2_beam   5 frames 1600x400   phase 2: the blast, growing
 // Run Tools > Rebuild Levels > Level 4 Boss: Add KK first. His hit box stays the same.
 public static class KKArtSetup
 {
@@ -24,6 +26,9 @@ public static class KKArtSetup
         Sprite[] attack = CompanionItemArtSetup.Slice(Folder, "kk_attack", 1600, 1600, new Vector2(0.5f, 72f / 1600f), 320f);
         Sprite[] surf = CompanionItemArtSetup.Slice(Folder, "kk_surf", 800, 800, new Vector2(0.5f, 0f), 260f);
         Sprite[] waves = CompanionItemArtSetup.Slice(Folder, "kk_wave", 800, 1200, new Vector2(0.5f, 0f), 250f); // tallest wave about 4.8 tiles
+        // Phase 2: the monster form (about 4.4 tiles tall, feet near the bottom) and the blast (drawn pointing right)
+        Sprite[] monster = CompanionItemArtSetup.Slice(Folder, "kk2_idle", 1600, 1600, new Vector2(0.5f, 324f / 1600f), 200f);
+        Sprite[] blast = CompanionItemArtSetup.Slice(Folder, "kk2_beam", 1600, 400, new Vector2(0f, 0.5f), 100f);
         if (idle.Length == 0)
         {
             EditorUtility.DisplayDialog("Set Up KK Art", "Could not find " + Folder + "/kk_idle.png.", "OK");
@@ -74,6 +79,8 @@ public static class KKArtSetup
         SetArray(so.FindProperty("attackFrames"), attack);
         SetArray(so.FindProperty("surfFrames"), surf);
         SetArray(so.FindProperty("waveFrames"), waves);
+        SetArray(so.FindProperty("phase2Frames"), monster);
+        SetArray(so.FindProperty("blastFrames"), blast);
         so.FindProperty("waveArtScale").floatValue = 1f;
         so.FindProperty("waveWidth").floatValue = 2.4f; // hit box about as wide as the drawn water
         so.ApplyModifiedPropertiesWithoutUndo();
@@ -82,7 +89,7 @@ public static class KKArtSetup
         EditorSceneManager.SaveScene(scene);
         Selection.activeGameObject = kk.gameObject;
         EditorUtility.DisplayDialog("Set Up KK Art",
-            "Done! KK uses his drawings: idle " + idle.Length + ", attack " + attack.Length + ", surf " + surf.Length + ", waves " + waves.Length + " frames.", "OK");
+            "Done! KK uses his drawings: idle " + idle.Length + ", attack " + attack.Length + ", surf " + surf.Length + ", waves " + waves.Length + ", monster " + monster.Length + ", blast " + blast.Length + " frames.", "OK");
     }
 
     static void SetArray(SerializedProperty prop, Sprite[] sprites)

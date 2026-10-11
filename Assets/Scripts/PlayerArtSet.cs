@@ -23,6 +23,7 @@ public class PlayerArtSet : ScriptableObject
 
     [Header("Placement")]
     public float heightOffset = 0f; // moves the drawing up (+) or down (-) from his feet
+    public float drawScale = 1.3f;  // makes the drawing bigger (1 = about 2.3 tiles tall). His hit box stays the same.
 
     static PlayerArtSet current;
     static bool loaded;

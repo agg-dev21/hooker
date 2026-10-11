@@ -35,7 +35,8 @@ public class ItemPickup : MonoBehaviour
             PlayerItems.Toast(ItemSettings.Current.Look(item).name + " is full");
             return;
         }
-        PlayerItems.Toast("Got: " + ItemSettings.Current.Look(item).name + (amount > 1 ? " x" + amount : ""));
+        if (item == ItemType.Scroll) PlayerItems.Read(scrollTitle, scrollText); // read it now (game paused), kept in the inventory
+        else PlayerItems.Toast("Got: " + ItemSettings.Current.Look(item).name + (amount > 1 ? " x" + amount : ""));
         Destroy(gameObject);
     }
 }

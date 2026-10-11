@@ -66,7 +66,7 @@ public class LevelEndPrompt : MonoBehaviour
         panel = new GameObject("Panel", typeof(RectTransform), typeof(Image));
         panel.transform.SetParent(transform, false);
         var rt = (RectTransform)panel.transform;
-        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
+        rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.4f); // under the messages in the middle of the screen
         rt.sizeDelta = new Vector2(900f, 220f);
         panel.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.75f);
 

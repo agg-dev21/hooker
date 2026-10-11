@@ -50,8 +50,8 @@ public class JailCell : MonoBehaviour
         float floorY = t.position.y - Mathf.Abs(t.lossyScale.y) * 0.5f; // bottom of the old box
         sr.sprite = s.idleFrames[0];
         sr.color = Color.white;
-        t.localScale = Vector3.one;
-        t.position = new Vector3(t.position.x, floorY + sr.sprite.bounds.extents.y - sr.sprite.bounds.center.y, t.position.z);
+        t.localScale = Vector3.one * s.drawScale; // as tall as Raphael
+        t.position = new Vector3(t.position.x, floorY + (sr.sprite.bounds.extents.y - sr.sprite.bounds.center.y) * s.drawScale, t.position.z);
     }
 
     void Update()

@@ -38,6 +38,7 @@ public static class Inventory
         Load();
         if (type == ItemType.Scroll)
         {
+            if (entries.Exists(e => e.type == ItemType.Scroll && e.title == title)) return true; // already have this note
             for (int i = 0; i < amount; i++) entries.Add(new Entry { type = type, title = title, text = text });
         }
         else

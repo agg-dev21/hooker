@@ -30,8 +30,8 @@ public class GameManager : MonoBehaviour
     {
         if (menu && menu.IsListening) return; // waiting for a new key in the Controls page
 
-        // Pause key (Esc / controller Menu by default)
-        if (GameInput.PausePressed)
+        // Pause key (Esc / controller Menu by default). With the inventory or a note open, Esc closes that instead.
+        if (GameInput.PausePressed && !(PlayerItems.ScreenOpen && !paused))
         {
             if (menu && menu.InControls) menu.ShowMain(); // from Controls, go back one page first
             else TogglePause();

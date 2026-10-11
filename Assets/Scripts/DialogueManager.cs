@@ -63,16 +63,18 @@ public class DialogueManager : MonoBehaviour
         panel = new GameObject("DialogueBox", typeof(RectTransform), typeof(UnityEngine.UI.Image));
         panel.transform.SetParent(canvasGo.transform, false);
         var rt = (RectTransform)panel.transform;
-        rt.anchorMin = new Vector2(0.15f, 0.04f);
-        rt.anchorMax = new Vector2(0.85f, 0.27f);
+        rt.anchorMin = new Vector2(0.2f, 0.24f);  // above the item bar and the power icons at the bottom
+        rt.anchorMax = new Vector2(0.8f, 0.48f);  // a bit taller to fit the big "next" hint
         rt.offsetMin = rt.offsetMax = Vector2.zero;
         panel.GetComponent<UnityEngine.UI.Image>().color = new Color(0.05f, 0.04f, 0.08f, 0.92f);
 
         speakerText = Text("Speaker", new Vector2(0.03f, 0.72f), new Vector2(0.97f, 0.95f), 36f, new Color(1f, 0.85f, 0.35f));
-        bodyText = Text("Line", new Vector2(0.03f, 0.12f), new Vector2(0.97f, 0.74f), 32f, Color.white);
-        TMP_Text hint = Text("Hint", new Vector2(0.6f, 0.02f), new Vector2(0.97f, 0.16f), 22f, new Color(0.7f, 0.7f, 0.75f));
+        bodyText = Text("Line", new Vector2(0.03f, 0.22f), new Vector2(0.97f, 0.74f), 32f, Color.white);
+        // Big and bright so players know how to move on (was size 22, grey)
+        TMP_Text hint = Text("Hint", new Vector2(0.5f, 0.02f), new Vector2(0.97f, 0.22f), 38f, new Color(1f, 0.85f, 0.35f));
         hint.text = "[" + GameInput.KeyName(GameInput.GetKey(GameAction.Interact)) + "] next";
-        hint.alignment = TextAlignmentOptions.Right;
+        hint.fontStyle = FontStyles.Bold;
+        hint.alignment = TextAlignmentOptions.BottomRight;
         panel.SetActive(false);
     }
 
