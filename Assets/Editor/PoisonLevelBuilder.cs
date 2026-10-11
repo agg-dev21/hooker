@@ -36,16 +36,16 @@ public static class PoisonLevelBuilder
     const float DripInterval = 0.9f; // seconds between poison drops from each vent (was 1.6)
     const float CameraSize = 5f; // zoomed in: shows part of the floor you're on (10 tiles tall)
 
-    // Camera zones (floors), bottom to top: (lowest y the camera may show, highest y).
+    // Camera zones (floors), bottom to top: (lowest y the camera may show, highest y, camera size or 0 = normal).
     // The camera never shows outside the zone the player is in. Every zone is at least 10 tall (camera size 5).
-    static readonly Vector2[] CameraZones =
+    static readonly Vector3[] CameraZones =
     {
-        new Vector2(-1f, 12f),     // bottom area: enemies and pits
-        new Vector2(11f, 26f),     // side rooms and the poison shaft
-        new Vector2(25f, 37f),     // platform row over the poisoned roof (now 3 taller)
-        new Vector2(36f, 46f),     // spike-ball room
-        new Vector2(45f, 56f),     // floor 2 (under the start platform)
-        new Vector2(55f, 66f),     // start platform
+        new Vector3(-1f, 12f, 0f),     // bottom area: enemies and pits
+        new Vector3(11f, 26f, 0f),     // side rooms and the poison shaft
+        new Vector3(25f, 37f, 6f),     // platform row: zoomed out a little so the poison floor AND the vents are both on screen
+        new Vector3(36f, 46f, 0f),     // spike-ball room
+        new Vector3(45f, 56f, 0f),     // floor 2 (under the start platform)
+        new Vector3(55f, 66f, 0f),     // start platform
     };
 
     // Colors (placeholders until there is art)
@@ -394,6 +394,7 @@ public static class PoisonLevelBuilder
         {
             zones.GetArrayElementAtIndex(i).FindPropertyRelative("bottom").floatValue = CameraZones[i].x;
             zones.GetArrayElementAtIndex(i).FindPropertyRelative("top").floatValue = CameraZones[i].y;
+            zones.GetArrayElementAtIndex(i).FindPropertyRelative("size").floatValue = CameraZones[i].z;
         }
         so.ApplyModifiedPropertiesWithoutUndo();
     }
