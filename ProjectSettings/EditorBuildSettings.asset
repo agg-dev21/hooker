@@ -5,30 +5,30 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
     path: Assets/Scenes/Tutorial_1_Move.unity
-    guid: 10c2e4e3d0eeeed47887317793ba96ef
+    guid: 83edb947f96f8fa4a882048e941deb3e
   - enabled: 1
     path: Assets/Scenes/Tutorial_2_Jump.unity
-    guid: 31cecfb0c11f97f489cef548a17e0c76
+    guid: 547ea60de611ea648bb445fa91d1d26a
   - enabled: 1
     path: Assets/Scenes/Tutorial_3_Dash.unity
-    guid: 59b2280ca263fc54ca191b0532040561
+    guid: 718f8b49764a5f94f886b52c8c32d1a0
   - enabled: 1
     path: Assets/Scenes/Tutorial_4_Punch.unity
-    guid: 775847407df1c2c4185e981c3ebb10fe
-  - enabled: 0
+    guid: 112666ff3990c194aaca4573b94643de
+  - enabled: 1
     path: Assets/Scenes/Tutorial_5_Hook.unity
-    guid: 22d3c6ba6c3151c4f90d79351446c7b2
-  - enabled: 0
+    guid: ce4ad259674af474cac77e516f317563
+  - enabled: 1
     path: Assets/Scenes/Tutorial_6_DashThroughBullets.unity
-    guid: 174ad1fda7f89ce4b9d3010a9f75c9db
+    guid: be354ced65c184b4a80e2ee47024baf7
   - enabled: 1
     path: Assets/Scenes/Tutorial_7_Dock.unity
-    guid: 97cc787451ae0784390bfbd81dec1431
+    guid: efb35fbf781201b41912c33d8af4a2fa
   - enabled: 1
     path: Assets/Scenes/Level_1.unity
     guid: 0c66ed2641c227f49be2ada6103c9cf0

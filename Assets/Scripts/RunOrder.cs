@@ -29,6 +29,9 @@ public static class RunOrder
     public static string LastBoss => PlayerPrefs.GetString(LastBossKey, "");
     public static int RunId => PlayerPrefs.GetInt(RunIdKey, 0);
 
+    // A game has been started and got past the tutorial (the title screen shows "Continue")
+    public static bool HasProgress => PlayerPrefs.HasKey(FirstKey) && RunId > 0;
+
     // In the tutorial rooms: no boss powers and no Ariel (you haven't earned them yet)
     public static bool InTutorial => SceneManager.GetActiveScene().name.StartsWith("Tutorial");
 

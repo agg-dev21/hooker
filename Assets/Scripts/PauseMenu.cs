@@ -30,6 +30,7 @@ public class PauseMenu : MonoBehaviour
     const string DefaultHint = "Select a key or button and press the new one. It is saved automatically.";
 
     GameManager gm;
+    System.Action controlsBack; // set when the title screen opens the Controls page directly
     GameObject root, mainPage, controlsPage;
     CanvasGroup controlsGroup;
     TextMeshProUGUI hint;
@@ -65,6 +66,24 @@ public class PauseMenu : MonoBehaviour
         if (EventSystem.current) EventSystem.current.SetSelectedGameObject(null);
     }
 
+    // Title screen: open straight on the Controls page; Back closes it and calls onBack
+    public void OpenControls(System.Action onBack)
+    {
+        controlsBack = onBack;
+        root.SetActive(true);
+        ShowControls();
+    }
+
+    // Back from the Controls page (button, controller B, or the pause key)
+    public void Back()
+    {
+        if (controlsBack == null) { ShowMain(); return; }
+        System.Action onBack = controlsBack;
+        controlsBack = null;
+        Close();
+        onBack();
+    }
+
     public void ShowMain()
     {
         mainPage.SetActive(true);
@@ -86,7 +105,7 @@ public class PauseMenu : MonoBehaviour
         // Controller B goes back from the Controls page
         Gamepad gp = Gamepad.current;
         if (InControls && !IsListening && gp != null && gp.buttonEast.wasPressedThisFrame)
-            ShowMain();
+            Back();
     }
 
     // ---------------- Rebinding ----------------
@@ -232,6 +251,7 @@ public class PauseMenu : MonoBehaviour
         resumeButton = AddButton(mainPage.transform, "Resume", 380f, () => gm.Resume());
         AddButton(mainPage.transform, "Controls", 380f, ShowControls);
         AddButton(mainPage.transform, "Restart", 380f, () => gm.Restart());
+        AddButton(mainPage.transform, "Main Menu", 380f, () => gm.MainMenu()); // back to the HOOKER title screen
         AddButton(mainPage.transform, "Quit", 380f, () => gm.Quit());
 
         // ---- Controls page ----
@@ -273,7 +293,7 @@ public class PauseMenu : MonoBehaviour
 
         Transform bottom = Row(controlsPage.transform, 60f);
         AddButton(bottom, "Reset to Defaults", 360f, ResetDefaults);
-        AddButton(bottom, "Back", 360f, ShowMain);
+        AddButton(bottom, "Back", 360f, Back);
 
         RefreshLabels();
     }
