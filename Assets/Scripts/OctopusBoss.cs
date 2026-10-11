@@ -29,6 +29,9 @@ public class OctopusBoss : MonoBehaviour, IChainStunnable
     [SerializeField] float rainMaxX = 32f;
     [SerializeField] Transform hands;         // where her chains come from
 
+    [Header("Position")]
+    [SerializeField] bool immovable = true; // she never moves: punches, the hook or chains can't push her off her throne
+
     [Header("Flow")]
     [SerializeField] float startDelay = 2f;
     [SerializeField] float restTime = 0.8f;
@@ -119,8 +122,11 @@ public class OctopusBoss : MonoBehaviour, IChainStunnable
 
     Vector2 HandPos => hands ? (Vector2)hands.position : (Vector2)transform.position;
 
+    Vector3 homePosition; // where she sits
+
     void Awake()
     {
+        homePosition = transform.position;
         health = GetComponent<Health>();
         health.onDied.AddListener(OnDied);
         if (!boxSprite && TryGetComponent(out SpriteRenderer sr)) boxSprite = sr.sprite;
@@ -149,6 +155,12 @@ public class OctopusBoss : MonoBehaviour, IChainStunnable
     void OnDisable() { PlayerRespawn.Respawned -= ResetFight; BossTurns.End(this); }
 
     float animTime, attackPoseUntil;
+
+    // After everything else this frame (punch knockback, hook, chains): put her back on her throne
+    void LateUpdate()
+    {
+        if (immovable && transform.position != homePosition) transform.position = homePosition;
+    }
 
     void Update()
     {
