@@ -9,8 +9,8 @@ using UnityEngine.UI;
 //   1) Walk to the grave, press Interact (E / Y).
 //   2) Raphael reads Mom's last letter (pages on old paper).
 //   3) He takes the ring.
-//   4) If Ariel is with him, she comes up the path, and he proposes. Hearts, petals, the end.
-//      Without Ariel he keeps the ring for "someday".
+//   4) Ariel comes up the path. Press E to propose. Hearts, petals, the end.
+//      (Only if the scene has no Ariel object does he keep the ring for "someday".)
 //   5) THE END card, then back to the title screen.
 // Every line is in this file (Letter, AtGrave, Proposal...) so it's easy to edit.
 public class EndingGrave : MonoBehaviour
@@ -93,12 +93,15 @@ public class EndingGrave : MonoBehaviour
         A, "Are you okay?",
         R, "No. But I think I'm going to be.");
 
-    List<DialogueLine> Proposal() => L(
+    List<DialogueLine> BeforeProposal() => L(
         R, "She said to give it to someone who will stay.",
         R, "You followed me across Hardy's ship, a poison tower, a sunken prison, and a hallway full of water. You never once asked me to turn back.",
         A, "You never once let me fall behind.",
         R, "I spent my whole life looking for where I came from.",
-        R, "Turns out I was looking in the wrong direction. The answer was walking right next to me.",
+        R, "Turns out I was looking in the wrong direction. The answer was walking right next to me.");
+
+    // After the player presses E to propose
+    List<DialogueLine> Proposal() => L(
         "", "(Raphael kneels in the grass, the ring held out in his open hand.)",
         R, "Ariel. I don't know how to be anyone's family. Nobody ever showed me how.",
         R, "But I want to learn it. With you.",
@@ -188,12 +191,15 @@ public class EndingGrave : MonoBehaviour
         // The ring
         if (ringOnGrave) yield return LiftRing();
 
-        bool withAriel = Companion.Found && ariel;
+        bool withAriel = ariel; // Ariel always comes up the path at the end (even if you jumped straight here to test)
         if (withAriel)
         {
             yield return ArielWalksIn();
             yield return Talk(ArielArrives());
+            yield return Talk(BeforeProposal());
+            yield return WaitToPropose();
             yield return Talk(Proposal());
+            if (ringOnGrave) ringOnGrave.enabled = false; // the ring is on her finger now
             yield return Hearts();
         }
         else yield return Talk(Alone());
@@ -201,6 +207,29 @@ public class EndingGrave : MonoBehaviour
         yield return Talk(Goodbye(withAriel));
         yield return new WaitForSeconds(1f);
         yield return EndCard(withAriel);
+    }
+
+    // "Press E to propose" over Raphael, with the ring glowing in front of him, until the player presses it
+    IEnumerator WaitToPropose()
+    {
+        Vector2 at = player ? (Vector2)player.position : Vector2.zero;
+        TextMeshPro ask = WorldText("ProposePrompt", at + Vector2.up * 2.2f, "Press E to propose", 3.6f, Gold);
+        if (ringOnGrave)
+        {
+            ringOnGrave.enabled = true;
+            ringOnGrave.transform.position = at + new Vector2(arielStandOffset * 0.35f, 0.5f); // held out toward Ariel
+        }
+        float t = 0f;
+        yield return null;
+        while (!GameInput.InteractPressed)
+        {
+            t += Time.deltaTime;
+            ask.color = new Color(Gold.r, Gold.g, Gold.b, 0.6f + Mathf.PingPong(t, 0.4f));
+            if (ringOnGrave) ringOnGrave.transform.localScale = Vector3.one * (ringScale * (1f + Mathf.Sin(t * 5f) * 0.08f));
+            yield return null;
+        }
+        Destroy(ask.gameObject);
+        StartCoroutine(Heart(at + Vector2.up * 1.2f));
     }
 
     void Freeze(bool on)
@@ -220,15 +249,18 @@ public class EndingGrave : MonoBehaviour
     }
 
     // The ring rises off the grave, glints, and floats to Raphael
+    float ringScale = 1f;
+
     IEnumerator LiftRing()
     {
+        ringScale = ringOnGrave.transform.localScale.x;
         Vector3 from = ringOnGrave.transform.position;
         Vector3 to = player ? player.position + Vector3.up * 1.2f : from + Vector3.up;
         for (float t = 0f; t < 1.6f; t += Time.deltaTime)
         {
             float k = Mathf.SmoothStep(0f, 1f, t / 1.6f);
             ringOnGrave.transform.position = Vector3.Lerp(from, to, k) + Vector3.up * Mathf.Sin(k * Mathf.PI) * 0.8f;
-            ringOnGrave.transform.localScale = Vector3.one * (1f + Mathf.Sin(t * 12f) * 0.06f);
+            ringOnGrave.transform.localScale = Vector3.one * (ringScale * (1f + Mathf.Sin(t * 12f) * 0.06f));
             yield return null;
         }
         yield return new WaitForSeconds(0.6f);
@@ -485,4 +517,4 @@ public class EndingGrave : MonoBehaviour
         rt.anchorMax = Vector2.one;
         rt.offsetMin = rt.offsetMax = Vector2.zero;
     }
-}
+}   
