@@ -1042,7 +1042,18 @@ public static class TutorialRoomBuilder
         var chestCol = chest.GetComponent<BoxCollider2D>();
         chestCol.isTrigger = true;
         chestCol.size = new Vector2(2f, 2.5f);
-        chest.AddComponent<Chest>();
+        var chestSo = new SerializedObject(chest.AddComponent<Chest>());
+        // What each Level 1 secret room's chest gives (floor 1 to 4)
+        ItemType[] items = { ItemType.Healing, ItemType.Shield, ItemType.Scroll, ItemType.InstantRevival };
+        chestSo.FindProperty("givesItem").boolValue = true;
+        chestSo.FindProperty("item").enumValueIndex = (int)items[Mathf.Clamp(k, 0, items.Length - 1)];
+        chestSo.FindProperty("amount").intValue = k == 0 ? 2 : 1;
+        if (k == 2)
+        {
+            chestSo.FindProperty("scrollTitle").stringValue = "A Torn Note";
+            chestSo.FindProperty("scrollText").stringValue = "...the woman in the blue coat was taken aboard a black-sailed ship heading east.\n\n(Type the real hint about the mother here, in the chest's Inspector.)";
+        }
+        chestSo.ApplyModifiedPropertiesWithoutUndo();
 
         // Where you appear inside the room, and where you appear back in the level
         var inside = new GameObject("RoomSpawn").transform;

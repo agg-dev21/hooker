@@ -6,7 +6,8 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // The player's special ability, unlocked by beating a boss (like Genshin's elemental skill).
-// Right now: Hardy's Spikes - beat Hardy and you can shoot his sideways spike attack.
+// Right now: Hardy's Spikes - beat Hardy and you can shoot his sideways spike attack (it sets enemies on fire).
+// From Level 2 on it is always unlocked (so it works even when you start testing from a Level 2 scene).
 //  - Press the Ability button (Q / LB by default, can be changed in the pause menu Controls).
 //  - An icon in the bottom-right corner shows the key and a dark sweep while it recharges.
 //  - The unlock is saved, so it stays after quitting.
@@ -26,17 +27,25 @@ public class PlayerAbility : MonoBehaviour
         PlayerPrefs.Save();
     }
 
-    [Header("Hardy's Spikes")]
-    [SerializeField] float length = 9f;          // how far the spikes reach in front of the player
-    [SerializeField] float hitThickness = 1.6f;  // how tall the hit area is
-    [SerializeField] float drawnThickness = 1f;  // vertical size of the drawing
-    [SerializeField] float heightAboveFeet = 1f;
-    [SerializeField] int damage = 25;
+    // Hardy's Spikes works exactly like Hardy's horizontal attack (Tentacle Lash): the same animation,
+    // stretched to Length, a body hit and a stronger tip hit, only during the hit frames, and his fire.
+    [Header("Hardy's Spikes (same as Hardy's Tentacle Lash)")]
+    [SerializeField] float length = 18f;          // Hardy: Tentacle Length
+    [SerializeField] float tipLength = 2f;        // Hardy: Tentacle Tip Length (the last part hits harder)
+    [SerializeField] float thickness = 1.6f;      // Hardy: Tentacle Thickness (hit area height; the tip is 1.2x)
+    [SerializeField] float heightAboveFeet = 1f;  // Hardy: Tentacle Height
+    [SerializeField] float drawnThickness = 1f;   // Hardy: Tentacle Fx Thickness Scale
+    [SerializeField] float fps = 18f;             // Hardy: Tentacle Fx Fps
+    [SerializeField] int hitFirstFrame = 6;       // Hardy: Tentacle Hit First Frame
+    [SerializeField] int hitLastFrame = 11;       // Hardy: Tentacle Hit Last Frame
+    [SerializeField] int bodyDamage = 20;         // to enemies (Hardy's own numbers are for hitting the player)
+    [SerializeField] int tipDamage = 30;
+    [SerializeField] float knockback = 10f;       // Hardy: Tentacle Knockback
+    [SerializeField] bool burns = true;           // Hardy: Tentacle Burns
+    [SerializeField] int burnDamage = 2;          // Hardy: Burn Damage
+    [SerializeField] float burnDuration = 3f;     // Hardy: Burn Duration
+    [SerializeField] float burnTickInterval = 1f; // Hardy: Burn Tick Interval
     [SerializeField] float cooldown = 6f;
-    [SerializeField] float fps = 18f;
-    [SerializeField] int hitFirstFrame = 6;      // frames (counting from 0) during which the spikes can hurt
-    [SerializeField] int hitLastFrame = 11;
-    [SerializeField] float knockback = 10f;
 
     [Header("Icon (bottom right)")]
     [SerializeField] float iconSize = 120f;
@@ -68,8 +77,21 @@ public class PlayerAbility : MonoBehaviour
 
     static void AddToPlayer()
     {
+        int level = LevelNumber(SceneManager.GetActiveScene().name);
+        if (level >= 2) UnlockHardySpikes();               // Hardy is beaten by Level 2
+        if (level >= 3) PlayerUpgrades.UnlockPoisonHook(); // the lizard is beaten by Level 3
         PlayerController2D pc = FindAnyObjectByType<PlayerController2D>();
         if (pc && !pc.GetComponent<PlayerAbility>()) pc.gameObject.AddComponent<PlayerAbility>();
+    }
+
+    // "Level_2_Boss" -> 2, "Tutorial_3_Dash" -> 0 (not a level)
+    static int LevelNumber(string sceneName)
+    {
+        if (!sceneName.StartsWith("Level_")) return 0;
+        string rest = sceneName.Substring(6);
+        int end = 0;
+        while (end < rest.Length && char.IsDigit(rest[end])) end++;
+        return end > 0 && int.TryParse(rest.Substring(0, end), out int n) ? n : 0;
     }
 
     // ---------------- Setup ----------------
@@ -116,11 +138,12 @@ public class PlayerAbility : MonoBehaviour
         float halfWidth = playerCol ? playerCol.bounds.extents.x : 0.5f;
         Vector2 start = new Vector2(transform.position.x + dir * halfWidth, feet + heightAboveFeet);
 
-        // The drawing (same art as Hardy's horizontal attack), stretched to Length and flipped to face forward
+        // The drawing: Hardy's horizontal attack, stretched to Length, flipped to face forward (the art grows to the left)
         GameObject fx = null;
         SpriteRenderer fxSr = null;
         Sprite[] frames = art ? art.hardySpikesFrames : null;
-        if (frames != null && frames.Length > 0)
+        bool hasArt = frames != null && frames.Length > 0;
+        if (hasArt)
         {
             fx = new GameObject("PlayerSpikes");
             fx.transform.position = start;
@@ -128,34 +151,47 @@ public class PlayerAbility : MonoBehaviour
             fxSr.sortingOrder = 15;
             fxSr.sprite = frames[0];
             float drawn = Mathf.Max(fxSr.sprite.bounds.size.x, 0.01f);
-            fx.transform.localScale = new Vector3(-dir * length / drawn, drawnThickness, 1f); // the art grows to the left
+            fx.transform.localScale = new Vector3(-dir * length / drawn, drawnThickness, 1f);
         }
 
-        Vector2 center = start + Vector2.right * dir * length * 0.5f;
-        Vector2 size = new Vector2(length, hitThickness);
-        var alreadyHit = new HashSet<Health>();
-        int frameCount = frames != null && frames.Length > 0 ? frames.Length : hitLastFrame + 1;
-        float frameTime = 1f / Mathf.Max(fps, 0.01f);
+        // Body and tip hit areas, like Hardy's (the tip is the far end and hits harder)
+        float tip = Mathf.Min(tipLength, length);
+        Vector2 bodyCenter = start + Vector2.right * dir * (length - tip) * 0.5f;
+        Vector2 bodySize = new Vector2(Mathf.Max(length - tip, 0.01f), thickness);
+        Vector2 tipCenter = start + Vector2.right * dir * (length - tip * 0.5f);
+        Vector2 tipSize = new Vector2(tip, thickness * 1.2f);
 
+        var alreadyHit = new HashSet<Health>(); // each enemy is hit once per cast
+        int frameCount = hasArt ? frames.Length : hitLastFrame + 1;
+        float frameTime = 1f / Mathf.Max(fps, 0.01f);
         for (int i = 0; i < frameCount; i++)
         {
             if (fxSr) fxSr.sprite = frames[i];
             if (i >= hitFirstFrame && i <= hitLastFrame)
-                foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, size, 0f))
-                {
-                    if (hit.transform.IsChildOf(transform)) continue; // not the player
-                    Health h = hit.GetComponentInParent<Health>();
-                    if (!h || alreadyHit.Contains(h)) continue;
-                    alreadyHit.Add(h);
-                    h.TakeDamage(damage);
-                    Rigidbody2D rb = hit.attachedRigidbody;
-                    if (rb && rb.bodyType == RigidbodyType2D.Dynamic) rb.linearVelocity = new Vector2(dir, 0.4f).normalized * knockback;
-                }
+            {
+                HitArea(tipCenter, tipSize, tipDamage, dir, alreadyHit);   // tip first, so it wins over the body
+                HitArea(bodyCenter, bodySize, bodyDamage, dir, alreadyHit);
+            }
             yield return new WaitForSeconds(frameTime);
         }
 
         if (fx) Destroy(fx);
         casting = false;
+    }
+
+    void HitArea(Vector2 center, Vector2 size, int damage, float dir, HashSet<Health> alreadyHit)
+    {
+        foreach (Collider2D hit in Physics2D.OverlapBoxAll(center, size, 0f))
+        {
+            if (hit.transform.IsChildOf(transform)) continue; // not the player
+            Health h = hit.GetComponentInParent<Health>();
+            if (!h || alreadyHit.Contains(h)) continue;
+            alreadyHit.Add(h);
+            h.TakeDamage(damage);
+            if (burns) Burn.Apply(h.gameObject, burnDamage, burnDuration, burnTickInterval); // Hardy's fire
+            Rigidbody2D rb = hit.attachedRigidbody;
+            if (rb && rb.bodyType == RigidbodyType2D.Dynamic) rb.linearVelocity = new Vector2(dir, 0.5f).normalized * knockback;
+        }
     }
 
     // ---------------- Icon ----------------

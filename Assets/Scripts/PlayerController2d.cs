@@ -53,6 +53,7 @@ public class PlayerController2D : MonoBehaviour
     float dashCooldownTimer;
 
     public int FacingDirection { get; private set; } = 1;
+    public float SpeedMultiplier { get; set; } = 1f; // items (speed boost) change this
     public bool IsGrounded => isGrounded;
     public bool IsDashing => isDashing;
     public float MoveInput => moveInput;
@@ -113,7 +114,7 @@ public class PlayerController2D : MonoBehaviour
             return;
         }
 
-        float target = moveInput * moveSpeed;
+        float target = moveInput * moveSpeed * SpeedMultiplier;
         float rate = Mathf.Abs(target) > 0.01f ? acceleration : deceleration;
         if (!isGrounded) rate *= airControl;
 

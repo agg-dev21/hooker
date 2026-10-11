@@ -21460,6 +21460,14 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 6
+  amount: 1
+  scrollTitle: A torn note
+  scrollText: "Write the hint about the mother here."
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &1143275250
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -23159,6 +23167,14 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 1
+  amount: 2
+  scrollTitle: A torn note
+  scrollText: "Write the hint about the mother here."
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &1309907498
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -24836,6 +24852,14 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 4
+  amount: 1
+  scrollTitle: A torn note
+  scrollText: "Write the hint about the mother here."
+  givesBonus: 1
+  bonusItem: 7
+  bonusAmount: 1
 --- !u!61 &1528041596
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -28248,6 +28272,16 @@ MonoBehaviour:
   onOpened:
     m_PersistentCalls:
       m_Calls: []
+  givesItem: 1
+  item: 5
+  amount: 1
+  scrollTitle: A Second Note
+  scrollText: "...she was seen in the harbour of the poison tower, asking about her son.
+
+(Type the real hint about the mother here, in the chest's Inspector.)"
+  givesBonus: 0
+  bonusItem: 2
+  bonusAmount: 1
 --- !u!61 &1937717970
 BoxCollider2D:
   m_ObjectHideFlags: 0

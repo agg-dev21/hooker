@@ -8,7 +8,7 @@ using UnityEngine.InputSystem.LowLevel;
 public enum GameAction
 {
     MoveLeft, MoveRight, Jump, Dash, Punch, Hook,
-    AimUp, AimDown, AimLeft, AimRight, Interact, Pause, Ability
+    AimUp, AimDown, AimLeft, AimRight, Interact, Pause, Ability, UseItem, NextItem
 }
 
 // One place for all player input: keyboard + mouse + Xbox controller (any gamepad works).
@@ -24,6 +24,8 @@ public enum GameAction
 //   Interact / talk   E                       Y
 //   Pause             Esc                     Start (Menu button)
 //   Ability           Q                       LB (special ability unlocked from bosses)
+//   Use item          F                       RT
+//   Next item         Tab                     LT
 public static class GameInput
 {
     const float MoveDeadzone = 0.2f; // left stick: ignore tiny drift when moving
@@ -40,6 +42,7 @@ public static class GameInput
         { GameAction.AimLeft, Key.LeftArrow }, { GameAction.AimRight, Key.RightArrow },
         { GameAction.Interact, Key.E },        { GameAction.Pause, Key.Escape },
         { GameAction.Ability, Key.Q },
+        { GameAction.UseItem, Key.F },         { GameAction.NextItem, Key.Tab },
     };
 
     // Actions that have a controller button (moving and aiming use the sticks / D-pad instead)
@@ -52,6 +55,8 @@ public static class GameInput
         { GameAction.Interact, GamepadButton.North },      // Y
         { GameAction.Pause, GamepadButton.Start },         // Start / Menu
         { GameAction.Ability, GamepadButton.LeftShoulder }, // LB
+        { GameAction.UseItem, GamepadButton.RightTrigger }, // RT
+        { GameAction.NextItem, GamepadButton.LeftTrigger }, // LT
     };
 
     // Controller buttons that can be picked when rebinding
@@ -193,6 +198,8 @@ public static class GameInput
     public static bool JumpHeld     => Held(GameAction.Jump);
     public static bool DashPressed  => Pressed(GameAction.Dash);
     public static bool AbilityPressed => Pressed(GameAction.Ability);
+    public static bool UseItemPressed => Pressed(GameAction.UseItem);
+    public static bool NextItemPressed => Pressed(GameAction.NextItem);
 
     // ---------------- Combat ----------------
 
@@ -270,6 +277,8 @@ public static class GameInput
             case GameAction.AimRight:  return "Aim Right";
             case GameAction.Interact:  return "Interact / Talk";
             case GameAction.Ability:   return "Special Ability";
+            case GameAction.UseItem:   return "Use Item";
+            case GameAction.NextItem:  return "Next Item";
             default:                   return a.ToString();
         }
     }

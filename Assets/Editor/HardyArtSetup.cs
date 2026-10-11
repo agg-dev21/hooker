@@ -175,11 +175,20 @@ public static class HardyArtSetup
         EditorUtility.DisplayDialog("Abilities", "Hardy's Spikes unlocked. Press Q (or LB) in Play mode.", "OK");
     }
 
+    [MenuItem("Tools/Abilities/Unlock Poison Hook (testing)")]
+    static void UnlockPoisonHookForTesting()
+    {
+        PlayerPrefs.SetInt(PlayerUpgrades.PoisonHookSave, 1);
+        PlayerPrefs.Save();
+        EditorUtility.DisplayDialog("Abilities", "Poison Hook unlocked: hook hits now poison enemies.", "OK");
+    }
+
     [MenuItem("Tools/Abilities/Lock All Abilities Again")]
     static void LockForTesting()
     {
         PlayerPrefs.DeleteKey(PlayerAbility.HardySpikesSave);
         PlayerPrefs.DeleteKey(PlayerAbility.HardySpikesSave + ".new");
+        PlayerPrefs.DeleteKey(PlayerUpgrades.PoisonHookSave);
         PlayerPrefs.Save();
         EditorUtility.DisplayDialog("Abilities", "All abilities are locked again (like a new game).", "OK");
     }

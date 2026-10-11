@@ -6,12 +6,15 @@ using UnityEngine;
 // Attacks (picked at random, never the same twice in a row; each can be switched off under "Attacks Used"):
 //   1) Lizard Dash - glows, then dashes at the player. If it hits: big damage (no poison) and he stops.
 //                    If the player dodges: he crashes into the wall, is stunned, and poison bursts all over the arena.
+//                    Then he climbs onto the side ledge (the first level), dashes across at that height and
+//                    crashes into the opposite side too (poison again), then drops back down.
 //                    Phase 2: leaves a poison trail.
 //   2) Slam        - leaps onto the player and lands with a poison splash. (off by default)
 //   3) Rain        - poison drops fall from the ceiling all over the arena. (off by default)
 //   4) Vomit       - sprays poison globs in an arc at the player; each leaves a puddle where it lands.
 //   5) Claws       - when the player is close he steps in and swipes with his claws (off by default: he has contact damage instead).
-// Below Phase 2 At (50% health) he gets faster and angrier, and poison keeps spawning all over the arena.
+// Below Phase 2 At he gets faster and angrier, and poison keeps spawning all over the arena.
+// Masts: if the player camps on a mast's crow's nest, he walks over and hits the mast until it breaks.
 // If the player dies he gets all his health back and the fight starts over.
 // Needs: Health, a BoxCollider2D (his body) and a SpriteRenderer.
 [RequireComponent(typeof(Health), typeof(BoxCollider2D))]
@@ -25,9 +28,9 @@ public class PoisonBoss : MonoBehaviour
 
     [Header("Flow")]
     [SerializeField] float startDelay = 2f;
-    [SerializeField] float restTime = 0.9f;
-    [SerializeField, Range(0f, 1f)] float phase2At = 0.5f;
-    [SerializeField] float phase2SpeedUp = 1.35f;
+    [SerializeField] float restTime = 0.6f;
+    [SerializeField, Range(0f, 1f)] float phase2At = 0.6f;
+    [SerializeField] float phase2SpeedUp = 1.5f;
 
     [Header("Attacks Used")]
     [SerializeField] bool useCharge = true;
@@ -39,18 +42,23 @@ public class PoisonBoss : MonoBehaviour
     [Header("Touch")]
     [SerializeField] bool touchHurts = true;    // ON: touching him hurts (contact damage)
     [SerializeField] bool touchPoisons = false; // ON: touching him also poisons
-    [SerializeField] int touchDamage = 8;
+    [SerializeField] int touchDamage = 10;
     [SerializeField] float touchKnockback = 10f;
 
     [Header("1) Charge")]
-    [SerializeField] float chargeWarnTime = 0.7f;
-    [SerializeField] float chargeSpeed = 17f;
+    [SerializeField] float chargeWarnTime = 0.5f;
+    [SerializeField] float chargeSpeed = 22f;
     [SerializeField] int chargeDamage = 14;      // (old touch-based charge damage, not used by the lizard dash)
-    [SerializeField] int dashHitDamage = 18;     // lizard dash: hitting the player hurts a lot (no poison)
+    [SerializeField] int dashHitDamage = 22;     // lizard dash: hitting the player hurts a lot (no poison)
     [SerializeField] float dashKnockback = 16f;
-    [SerializeField] float crashStunTime = 1.2f; // dodged: he hits the wall and is stunned this long
-    [SerializeField] int crashPuddles = 8;       // dodged: poison puddles that appear all over the floor
-    [SerializeField] int crashDrops = 10;        // dodged: poison drops that fall all over the arena
+    [SerializeField] float crashStunTime = 0.8f; // dodged: he hits the wall and is stunned this long
+    [SerializeField] int crashPuddles = 10;       // dodged: poison puddles that appear all over the floor
+    [SerializeField] int crashDrops = 14;        // dodged: poison drops that fall all over the arena
+    [SerializeField] bool useLedgeDash = true;   // after the crash: climb onto the side ledge and dash across up there
+    [SerializeField] float ledgeTopY = 3.5f;     // top of the two side ledges (the first level)
+    [SerializeField] float climbTime = 0.45f;
+    [SerializeField] float ledgeDashWarnTime = 0.35f;
+    [SerializeField] float dropTime = 0.35f;
 
     [Header("2) Slam")]
     [SerializeField] float slamAirTime = 0.9f;
@@ -58,7 +66,7 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField] int slamDamage = 16;
     [SerializeField] float slamRadius = 3.5f;
     [SerializeField] float slamPuddleWidth = 7f;
-    [SerializeField] float puddleLifetime = 4f;
+    [SerializeField] float puddleLifetime = 5f;
 
     [Header("3) Rain")]
     [SerializeField] int rainDrops = 9;
@@ -70,11 +78,11 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField] float spitSpread = 18f; // degrees between globs
 
     [Header("4) Vomit")]
-    [SerializeField] float vomitWarnTime = 0.5f;
-    [SerializeField] int vomitGlobs = 7;
-    [SerializeField] float vomitSpeed = 11f;
+    [SerializeField] float vomitWarnTime = 0.35f;
+    [SerializeField] int vomitGlobs = 9;
+    [SerializeField] float vomitSpeed = 13f;
     [SerializeField] float vomitArc = 35f;       // degrees: globs spread between flat and this far up
-    [SerializeField] int vomitDamage = 5;        // per glob, plus poison
+    [SerializeField] int vomitDamage = 6;        // per glob, plus poison
     [SerializeField] float vomitGlobSize = 0.5f;
     [SerializeField] float vomitPuddleWidth = 2.5f;
 
@@ -90,19 +98,40 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField] int clawDamage = 7;
     [SerializeField] float clawKnockback = 10f;
 
+    [Header("Masts (player camping on top)")]
+    [SerializeField] float mastWalkSpeed = 9f;     // how fast he goes to the mast
+    [SerializeField] float mastHitWindup = 0.25f;  // flash before each hit
+    [SerializeField] float mastHitInterval = 0.35f;
+
     [Header("Phase 2 poison everywhere")]
-    [SerializeField] float phase2PoisonInterval = 1.4f;
-    [SerializeField] int phase2PuddlesPerWave = 2;
-    [SerializeField] int phase2DropsPerWave = 2;
+    [SerializeField] float phase2PoisonInterval = 1f;
+    [SerializeField] int phase2PuddlesPerWave = 3;
+    [SerializeField] int phase2DropsPerWave = 3;
 
     [Header("Poison")]
-    [SerializeField] int poisonDamage = 2;
+    [SerializeField] int poisonDamage = 3;
     [SerializeField] float poisonDuration = 3f;
 
     [Header("On Death")]
     [SerializeField] GameObject healthBarRoot;  // hidden when he dies
     [SerializeField] GameObject[] removeOnDeath; // e.g. the exit gate
     [SerializeField] GameObject[] showOnDeath;   // e.g. the exit door
+
+    [Header("Art (sprite frames; filled by Tools > Set Up Lizard Art)")]
+    [SerializeField] SpriteRenderer artRenderer;   // child that shows the drawing (the body box stays for hits)
+    [SerializeField] bool artFacesRight = true;    // the drawings face right
+    [SerializeField] Sprite idleFrame;
+    [SerializeField] Sprite[] dashFrames;          // wind-up, then spinning roll
+    [SerializeField] int dashWindupFrames = 4;     // first frames: wind-up before the dash (played once)
+    [SerializeField] float dashFps = 12f;
+    [SerializeField] Sprite[] spewFrames;          // wind-up, then spewing
+    [SerializeField] int spewWindupFrames = 5;
+    [SerializeField] float spewFps = 12f;
+    [SerializeField] Sprite[] poisonFrames;        // splash, puddle, drips
+    [SerializeField] int puddleFrame = 1;          // the frame used for a puddle lying on the floor
+    [SerializeField] float puddleArtHeight = 0.6f; // how tall a puddle drawing is
+    [SerializeField] float splashFps = 14f;
+    [SerializeField] bool splashOnPuddle = true;   // play the splash when a puddle appears
 
     [Header("Colors")]
     [SerializeField] Color bodyColor = new Color(0.25f, 0.65f, 0.15f);
@@ -157,6 +186,8 @@ public class PoisonBoss : MonoBehaviour
         SetTouchDamage(touchDamage);
 
         if (sr) sr.color = bodyColor;
+        PlayIdle();
+        Face(DirToPlayer);
         startPos = rb.position;
         StartCoroutine(FightLoop());
     }
@@ -164,8 +195,65 @@ public class PoisonBoss : MonoBehaviour
     void OnEnable()  => PlayerRespawn.Respawned += ResetFight;
     void OnDisable() => PlayerRespawn.Respawned -= ResetFight;
 
+    // ---------------- Sprite animation ----------------
+    Sprite[] animFrames;
+    float animFps, animTime;
+    bool animLoop;
+    bool HasArt => artRenderer && idleFrame;
+
+    void Play(Sprite[] frames, float fps, bool loop)
+    {
+        if (!HasArt || frames == null || frames.Length == 0) return;
+        animFrames = frames;
+        animFps = Mathf.Max(fps, 0.01f);
+        animLoop = loop;
+        animTime = 0f;
+        artRenderer.sprite = frames[0];
+    }
+
+    void PlayIdle()
+    {
+        if (!HasArt) return;
+        animFrames = null;
+        artRenderer.sprite = idleFrame;
+    }
+
+    static Sprite[] Part(Sprite[] frames, int first, int count)
+    {
+        if (frames == null || frames.Length == 0) return null;
+        first = Mathf.Clamp(first, 0, frames.Length - 1);
+        count = Mathf.Clamp(count, 1, frames.Length - first);
+        var part = new Sprite[count];
+        System.Array.Copy(frames, first, part, 0, count);
+        return part;
+    }
+
+    void Face(float dir)
+    {
+        if (artRenderer && dir != 0f) artRenderer.flipX = artFacesRight ? dir < 0f : dir > 0f;
+    }
+
+    // Plays a wind-up (frames from first, count) once and waits for it; with no art it flashes instead
+    IEnumerator Windup(Sprite[] frames, int count, float fps, float flashTime)
+    {
+        Sprite[] part = Part(frames, 0, count);
+        if (HasArt && part != null)
+        {
+            Play(part, fps, false);
+            yield return new WaitForSeconds(part.Length / Mathf.Max(fps, 0.01f) / Speed);
+        }
+        else yield return Warn(flashTime);
+    }
+
     void Update()
     {
+        if (HasArt && animFrames != null && animFrames.Length > 0)
+        {
+            animTime += Time.deltaTime;
+            int i = Mathf.FloorToInt(animTime * animFps);
+            artRenderer.sprite = animFrames[animLoop ? i % animFrames.Length : Mathf.Min(i, animFrames.Length - 1)];
+        }
+
         if (!phase2 && health.CurrentHealth > 0 && health.CurrentHealth <= health.MaxHealth * phase2At)
         {
             phase2 = true;
@@ -182,6 +270,17 @@ public class PoisonBoss : MonoBehaviour
         while (true)
         {
             if (!player) { yield return null; continue; }
+
+            // The player is camping on a mast: go break it first
+            BreakableMast camped = null;
+            foreach (BreakableMast m in BreakableMast.All) if (m.PlayerCamping) { camped = m; break; }
+            if (camped)
+            {
+                yield return AttackMast(camped);
+                Tint(bodyColor);
+                yield return new WaitForSeconds(restTime / Speed);
+                continue;
+            }
 
             // Close: claws. Otherwise a random attack (never the same twice in a row)
             var options = new List<int>();
@@ -209,19 +308,49 @@ public class PoisonBoss : MonoBehaviour
 
     // ---------------- 1) Charge ----------------
 
+    bool dashHit; // the last dash ran into the player
+
     IEnumerator Charge()
     {
         float dir = DirToPlayer;
-        yield return Warn(chargeWarnTime / Speed);
+        float groundCenter = startPos.y;
+        Sprite[] spin = Part(dashFrames, dashWindupFrames, (dashFrames != null ? dashFrames.Length : 0) - dashWindupFrames);
+        Face(dir);
+        yield return Windup(dashFrames, dashWindupFrames, dashFps, chargeWarnTime / Speed);
 
+        // 1) Low dash along the floor (spinning)
+        Play(spin, dashFps, true);
+        yield return DashAcross(dir, true);
+        if (dashHit) { PlayIdle(); yield break; }
+        PlayIdle();
+        yield return Crash();
+        if (!useLedgeDash) yield break;
+
+        // 2) Climb onto the ledge on this side, dash across up there the other way, crash again
+        yield return MoveToHeight(ledgeTopY + halfHeight, climbTime);
+        Face(-dir);
+        if (HasArt) yield return new WaitForSeconds(ledgeDashWarnTime / Speed);
+        else yield return Warn(ledgeDashWarnTime / Speed);
+        Play(spin, dashFps, true);
+        yield return DashAcross(-dir, false);
+        PlayIdle();
+        if (!dashHit) yield return Crash();
+
+        // 3) Back down to the floor
+        yield return MoveToHeight(groundCenter, dropTime);
+    }
+
+    // Dash to the wall in this direction at his current height. Stops early if it runs into the player (dashHit).
+    IEnumerator DashAcross(float dir, bool trail)
+    {
+        dashHit = false;
         float targetX = dir > 0 ? arenaMaxX - halfWidth : arenaMinX + halfWidth;
         float nextTrail = rb.position.x;
-        bool hitPlayer = false;
         while (Mathf.Abs(rb.position.x - targetX) > 0.05f)
         {
             float x = Mathf.MoveTowards(rb.position.x, targetX, chargeSpeed * Speed * Time.fixedDeltaTime);
             rb.MovePosition(new Vector2(x, rb.position.y));
-            if (phase2 && Mathf.Abs(x - nextTrail) >= 2.5f) // phase 2: poison trail behind him
+            if (trail && phase2 && Mathf.Abs(x - nextTrail) >= 2.5f) // phase 2: poison trail behind him
             {
                 nextTrail = x;
                 SpawnPuddle(x, 2.5f, puddleLifetime);
@@ -229,14 +358,16 @@ public class PoisonBoss : MonoBehaviour
 
             // Ran into the player: big hit, and the dash stops there
             foreach (Collider2D hit in Physics2D.OverlapBoxAll(new Vector2(x, rb.position.y), new Vector2(halfWidth * 2f, halfHeight * 2f), 0f))
-                if (HitPlayer(hit, dashHitDamage, new Vector2(dir, 0.6f).normalized * dashKnockback, false)) { hitPlayer = true; break; }
-            if (hitPlayer) break;
+                if (HitPlayer(hit, dashHitDamage, new Vector2(dir, 0.6f).normalized * dashKnockback, false)) { dashHit = true; break; }
+            if (dashHit) yield break;
 
             yield return new WaitForFixedUpdate();
         }
-        if (hitPlayer) yield break;
+    }
 
-        // The player dodged: he slams into the wall, is stunned, and poison bursts all over the arena
+    // He slams into the wall, is stunned, and poison bursts all over the arena
+    IEnumerator Crash()
+    {
         if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.45f, 0.45f);
         for (int i = 0; i < crashPuddles; i++)
             SpawnPuddle(Random.Range(arenaMinX + 1f, arenaMaxX - 1f), Random.Range(2f, 3.5f), puddleLifetime);
@@ -244,6 +375,19 @@ public class PoisonBoss : MonoBehaviour
         Tint(Color.Lerp(bodyColor, Color.gray, 0.5f)); // dazed
         yield return new WaitForSeconds(crashStunTime);
         Tint(bodyColor);
+    }
+
+    // Climb up or drop down to this height (his center) over a short time
+    IEnumerator MoveToHeight(float centerY, float time)
+    {
+        Vector2 from = rb.position;
+        for (float t = 0f; t < time; t += Time.fixedDeltaTime)
+        {
+            rb.MovePosition(new Vector2(from.x, Mathf.Lerp(from.y, centerY, t / time)));
+            yield return new WaitForFixedUpdate();
+        }
+        rb.MovePosition(new Vector2(from.x, centerY));
+        yield return new WaitForFixedUpdate();
     }
 
     // Poison drops falling at random spots across the arena over a short time
@@ -261,7 +405,9 @@ public class PoisonBoss : MonoBehaviour
     IEnumerator Vomit()
     {
         float dir = DirToPlayer;
-        yield return Warn(vomitWarnTime / Speed);
+        Face(dir);
+        yield return Windup(spewFrames, spewWindupFrames, spewFps, vomitWarnTime / Speed);
+        Play(Part(spewFrames, spewWindupFrames, (spewFrames != null ? spewFrames.Length : 0) - spewWindupFrames), spewFps, true);
         Vector2 mouth = rb.position + new Vector2(dir * halfWidth, halfHeight * 0.4f);
         int globs = phase2 ? vomitGlobs + 3 : vomitGlobs;
         for (int i = 0; i < globs; i++)
@@ -272,6 +418,8 @@ public class PoisonBoss : MonoBehaviour
             StartCoroutine(Glob(mouth, v * speed));
             yield return new WaitForSeconds(0.05f);
         }
+        yield return new WaitForSeconds(0.2f);
+        PlayIdle();
     }
 
     // One poison glob: flies in an arc, hurts and poisons the player, and leaves a puddle where it lands
@@ -336,6 +484,27 @@ public class PoisonBoss : MonoBehaviour
                     if (HitPlayer(hit, clawDamage, new Vector2(dir, 0.5f).normalized * clawKnockback, false)) { landed = true; break; }
                 yield return null;
             }
+        }
+    }
+
+    // ---------------- Masts ----------------
+
+    // Walk to the mast, then hit it until it breaks
+    IEnumerator AttackMast(BreakableMast mast)
+    {
+        float targetX = Mathf.Clamp(mast.X, arenaMinX + halfWidth, arenaMaxX - halfWidth);
+        while (!mast.Broken && Mathf.Abs(rb.position.x - targetX) > 0.1f)
+        {
+            float x = Mathf.MoveTowards(rb.position.x, targetX, mastWalkSpeed * Speed * Time.fixedDeltaTime);
+            rb.MovePosition(new Vector2(x, rb.position.y));
+            yield return new WaitForFixedUpdate();
+        }
+        for (int guard = 0; guard < 20 && !mast.Broken; guard++)
+        {
+            yield return Warn(mastHitWindup / Speed);
+            mast.TakeHit();
+            if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.12f, 0.15f);
+            yield return new WaitForSeconds(mastHitInterval / Speed);
         }
     }
 
@@ -467,8 +636,42 @@ public class PoisonBoss : MonoBehaviour
         col.size = new Vector2(1f, 3f);
         col.offset = new Vector2(0f, 1f);
         go.AddComponent<PoisonHazard>().Setup(0, 0f, poisonDamage, 2f, 0.5f, false);
+
+        // With the poison art: hide the plain box, show the puddle drawing (and a splash when it appears)
+        if (poisonFrames != null && poisonFrames.Length > 0)
+        {
+            psr.enabled = false;
+            Sprite puddle = poisonFrames[Mathf.Clamp(puddleFrame, 0, poisonFrames.Length - 1)];
+            var art = new GameObject("PuddleArt");
+            art.transform.SetParent(go.transform, false);
+            art.transform.localPosition = new Vector3(0f, -0.5f, 0f); // bottom of the puddle box
+            Vector2 drawn = puddle.bounds.size;
+            art.transform.localScale = new Vector3(1f / Mathf.Max(drawn.x, 0.01f), puddleArtHeight / Mathf.Max(drawn.y, 0.01f) / 0.25f, 1f);
+            var asr = art.AddComponent<SpriteRenderer>();
+            asr.sprite = puddle;
+            asr.sortingOrder = 2;
+            if (splashOnPuddle) StartCoroutine(Splash(new Vector2(x, groundY)));
+        }
         Destroy(go, lifetime);
         spawned.Add(go);
+    }
+
+    // The poison splash animation, played once
+    IEnumerator Splash(Vector2 at)
+    {
+        var fx = new GameObject("PoisonSplash");
+        fx.transform.position = at;
+        var fsr = fx.AddComponent<SpriteRenderer>();
+        fsr.sortingOrder = 4;
+        spawned.Add(fx);
+        foreach (Sprite f in poisonFrames)
+        {
+            if (!fx) yield break; // cleared (fight reset or boss died)
+            fsr.sprite = f;
+            yield return new WaitForSeconds(1f / Mathf.Max(splashFps, 0.01f));
+        }
+        spawned.Remove(fx);
+        Destroy(fx);
     }
 
     void SpawnDrop(Vector2 pos)
@@ -508,12 +711,15 @@ public class PoisonBoss : MonoBehaviour
         SetTouchDamage(touchDamage);
         rb.position = startPos;
         Tint(bodyColor);
+        foreach (BreakableMast m in BreakableMast.All) m.Restore();
+        PlayIdle();
         if (healthBarRoot) healthBarRoot.SetActive(true);
         StartCoroutine(FightLoop());
     }
 
     void OnDied()
     {
+        PlayerUpgrades.UnlockPoisonHook(); // the player puts his teeth on the hook: hook hits poison
         StopAllCoroutines();
         ClearSpawned();
         if (healthBarRoot) healthBarRoot.SetActive(false);

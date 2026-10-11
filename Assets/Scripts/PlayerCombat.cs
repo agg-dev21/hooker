@@ -32,6 +32,11 @@ public class PlayerCombat : MonoBehaviour
     [SerializeField] float hookCooldown = 0.6f;
     [SerializeField] float pullSpeed = 31.5f;
     [SerializeField] float pullStopDistance = 1.2f; // pulled enemy stops this close to the player
+    [Header("Poison Hook (lizard's teeth, unlocked by beating the Level 2 boss)")]
+    [SerializeField] int poisonHookDamage = 2;          // poison damage per tick
+    [SerializeField] float poisonHookDuration = 4f;
+    [SerializeField] float poisonHookTickInterval = 0.5f;
+    [SerializeField] Color poisonHookColor = new Color(0.4f, 0.95f, 0.2f);
     [SerializeField] LayerMask groundLayer;         // hook returns when it hits these layers (walls)
     [SerializeField] float ringClearance = 2.5f;    // ring launch: how high the player's feet go above the floor above the ring
 
@@ -53,6 +58,7 @@ public class PlayerCombat : MonoBehaviour
     float riseGravity = 1f;   // player's normal gravity scale while rising (used for the ring launch)
 
     int Facing => controller ? controller.FacingDirection : 1;
+    public float AttackSpeedMultiplier { get; set; } = 1f; // items (speed boost) change this
 
     void Awake()
     {
@@ -74,8 +80,8 @@ public class PlayerCombat : MonoBehaviour
     {
         if (Time.timeScale == 0f) return; // game paused
 
-        punchTimer -= Time.deltaTime;
-        hookTimer -= Time.deltaTime;
+        punchTimer -= Time.deltaTime * AttackSpeedMultiplier; // speed boost: attacks recharge faster
+        hookTimer -= Time.deltaTime * AttackSpeedMultiplier;
 
         bool canHook = hookTimer <= 0f && !hookOut;
 
@@ -311,6 +317,8 @@ public class PlayerCombat : MonoBehaviour
         if (target)
         {
             target.TakeDamage(traveled <= mediumRange ? mediumRangeDamage : longRangeDamage);
+            if (PlayerUpgrades.PoisonHook) // the lizard's teeth on the hook
+                Poison.Apply(target.gameObject, poisonHookDamage, poisonHookDuration, poisonHookTickInterval);
 
             Rigidbody2D rb = target.GetComponent<Rigidbody2D>();
             if (rb && rb.bodyType == RigidbodyType2D.Dynamic)
@@ -416,6 +424,7 @@ public class PlayerCombat : MonoBehaviour
     void DrawLine(Vector2 tip)
     {
         if (!hookLine) return;
+        if (PlayerUpgrades.PoisonHook) hookLine.startColor = hookLine.endColor = poisonHookColor; // green: poison teeth on the hook
         hookLine.positionCount = 2;
         hookLine.SetPosition(0, transform.position);
         hookLine.SetPosition(1, tip);
