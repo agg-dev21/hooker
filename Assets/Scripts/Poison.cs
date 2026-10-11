@@ -15,6 +15,7 @@ public class Poison : MonoBehaviour
     float timeLeft;
     float tickTimer;
     bool active;
+    GameObject effect; // rising poison drips while poisoned
 
     public bool IsPoisoned => active;
 
@@ -52,6 +53,7 @@ public class Poison : MonoBehaviour
             active = true;
             if (sr) normalColor = sr.color;
             tickTimer = interval; // first tick after one interval
+            if (!effect) effect = PoisonArt.AddPoisonedEffect(gameObject);
         }
         tickDamage = Mathf.Max(1, damage);
         tickInterval = Mathf.Max(0.05f, interval);
@@ -77,6 +79,8 @@ public class Poison : MonoBehaviour
     void Stop()
     {
         if (active && sr) sr.color = normalColor;
+        if (effect) Destroy(effect);
+        effect = null;
         active = false;
         timeLeft = 0f;
     }

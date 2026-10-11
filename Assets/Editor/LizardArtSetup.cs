@@ -20,7 +20,11 @@ public static class LizardArtSetup
 {
     const string ArtFolder = "Assets/Art/Lizard";
     const string BossScene = "Assets/Scenes/Level_2_Boss.unity";
-    const float PixelsPerUnit = 88f; // the standing lizard (310 px) is about 3.5 tiles tall
+    // 60 pixels per tile, same as Hardy: the standing lizard (316 px) is about 5.3 tiles tall, 7 wide.
+    // Same sharpness as Hardy. A smaller number makes him bigger but blurrier.
+    const float PixelsPerUnit = 60f;
+    // His hit box (world units), sized to fit the drawing. His feet stay on the floor (groundY).
+    static readonly Vector2 BodySize = new Vector2(5.9f, 4.1f);
 
     [MenuItem("Tools/Set Up Lizard Art")]
     static void SetUp()
@@ -43,6 +47,12 @@ public static class LizardArtSetup
             EditorUtility.DisplayDialog("Set Up Lizard Art", "Sheets sliced, but there is no lizard boss in Level_2_Boss.", "OK");
             return;
         }
+
+        // Hit box to match the bigger drawing, feet on the floor
+        boss.transform.localScale = new Vector3(BodySize.x, BodySize.y, 1f);
+        var bossSo = new SerializedObject(boss);
+        float groundY = bossSo.FindProperty("groundY").floatValue;
+        boss.transform.position = new Vector3(boss.transform.position.x, groundY + BodySize.y * 0.5f, boss.transform.position.z);
 
         // Hide the old look: the green box and the eyes on it
         if (boss.TryGetComponent(out SpriteRenderer boxRenderer)) boxRenderer.enabled = false;

@@ -6,7 +6,10 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 // The player's inventory in action: the item bar at the bottom of the screen, using items, and their effects.
-//   Next Item (Tab / LT) or 1-9 picks an item, Use Item (F / RT) uses it.
+//   Next Item (Tab / LT) opens the inventory: the game pauses. Then Tab picks the next item,
+//   Use Item (F / RT) uses it and closes, Interact (E) or Pause (Esc) closes without using.
+//   With the inventory closed, 1-9 picks an item and F uses it right away (no pause).
+//   Items are kept between levels and between play sessions (see Inventory).
 //   Shield            soaks up damage until it breaks or runs out of time
 //   Poison Resistance poison hurts much less for a while (and cures current poison)
 //   Healing           heals
@@ -31,10 +34,11 @@ public class PlayerItems : MonoBehaviour
     float shieldTime, resistTime, flyTime, speedTime, invulnerableTime;
     int shieldLeft;
 
-    GameObject uiRoot, barRoot, reader;
-    TMP_Text hintText, effectsText, toastText, readerTitle, readerBody;
+    GameObject uiRoot, barRoot, reader, inventoryDim;
+    TMP_Text inventoryTitle, hintText, effectsText, toastText, readerTitle, readerBody;
     float toastTimer;
     bool reading;
+    bool inventoryOpen;
     static Sprite whiteSprite;
 
     ItemSettings S => ItemSettings.Current;
@@ -91,7 +95,7 @@ public class PlayerItems : MonoBehaviour
             health.DamageFilter = null;
             health.BeforeDeath = null;
         }
-        if (reading) Time.timeScale = 1f;
+        if (reading || inventoryOpen) Time.timeScale = 1f;
         if (uiRoot) Destroy(uiRoot);
     }
 
@@ -102,6 +106,11 @@ public class PlayerItems : MonoBehaviour
         if (reading)
         {
             if (GameInput.Pressed(GameAction.Interact) || GameInput.UseItemPressed) CloseReader();
+            return;
+        }
+        if (inventoryOpen)
+        {
+            InventoryControls();
             return;
         }
 
@@ -135,8 +144,51 @@ public class PlayerItems : MonoBehaviour
             for (int i = 0; i < Mathf.Min(count, 9); i++)
                 if (kb[(Key)((int)Key.Digit1 + i)].wasPressedThisFrame) { selected = i; RefreshBar(); }
 
-        if (GameInput.NextItemPressed) { selected = (selected + 1) % count; RefreshBar(); }
+        if (GameInput.NextItemPressed) { OpenInventory(); return; }
         if (GameInput.UseItemPressed) Use(selected);
+    }
+
+    // ---------------- Inventory open (game paused) ----------------
+
+    void OpenInventory()
+    {
+        inventoryOpen = true;
+        Time.timeScale = 0f;
+        RefreshBar();
+    }
+
+    void CloseInventory()
+    {
+        inventoryOpen = false;
+        Unpause();
+        RefreshBar();
+    }
+
+    void InventoryControls()
+    {
+        int count = Inventory.Entries.Count;
+        // Esc opens the pause menu: close the inventory under it. E closes. Empty inventory closes too.
+        if (count == 0 || GameInput.PausePressed || GameInput.Pressed(GameAction.Interact)) { CloseInventory(); return; }
+        if (selected >= count) selected = count - 1;
+
+        Keyboard kb = Keyboard.current;
+        if (kb != null)
+            for (int i = 0; i < Mathf.Min(count, 9); i++)
+                if (kb[(Key)((int)Key.Digit1 + i)].wasPressedThisFrame) { selected = i; RefreshBar(); }
+
+        if (GameInput.NextItemPressed) { selected = (selected + 1) % count; RefreshBar(); }
+        if (GameInput.UseItemPressed)
+        {
+            CloseInventory();
+            Use(selected);
+        }
+    }
+
+    // Back to normal speed, unless the pause menu is open
+    static void Unpause()
+    {
+        if (GameManager.Instance && GameManager.Instance.IsPausedOrWon) return;
+        Time.timeScale = 1f;
     }
 
     // Flying: hold Jump to rise, otherwise fall slowly
@@ -229,7 +281,7 @@ public class PlayerItems : MonoBehaviour
     {
         reader.SetActive(false);
         reading = false;
-        Time.timeScale = 1f;
+        Unpause();
     }
 
     // ---------------- UI ----------------
@@ -262,8 +314,12 @@ public class PlayerItems : MonoBehaviour
 
         IReadOnlyList<Inventory.Entry> list = Inventory.Entries;
         hintText.gameObject.SetActive(list.Count > 0);
-        hintText.text = "[" + GameInput.KeyName(GameInput.GetKey(GameAction.NextItem)) + "] next    [" +
-                        GameInput.KeyName(GameInput.GetKey(GameAction.UseItem)) + "] use";
+        string next = GameInput.KeyName(GameInput.GetKey(GameAction.NextItem));
+        string use = GameInput.KeyName(GameInput.GetKey(GameAction.UseItem));
+        hintText.text = inventoryOpen
+            ? "[" + next + "] next    [" + use + "] use    [" + GameInput.KeyName(GameInput.GetKey(GameAction.Interact)) + "] close"
+            : "[" + next + "] open inventory    [" + use + "] use";
+        if (inventoryDim) inventoryDim.SetActive(inventoryOpen);
 
         const float size = 90f, gap = 12f;
         float startX = -(list.Count - 1) * (size + gap) * 0.5f;
@@ -306,6 +362,21 @@ public class PlayerItems : MonoBehaviour
         var scaler = uiRoot.AddComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920f, 1080f);
+
+        // Shown while the inventory is open: dim screen and a title (made first so it sits behind the bar)
+        inventoryDim = new GameObject("InventoryDim", typeof(RectTransform), typeof(Image));
+        inventoryDim.transform.SetParent(uiRoot.transform, false);
+        Fill((RectTransform)inventoryDim.transform, 0f);
+        var dimImage = inventoryDim.GetComponent<Image>();
+        dimImage.sprite = whiteSprite;
+        dimImage.color = new Color(0f, 0f, 0f, 0.55f);
+        dimImage.raycastTarget = false;
+        inventoryTitle = Label("Title", inventoryDim.transform, "INVENTORY  (paused)", 40f, Vector2.zero);
+        var trt0 = inventoryTitle.rectTransform;
+        trt0.anchorMin = trt0.anchorMax = new Vector2(0.5f, 0f);
+        trt0.anchoredPosition = new Vector2(0f, 230f);
+        trt0.sizeDelta = new Vector2(800f, 60f);
+        inventoryDim.SetActive(false);
 
         // Item bar along the bottom middle
         barRoot = new GameObject("Bar", typeof(RectTransform));

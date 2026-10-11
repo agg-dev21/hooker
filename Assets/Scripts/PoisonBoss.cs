@@ -635,10 +635,15 @@ public class PoisonBoss : MonoBehaviour
         col.isTrigger = true;
         col.size = new Vector2(1f, 3f);
         col.offset = new Vector2(0f, 1f);
-        go.AddComponent<PoisonHazard>().Setup(0, 0f, poisonDamage, 2f, 0.5f, false);
+        go.AddComponent<PoisonHazard>().Setup(0, 0f, poisonDamage, 2f, 0.5f, false); // also puts on the puddle drawing
 
-        // With the poison art: hide the plain box, show the puddle drawing (and a splash when it appears)
-        if (poisonFrames != null && poisonFrames.Length > 0)
+        // The game-wide poison art (Assets/Resources/PoisonArt) is used when it exists
+        if (PoisonArt.Current)
+        {
+            if (splashOnPuddle) PoisonArt.SplashAt(new Vector2(x, groundY), Mathf.Min(width, 4f));
+        }
+        // Otherwise the lizard's own poison frames: hide the plain box, show the puddle drawing (and a splash when it appears)
+        else if (poisonFrames != null && poisonFrames.Length > 0)
         {
             psr.enabled = false;
             Sprite puddle = poisonFrames[Mathf.Clamp(puddleFrame, 0, poisonFrames.Length - 1)];
