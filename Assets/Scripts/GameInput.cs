@@ -8,11 +8,13 @@ using UnityEngine.InputSystem.LowLevel;
 public enum GameAction
 {
     MoveLeft, MoveRight, Jump, Dash, Punch, Hook,
-    AimUp, AimDown, AimLeft, AimRight, Interact, Pause, Ability, UseItem, NextItem
+    AimUp, AimDown, AimLeft, AimRight, Interact, Pause, Ability, UseItem, NextItem, ChainAbility, Companion
 }
 
 // One place for all player input: keyboard + mouse + Xbox controller (any gamepad works).
 // Buttons can be changed in the pause menu (Controls) and are saved between sessions.
+// The keyboard column also accepts the extra mouse buttons: middle click, Mouse 4 (back) and Mouse 5 (forward).
+// (Left and right click already punch and hook.)
 //
 //   Action            Keyboard default        Controller default
 //   Move              A / D                   Left stick or D-pad (fixed)
@@ -26,6 +28,8 @@ public enum GameAction
 //   Ability           Q                       LB (special ability unlocked from bosses)
 //   Use item          F                       RT
 //   Next item         Tab                     LT
+//   Madame O's Chain  C                       View / Back button (unlocked by beating the Siren)
+//   Companion's Light R                       RS click (once you have freed her)
 public static class GameInput
 {
     const float MoveDeadzone = 0.2f; // left stick: ignore tiny drift when moving
@@ -43,6 +47,8 @@ public static class GameInput
         { GameAction.Interact, Key.E },        { GameAction.Pause, Key.Escape },
         { GameAction.Ability, Key.Q },
         { GameAction.UseItem, Key.F },         { GameAction.NextItem, Key.Tab },
+        { GameAction.ChainAbility, Key.C },
+        { GameAction.Companion, Key.R },
     };
 
     // Actions that have a controller button (moving and aiming use the sticks / D-pad instead)
@@ -57,6 +63,8 @@ public static class GameInput
         { GameAction.Ability, GamepadButton.LeftShoulder }, // LB
         { GameAction.UseItem, GamepadButton.RightTrigger }, // RT
         { GameAction.NextItem, GamepadButton.LeftTrigger }, // LT
+        { GameAction.ChainAbility, GamepadButton.Select },  // View / Back
+        { GameAction.Companion, GamepadButton.RightStick }, // RS click
     };
 
     // Controller buttons that can be picked when rebinding
@@ -136,12 +144,32 @@ public static class GameInput
     static Keyboard Kb => Keyboard.current;
     static Gamepad Pad => Gamepad.current;
 
-    static KeyControl KeyFor(GameAction action)
+    // Extra mouse buttons are stored in the keyboard binding as these special values
+    public const Key MouseMiddle = (Key)1001;
+    public const Key MouseBack = (Key)1002;     // Mouse 4 (side button)
+    public const Key MouseForward = (Key)1003;  // Mouse 5 (side button)
+    public static readonly Key[] MouseKeys = { MouseMiddle, MouseBack, MouseForward };
+
+    public static bool IsMouseKey(Key key) => key == MouseMiddle || key == MouseBack || key == MouseForward;
+
+    // The mouse button for one of the special values (null if no mouse)
+    public static ButtonControl MouseButton(Key key)
     {
-        Keyboard kb = Kb;
-        if (kb == null) return null;
+        Mouse m = Mouse.current;
+        if (m == null) return null;
+        if (key == MouseMiddle) return m.middleButton;
+        if (key == MouseBack) return m.backButton;
+        if (key == MouseForward) return m.forwardButton;
+        return null;
+    }
+
+    static ButtonControl KeyFor(GameAction action)
+    {
         Key key = GetKey(action);
-        return key == Key.None ? null : kb[key];
+        if (key == Key.None) return null;
+        if (IsMouseKey(key)) return MouseButton(key);
+        Keyboard kb = Kb;
+        return kb == null ? null : kb[key];
     }
 
     static ButtonControl PadFor(GameAction action)
@@ -151,9 +179,9 @@ public static class GameInput
         return gp[GetPadButton(action)];
     }
 
-    public static bool KeyPressed(GameAction a)  { KeyControl k = KeyFor(a); return k != null && k.wasPressedThisFrame; }
-    public static bool KeyReleased(GameAction a) { KeyControl k = KeyFor(a); return k != null && k.wasReleasedThisFrame; }
-    public static bool KeyHeld(GameAction a)     { KeyControl k = KeyFor(a); return k != null && k.isPressed; }
+    public static bool KeyPressed(GameAction a)  { ButtonControl k = KeyFor(a); return k != null && k.wasPressedThisFrame; }
+    public static bool KeyReleased(GameAction a) { ButtonControl k = KeyFor(a); return k != null && k.wasReleasedThisFrame; }
+    public static bool KeyHeld(GameAction a)     { ButtonControl k = KeyFor(a); return k != null && k.isPressed; }
 
     public static bool PadPressed(GameAction a)  { ButtonControl b = PadFor(a); return b != null && b.wasPressedThisFrame; }
     public static bool PadReleased(GameAction a) { ButtonControl b = PadFor(a); return b != null && b.wasReleasedThisFrame; }
@@ -198,6 +226,8 @@ public static class GameInput
     public static bool JumpHeld     => Held(GameAction.Jump);
     public static bool DashPressed  => Pressed(GameAction.Dash);
     public static bool AbilityPressed => Pressed(GameAction.Ability);
+    public static bool ChainAbilityPressed => Pressed(GameAction.ChainAbility);
+    public static bool CompanionPressed => Pressed(GameAction.Companion);
     public static bool UseItemPressed => Pressed(GameAction.UseItem);
     public static bool NextItemPressed => Pressed(GameAction.NextItem);
 
@@ -279,6 +309,8 @@ public static class GameInput
             case GameAction.Ability:   return "Special Ability";
             case GameAction.UseItem:   return "Use Item";
             case GameAction.NextItem:  return "Next Item";
+            case GameAction.ChainAbility: return "Madame O's Chain";
+            case GameAction.Companion: return "Companion's Light";
             default:                   return a.ToString();
         }
     }
@@ -286,6 +318,9 @@ public static class GameInput
     public static string KeyName(Key key)
     {
         if (key == Key.None) return "-";
+        if (key == MouseMiddle) return "Middle Click";
+        if (key == MouseBack) return "Mouse 4";
+        if (key == MouseForward) return "Mouse 5";
         Keyboard kb = Kb;
         string name = kb != null ? kb[key].displayName : key.ToString();
         return string.IsNullOrEmpty(name) ? key.ToString() : name;

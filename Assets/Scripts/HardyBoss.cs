@@ -15,7 +15,7 @@ using UnityEngine;
 // Every value is in the Inspector. Touching him does no damage by default (Touch Hurts), only his attacks do.
 // Needs: SpriteRenderer, BoxCollider2D (solid), Rigidbody2D (Kinematic), Health.
 [RequireComponent(typeof(Rigidbody2D), typeof(BoxCollider2D), typeof(Health))]
-public class HardyBoss : MonoBehaviour
+public class HardyBoss : MonoBehaviour, IChainStunnable
 {
     [Header("Arena")]
     [SerializeField] float groundY = -5f;     // top surface of the deck
@@ -177,6 +177,10 @@ public class HardyBoss : MonoBehaviour
     BoxCollider2D body;
     SpriteRenderer sr;
     Health health;
+
+    // Player's Siren's Chain: stunned, then slower for a while (see ChainStun)
+    float slowUntil, slowFactor = 1f, resumeDelay = -1f;
+    float SlowFactor => Time.time < slowUntil ? slowFactor : 1f;
     Transform player;
     Vector3 baseScale;
     Vector2 baseHalfSize;
@@ -272,11 +276,32 @@ public class HardyBoss : MonoBehaviour
         StartCoroutine(FightLoop()); // waits Start Delay before the first attack, like the first time
     }
 
+
+    // The player's Siren's Chain hit him: he stops what he is doing for stunTime, then is slower for slowTime
+    public void ChainStun(float stunTime, float slowMultiplier, float slowTime)
+    {
+        if (!health || health.CurrentHealth <= 0) return;
+        slowFactor = Mathf.Clamp(slowMultiplier, 0.05f, 1f);
+        slowUntil = Time.time + stunTime + slowTime;
+        StopAllCoroutines();
+        foreach (GameObject go in spawned) if (go) Destroy(go);
+        spawned.Clear();
+        movingSelf = false;
+        walkDir = 0f;
+        transform.rotation = Quaternion.identity;
+        SetPose(Vector2.one);
+        rb.position = new Vector2(rb.position.x, GroundCenterY); // mid-jump: drops back to the deck
+        PlayIdle();
+        if (phase2) StartCoroutine(RandomSpikes());
+        resumeDelay = stunTime;
+        StartCoroutine(FightLoop());
+    }
+
     void FixedUpdate()
     {
         // Stay planted on the ground so punches cannot knock it into the air (except while leaping/rolling).
         // While walking, also step toward the player.
-        float speed = phase2 ? walkSpeed * phase2SpeedMultiplier : walkSpeed;
+        float speed = (phase2 ? walkSpeed * phase2SpeedMultiplier : walkSpeed) * SlowFactor;
         if (!movingSelf) rb.MovePosition(new Vector2(ClampX(rb.position.x + walkDir * speed * Time.fixedDeltaTime), GroundCenterY));
     }
 
@@ -341,7 +366,8 @@ public class HardyBoss : MonoBehaviour
     IEnumerator FightLoop()
     {
         PlayIdle();
-        yield return new WaitForSeconds(startDelay);
+        yield return new WaitForSeconds(resumeDelay >= 0f ? resumeDelay : startDelay); // after a chain stun: only the stun
+        resumeDelay = -1f;
 
         while (true)
         {
@@ -373,7 +399,7 @@ public class HardyBoss : MonoBehaviour
             // Otherwise rest (and walk) as normal.
             bool stillInReach = player && Mathf.Abs(player.position.x - rb.position.x) <= PunchReach;
             if (attack == 3 && lastPunchSwung && stillInReach) yield return new WaitForSeconds(punchRestTime);
-            else yield return WalkPhase(phase2 ? restTime * phase2RestMultiplier : restTime);
+            else yield return WalkPhase((phase2 ? restTime * phase2RestMultiplier : restTime) / SlowFactor);
         }
     }
 

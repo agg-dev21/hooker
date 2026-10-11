@@ -44,6 +44,7 @@ public class ScreenFade : MonoBehaviour
         if (delay > 0f) yield return new WaitForSecondsRealtime(delay);
         yield return Fade(0f, 1f, fadeOutTime);
 
+        sceneName = RunOrder.Resolve(sceneName); // random boss order (see RunOrder)
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
         {
             Debug.LogWarning("ScreenFade: scene '" + sceneName + "' does not exist yet (or is not in the Scene List). Staying black.");

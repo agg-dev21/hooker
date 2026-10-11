@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 // The player's special ability, unlocked by beating a boss (like Genshin's elemental skill).
 // Right now: Hardy's Spikes - beat Hardy and you can shoot his sideways spike attack (it sets enemies on fire).
-// From Level 2 on it is always unlocked (so it works even when you start testing from a Level 2 scene).
+// From Level 3 on it is always unlocked (Levels 1 and 2 come in a random order, so it is earned there).
 //  - Press the Ability button (Q / LB by default, can be changed in the pause menu Controls).
 //  - An icon in the bottom-right corner shows the key and a dark sweep while it recharges.
 //  - The unlock is saved, so it stays after quitting.
@@ -25,6 +25,7 @@ public class PlayerAbility : MonoBehaviour
         PlayerPrefs.SetInt(HardySpikesSave, 1);
         PlayerPrefs.SetInt(HardySpikesSave + ".new", 1); // show "NEW!" on the icon until it is used once
         PlayerPrefs.Save();
+        PlayerItems.Toast(TutorialSign.Fill("New power: HARDY'S SPIKES!\nPress {Ability} to shoot his spikes. They set enemies on fire."), 6f);
     }
 
     // Hardy's Spikes works exactly like Hardy's horizontal attack (Tentacle Lash): the same animation,
@@ -78,7 +79,7 @@ public class PlayerAbility : MonoBehaviour
     static void AddToPlayer()
     {
         int level = LevelNumber(SceneManager.GetActiveScene().name);
-        if (level >= 2) UnlockHardySpikes();               // Hardy is beaten by Level 2
+        if (level >= 3) UnlockHardySpikes();               // Hardy is beaten by Level 3 (Levels 1 and 2 come in a random order)
         if (level >= 3) PlayerUpgrades.UnlockPoisonHook(); // the lizard is beaten by Level 3
         PlayerController2D pc = FindAnyObjectByType<PlayerController2D>();
         if (pc && !pc.GetComponent<PlayerAbility>()) pc.gameObject.AddComponent<PlayerAbility>();

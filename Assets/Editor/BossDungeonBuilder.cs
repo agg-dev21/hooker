@@ -97,7 +97,7 @@ public static class BossDungeonBuilder
         EditorSceneManager.SaveScene(scene);
         AddToSceneList(path);
         EditorUtility.DisplayDialog("Build Boss Dungeon", "Done! " + SceneName + " is built, open, and in the Scene List.\n\n" +
-            "Beat the Plague Warden to open the exit gate. The door behind it loads '" + NextScene + "'.", "OK");
+            "Beat Oscar to open the exit gate. The door behind it loads '" + NextScene + "'.", "OK");
     }
 
     // ---------------- Stone ----------------
@@ -268,7 +268,7 @@ public static class BossDungeonBuilder
         glow.intensity = 0.8f;
         glow.pointLightOuterRadius = 6f;
 
-        GameObject bar = MakeBossBar(boss.GetComponent<Health>(), "PLAGUE WARDEN");
+        GameObject bar = MakeBossBar(boss.GetComponent<Health>(), "OSCAR");
 
         var so = new SerializedObject(boss.AddComponent<PoisonBoss>());
         so.FindProperty("groundY").floatValue = 0f;
@@ -277,6 +277,7 @@ public static class BossDungeonBuilder
         so.FindProperty("arenaMaxX").floatValue = 36f;
         so.FindProperty("spitPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>(ProjectilePrefab);
         so.FindProperty("healthBarRoot").objectReferenceValue = bar;
+        so.FindProperty("runsAwayWhenBeaten").boolValue = true; // he flees here and comes back in Level 3
         SetArray(so.FindProperty("removeOnDeath"), exit[0]);
         SetArray(so.FindProperty("showOnDeath"), exit[1]);
         so.ApplyModifiedPropertiesWithoutUndo();

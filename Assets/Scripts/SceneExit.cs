@@ -9,6 +9,6 @@ public class SceneExit : MonoBehaviour
     {
         // The player reached the edge of the screen: load the next scene
         if (other.TryGetComponent(out PlayerController2D _) && !string.IsNullOrEmpty(nextScene))
-            SceneManager.LoadScene(nextScene);
+            SceneManager.LoadScene(RunOrder.Resolve(nextScene));
     }
 }

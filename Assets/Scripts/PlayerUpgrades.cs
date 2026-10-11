@@ -13,5 +13,6 @@ public static class PlayerUpgrades
         if (PoisonHook) return;
         PlayerPrefs.SetInt(PoisonHookSave, 1);
         PlayerPrefs.Save();
+        PlayerItems.Toast("Oscar left a tooth in your hook!\nYour hook now poisons enemies.", 6f);
     }
 }

@@ -1,0 +1,50 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c683ecdd33ce4664581db5af5e79fb5c, type: 3}
+  m_Name: PlayerArtSet
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerArtSet
+  run:
+  - {fileID: -938658608654533949, guid: b0cb16ee349f59a48863390779232bc4, type: 3}
+  - {fileID: -4148961355465977301, guid: b0cb16ee349f59a48863390779232bc4, type: 3}
+  - {fileID: 8204335442217980708, guid: b0cb16ee349f59a48863390779232bc4, type: 3}
+  - {fileID: 4230258538296812781, guid: b0cb16ee349f59a48863390779232bc4, type: 3}
+  - {fileID: 1805687361805048230, guid: b0cb16ee349f59a48863390779232bc4, type: 3}
+  jump:
+  - {fileID: 4330694004763997605, guid: b24a023116a1e8943abbdaf1721b6c23, type: 3}
+  - {fileID: -9012280687236740709, guid: b24a023116a1e8943abbdaf1721b6c23, type: 3}
+  - {fileID: 3706479157532092022, guid: b24a023116a1e8943abbdaf1721b6c23, type: 3}
+  - {fileID: 6651360496480428754, guid: b24a023116a1e8943abbdaf1721b6c23, type: 3}
+  dash:
+  - {fileID: -1768592330400461901, guid: 3aaa578ad32ead24093b01f5e120cac9, type: 3}
+  - {fileID: -350301785380013227, guid: 3aaa578ad32ead24093b01f5e120cac9, type: 3}
+  - {fileID: -5630700408751817347, guid: 3aaa578ad32ead24093b01f5e120cac9, type: 3}
+  - {fileID: -3021421588914328452, guid: 3aaa578ad32ead24093b01f5e120cac9, type: 3}
+  - {fileID: 86900460410263634, guid: 3aaa578ad32ead24093b01f5e120cac9, type: 3}
+  - {fileID: -6560374617480993632, guid: 3aaa578ad32ead24093b01f5e120cac9, type: 3}
+  attack:
+  - {fileID: -8403806705498589453, guid: 29e1200d4918fd940b2e419ef26c3c15, type: 3}
+  - {fileID: -4700962206925797956, guid: 29e1200d4918fd940b2e419ef26c3c15, type: 3}
+  - {fileID: -2858461255669054906, guid: 29e1200d4918fd940b2e419ef26c3c15, type: 3}
+  - {fileID: -737162690956582579, guid: 29e1200d4918fd940b2e419ef26c3c15, type: 3}
+  - {fileID: 4796735922052937764, guid: 29e1200d4918fd940b2e419ef26c3c15, type: 3}
+  hook:
+  - {fileID: -7743277210323664531, guid: 2eff9e3288f96db4d96a45154b50c056, type: 3}
+  - {fileID: 7101850880123887377, guid: 2eff9e3288f96db4d96a45154b50c056, type: 3}
+  - {fileID: 2177905675421561282, guid: 2eff9e3288f96db4d96a45154b50c056, type: 3}
+  - {fileID: -7815448318453350514, guid: 2eff9e3288f96db4d96a45154b50c056, type: 3}
+  drawnFacingRight: 1
+  runFps: 12
+  attackFps: 20
+  hookFps: 14
+  dashFps: 18
+  landTime: 0.1
+  heightOffset: 0

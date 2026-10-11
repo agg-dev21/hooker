@@ -421,7 +421,7 @@ public static class LevelKit
 
     // ---------------- Scene plumbing ----------------
 
-    static void RebuildColliders(Tilemap tilemap)
+    public static void RebuildColliders(Tilemap tilemap)
     {
         tilemap.CompressBounds();
         if (!tilemap.TryGetComponent(out TilemapCollider2D tc)) return;
@@ -443,7 +443,7 @@ public static class LevelKit
         foreach (GameObject go in doomed) if (go) Object.DestroyImmediate(go);
     }
 
-    static Tilemap FindGroundTilemap(Scene scene)
+    public static Tilemap FindGroundTilemap(Scene scene)
     {
         int ground = LayerMask.NameToLayer("Ground");
         Tilemap first = null;
@@ -456,7 +456,7 @@ public static class LevelKit
         return first;
     }
 
-    static TileBase FirstTile(Tilemap tilemap)
+    public static TileBase FirstTile(Tilemap tilemap)
     {
         foreach (TileBase t in tilemap.GetTilesBlock(tilemap.cellBounds))
             if (t) return t;

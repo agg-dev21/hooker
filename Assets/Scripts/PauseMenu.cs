@@ -106,7 +106,7 @@ public class PauseMenu : MonoBehaviour
         label.text = controller ? "Press a button..." : "Press a key...";
         hint.text = controller
             ? "Press the new controller button for " + GameInput.ActionName(action) + " (wait 5 s to cancel)"
-            : "Press the new key for " + GameInput.ActionName(action) + " (Esc to cancel)";
+            : "Press the new key or extra mouse button for " + GameInput.ActionName(action) + " (Esc to cancel)";
 
         yield return null;
         yield return WaitForRelease(); // ignore the press that opened this
@@ -151,6 +151,11 @@ public class PauseMenu : MonoBehaviour
     {
         if (Keyboard.current != null && Keyboard.current.anyKey.isPressed) return true;
         if (Mouse.current != null && Mouse.current.leftButton.isPressed) return true;
+        foreach (Key mk in GameInput.MouseKeys)
+        {
+            var mb = GameInput.MouseButton(mk);
+            if (mb != null && mb.isPressed) return true;
+        }
         Gamepad gp = Gamepad.current;
         if (gp != null)
             foreach (GamepadButton b in GameInput.BindablePadButtons)
@@ -160,6 +165,12 @@ public class PauseMenu : MonoBehaviour
 
     static Key PressedKey()
     {
+        // Extra mouse buttons (middle, Mouse 4, Mouse 5) count as keys too
+        foreach (Key mk in GameInput.MouseKeys)
+        {
+            var mb = GameInput.MouseButton(mk);
+            if (mb != null && mb.wasPressedThisFrame) return mk;
+        }
         Keyboard kb = Keyboard.current;
         if (kb == null) return Key.None;
         foreach (KeyControl k in kb.allKeys)

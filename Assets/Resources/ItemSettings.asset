@@ -12,3 +12,44 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d6b4f98b39044949f43057eb9cfdb97, type: 3}
   m_Name: ItemSettings
   m_EditorClassIdentifier: Assembly-CSharp::ItemSettings
+  shieldAmount: 40
+  shieldDuration: 15
+  poisonResistance: 0.75
+  poisonResistanceDuration: 20
+  curesPoisonOnUse: 1
+  healAmount: 40
+  reviveHealth: 50
+  reviveInvulnerable: 2
+  flyDuration: 6
+  flyUpSpeed: 9
+  flyFallSpeed: 2
+  moveSpeedMultiplier: 1.4
+  attackSpeedMultiplier: 1.5
+  speedDuration: 10
+  invulnerableDuration: 4
+  maxStack: 9
+  looks:
+  - name: Shield
+    color: {r: 0.35, g: 0.65, b: 1, a: 1}
+    icon: {fileID: 21300000, guid: ea693754b7891574ba0ab7251590e89d, type: 3}
+  - name: Poison Resist
+    color: {r: 0.45, g: 0.9, b: 0.3, a: 1}
+    icon: {fileID: 21300000, guid: b2186661f3e3166478064ac972c4507c, type: 3}
+  - name: Healing
+    color: {r: 0.95, g: 0.25, b: 0.3, a: 1}
+    icon: {fileID: 21300000, guid: 68514be4e68ca2847b1cf82034691d6c, type: 3}
+  - name: Instant Revival
+    color: {r: 1, g: 0.85, b: 0.3, a: 1}
+    icon: {fileID: 21300000, guid: 13672eed4a36df443b599b7e2e15e7ff, type: 3}
+  - name: Flying
+    color: {r: 0.75, g: 0.9, b: 1, a: 1}
+    icon: {fileID: 21300000, guid: f3edaf7fffecc29459fd2ce2229d2fdd, type: 3}
+  - name: Scroll
+    color: {r: 0.9, g: 0.8, b: 0.6, a: 1}
+    icon: {fileID: 21300000, guid: bd81bf37ba5a43143b35f7b868f2f7bc, type: 3}
+  - name: Speed Boost
+    color: {r: 1, g: 0.6, b: 0.15, a: 1}
+    icon: {fileID: 0}
+  - name: Invulnerable
+    color: {r: 0.85, g: 0.5, b: 1, a: 1}
+    icon: {fileID: 21300000, guid: b7447d768b234794cbcca6fdf325c2ef, type: 3}

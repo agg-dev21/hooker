@@ -67,6 +67,12 @@ public class PlayerItems : MonoBehaviour
         if (instance) instance.ShowToast(message);
     }
 
+    // Longer message, shown for this many seconds (new powers)
+    public static void Toast(string message, float seconds)
+    {
+        if (instance) instance.ShowToast(message, seconds);
+    }
+
     // ---------------- Setup ----------------
 
     void Awake()
@@ -142,7 +148,7 @@ public class PlayerItems : MonoBehaviour
         Keyboard kb = Keyboard.current;
         if (kb != null)
             for (int i = 0; i < Mathf.Min(count, 9); i++)
-                if (kb[(Key)((int)Key.Digit1 + i)].wasPressedThisFrame) { selected = i; RefreshBar(); }
+                if (kb[(Key)((int)Key.Digit1 + i)].wasPressedThisFrame) { selected = i; RefreshBar(); ShowSelectedName(); }
 
         if (GameInput.NextItemPressed) { OpenInventory(); return; }
         if (GameInput.UseItemPressed) Use(selected);
@@ -155,6 +161,17 @@ public class PlayerItems : MonoBehaviour
         inventoryOpen = true;
         Time.timeScale = 0f;
         RefreshBar();
+        ShowSelectedName();
+    }
+
+    // Pops up the name of the picked item (and how many) in the middle of the screen
+    void ShowSelectedName()
+    {
+        IReadOnlyList<Inventory.Entry> list = Inventory.Entries;
+        if (selected < 0 || selected >= list.Count) return;
+        Inventory.Entry e = list[selected];
+        string itemName = e.type == ItemType.Scroll && !string.IsNullOrEmpty(e.title) ? e.title : S.Look(e.type).name;
+        ShowToast(e.count > 1 ? itemName + "  x" + e.count : itemName, 1.5f);
     }
 
     void CloseInventory()
@@ -174,9 +191,9 @@ public class PlayerItems : MonoBehaviour
         Keyboard kb = Keyboard.current;
         if (kb != null)
             for (int i = 0; i < Mathf.Min(count, 9); i++)
-                if (kb[(Key)((int)Key.Digit1 + i)].wasPressedThisFrame) { selected = i; RefreshBar(); }
+                if (kb[(Key)((int)Key.Digit1 + i)].wasPressedThisFrame) { selected = i; RefreshBar(); ShowSelectedName(); }
 
-        if (GameInput.NextItemPressed) { selected = (selected + 1) % count; RefreshBar(); }
+        if (GameInput.NextItemPressed) { selected = (selected + 1) % count; RefreshBar(); ShowSelectedName(); }
         if (GameInput.UseItemPressed)
         {
             CloseInventory();
@@ -286,11 +303,11 @@ public class PlayerItems : MonoBehaviour
 
     // ---------------- UI ----------------
 
-    void ShowToast(string message)
+    void ShowToast(string message, float seconds = 2f)
     {
         toastText.text = message;
         toastText.alpha = 1f;
-        toastTimer = 2f;
+        toastTimer = seconds;
     }
 
     void ShowEffects()
@@ -404,7 +421,7 @@ public class PlayerItems : MonoBehaviour
         toastText = Label("Toast", uiRoot.transform, "", 36f, Vector2.zero);
         var trt = toastText.rectTransform;
         trt.anchorMin = trt.anchorMax = new Vector2(0.5f, 0.72f);
-        trt.sizeDelta = new Vector2(900f, 60f);
+        trt.sizeDelta = new Vector2(1400f, 160f); // room for two lines (new power messages)
         toastText.alpha = 0f;
 
         // Scroll reader: dim the screen, parchment panel in the middle

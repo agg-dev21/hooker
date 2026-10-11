@@ -17,8 +17,9 @@ public static class OctopusBossBuilder
 {
     const string SceneName = "Level_3_Boss";
     const string NextScene = "Level_4";
-    const int BossHealth = 450;
-    const int LizardHealth = 220; // less than in Level 2, because he isn't alone here
+    const int BossHealth = 600; // tougher than Hardy (see Tools > Make Level 3 Boss Harder)
+    const int LizardHealth = 320;
+    public const float SirenLift = 7f; // Madame O sits this high above the floor, on a ledge in the top-left
 
     static readonly Color StoneColor = new Color(0.3f, 0.38f, 0.45f);
     static readonly Color AbyssColor = new Color(0.04f, 0.05f, 0.11f);
@@ -44,7 +45,8 @@ public static class OctopusBossBuilder
         Fill(-3, 0, 3, 18);
         Fill(34, 0, 7, 18);
         Fill(34, 0, 6, 4, false);
-        Fill(0, 0, 6, 2); // her throne (top at y 2)
+        Fill(0, (int)SirenLift, 6, 2); // her throne: a high ledge in the top-left (top at y 9)
+        OneWayAt("SirenLedge", props, new Vector2(8f, SirenLift + 2.25f), 4f, OneWayColor); // climb up here to slash her
 
         // Low side ledges (top at y 3.5, like the dungeon): safe from both lashes; the lizard's ledge dash runs along them
         OneWayAt("SideLedge_Left", props, new Vector2(9f, 3.25f), 4f, OneWayColor);
@@ -64,6 +66,7 @@ public static class OctopusBossBuilder
         BuildDecor(decor);
         SetGlobalLight(scene, 0.45f, new Color(0.55f, 0.6f, 0.95f));
         Health siren = BuildSiren(root);
+        RaiseSiren(siren.transform, root);
         Health lizard = BuildLizard(root);
 
         // The exit opens only when both are dead
@@ -79,7 +82,7 @@ public static class OctopusBossBuilder
         SetUpCamera(player, 9f, new Vector2(-1f, -1f), new Vector2(41f, 19f));
 
         Finish(scene, SceneName, "Done! " + SceneName + " is built, open, and in the Scene List.\n\n" +
-            "Beat the Chain Siren AND the lizard to open the gate. The door behind it loads '" + NextScene + "'.");
+            "Beat Madame O AND Oscar to open the gate. The door behind it loads '" + NextScene + "'.");
     }
 
     static Health BuildSiren(Transform parent)
@@ -113,7 +116,7 @@ public static class OctopusBossBuilder
         hands.SetParent(body.transform, false);
         hands.position = new Vector2(5.2f, 5.6f);
 
-        GameObject bar = BossBar(body.GetComponent<Health>(), "THE CHAIN SIREN", new Color(0.55f, 0.25f, 0.75f));
+        GameObject bar = BossBar(body.GetComponent<Health>(), "MADAME O", new Color(0.55f, 0.25f, 0.75f));
 
         var so = new SerializedObject(body.AddComponent<OctopusBoss>());
         so.FindProperty("groundY").floatValue = 0f;
@@ -124,7 +127,7 @@ public static class OctopusBossBuilder
         so.FindProperty("hands").objectReferenceValue = hands;
         so.FindProperty("boxSprite").objectReferenceValue = BoxSprite;
         so.FindProperty("healthBarRoot").objectReferenceValue = bar;
-        so.FindProperty("restTime").floatValue = 1.2f; // a bit slower: she shares the fight with the lizard
+        so.FindProperty("restTime").floatValue = 0.6f;
         SerializedProperty partsProp = so.FindProperty("bodyParts");
         partsProp.arraySize = parts.Count;
         for (int i = 0; i < parts.Count; i++) partsProp.GetArrayElementAtIndex(i).objectReferenceValue = parts[i];
@@ -132,10 +135,54 @@ public static class OctopusBossBuilder
         return body.GetComponent<Health>();
     }
 
+    // Lifts Madame O (her body and her drawing) up onto the high throne
+    static void RaiseSiren(Transform body, Transform root)
+    {
+        body.position += Vector3.up * SirenLift;
+        Transform look = root.Find("ChainSiren_Look");
+        if (look) look.position += Vector3.up * SirenLift;
+    }
+
+    // Existing Level_3_Boss: moves Madame O up onto a high throne without rebuilding the room
+    // (keeps everything else, like Oscar's art). Running it twice does nothing the second time.
+    [MenuItem("Tools/Raise Madame O (Level 3 Boss)")]
+    static void RaiseInExistingScene()
+    {
+        string path = ScenesFolder + "/" + SceneName + ".unity";
+        if (!System.IO.File.Exists(path) || !UnityEditor.SceneManagement.EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
+        Scene scene = UnityEditor.SceneManagement.EditorSceneManager.OpenScene(path, UnityEditor.SceneManagement.OpenSceneMode.Single);
+        OctopusBoss siren = Object.FindAnyObjectByType<OctopusBoss>(FindObjectsInactive.Include);
+        if (!siren) { EditorUtility.DisplayDialog("Raise Madame O", "Madame O isn't in Level_3_Boss.", "OK"); return; }
+        if (siren.transform.position.y > SirenLift) { EditorUtility.DisplayDialog("Raise Madame O", "She is already up high.", "OK"); return; }
+
+        Map = FindGroundTilemap(scene);
+        Tile = FirstTile(Map);
+        BoxSprite = AssetDatabase.LoadAssetAtPath<UnityEngine.Tilemaps.Tile>("Assets/Tiles/Square.asset")?.sprite;
+        GroundLayer = LayerMask.NameToLayer("Ground");
+
+        Transform root = siren.transform.parent;
+        Fill(0, 0, 6, 2, false);                       // old low throne
+        Fill(0, (int)SirenLift, 6, 2);                 // new high throne
+        RebuildColliders(Map);
+        var solid = new GameObject("HighThroneSolid"); // its own collider, in case the tilemap's merged one doesn't update
+        solid.transform.SetParent(root);
+        solid.transform.position = new Vector3(3f, SirenLift + 1f, 0f);
+        solid.layer = GroundLayer;
+        solid.AddComponent<BoxCollider2D>().size = new Vector2(6f, 2f);
+        Transform props = root ? root.Find("Props") : null;
+        OneWayAt("SirenLedge", props ? props : root, new Vector2(8f, SirenLift + 2.25f), 4f, OneWayColor);
+        RaiseSiren(siren.transform, root);
+
+        UnityEditor.SceneManagement.EditorSceneManager.MarkSceneDirty(scene);
+        UnityEditor.SceneManagement.EditorSceneManager.SaveScene(scene);
+        Selection.activeGameObject = siren.gameObject;
+        EditorUtility.DisplayDialog("Raise Madame O", "Madame O now attacks from a high throne in the top-left.\nA thin ledge next to her lets you climb up and slash her.", "OK");
+    }
+
     // The Level 2 lizard (same script, same moves), kept out of the throne area
     static Health BuildLizard(Transform parent)
     {
-        Vector2 size = new Vector2(4f, 2.8f);
+        Vector2 size = new Vector2(5.9f, 4.1f); // same as Tools > Set Up Lizard Art (drawn at 60 pixels per tile)
         GameObject lizard = Box("Lizard", parent, new Vector2(20f, size.y * 0.5f), size, new Color(0.25f, 0.65f, 0.15f));
         lizard.GetComponent<SpriteRenderer>().sortingOrder = 5;
         foreach (float ex in new[] { -0.2f, 0.2f }) // placeholder eyes (hidden when the drawing is on)
@@ -145,15 +192,15 @@ public static class OctopusBossBuilder
             eye.transform.localScale = new Vector3(0.12f, 0.15f, 1f);
         }
         AddHealth(lizard, LizardHealth);
-        GameObject bar = BossBar(lizard.GetComponent<Health>(), "THE LIZARD", new Color(0.35f, 0.85f, 0.15f), -95f);
+        GameObject bar = BossBar(lizard.GetComponent<Health>(), "OSCAR", new Color(0.35f, 0.85f, 0.15f), -95f);
 
         var so = new SerializedObject(lizard.AddComponent<PoisonBoss>());
         so.FindProperty("groundY").floatValue = 0f;
         so.FindProperty("ceilingY").floatValue = 17.5f;
         so.FindProperty("arenaMinX").floatValue = 6.5f; // never runs into the throne
         so.FindProperty("arenaMaxX").floatValue = 34f;
-        so.FindProperty("startDelay").floatValue = 3.5f; // the Siren opens the fight, then he joins in
-        so.FindProperty("restTime").floatValue = 1.5f;
+        so.FindProperty("startDelay").floatValue = 2f; // Madame O opens the fight, then he joins in
+        so.FindProperty("restTime").floatValue = 0.8f;
         so.FindProperty("spitPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>("Assets/Prefabs/Projectile.prefab");
         so.FindProperty("healthBarRoot").objectReferenceValue = bar;
         so.FindProperty("ledgeTopY").floatValue = 3.5f; // the two side ledges

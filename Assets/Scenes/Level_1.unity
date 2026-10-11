@@ -7074,7 +7074,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &79611540
 Transform:
   m_ObjectHideFlags: 0
@@ -16030,7 +16030,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &182856292
 Transform:
   m_ObjectHideFlags: 0
@@ -17528,7 +17528,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &191314703
 Transform:
   m_ObjectHideFlags: 0
@@ -43945,6 +43945,7 @@ MonoBehaviour:
   floorHeight: 15
   firstFloorCenterY: 0.5
   zones: []
+  zoomSpeed: 6
 --- !u!1 &520322107
 GameObject:
   m_ObjectHideFlags: 0
@@ -52336,7 +52337,7 @@ MonoBehaviour:
     rid: 7848858482183241728
   m_FalloffIntensity: 0.5
   m_Color: {r: 0.72, g: 0.66, b: 0.88, a: 1}
-  m_Intensity: 0.42
+  m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000i
@@ -55201,7 +55202,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &656847289
 Transform:
   m_ObjectHideFlags: 0
@@ -63263,7 +63264,7 @@ MonoBehaviour:
   item: 0
   amount: 1
   scrollTitle: A torn note
-  scrollText: "Write the hint about the mother here."
+  scrollText: Write the hint about the mother here.
   givesBonus: 0
   bonusItem: 2
   bonusAmount: 1
@@ -65319,7 +65320,7 @@ MonoBehaviour:
   item: 2
   amount: 2
   scrollTitle: A torn note
-  scrollText: "Write the hint about the mother here."
+  scrollText: Write the hint about the mother here.
   givesBonus: 0
   bonusItem: 2
   bonusAmount: 1
@@ -120261,7 +120262,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1253124347
 Transform:
   m_ObjectHideFlags: 0
@@ -130571,6 +130572,10 @@ MonoBehaviour:
   hookCooldown: 0.6
   pullSpeed: 31.5
   pullStopDistance: 1.2
+  poisonHookDamage: 2
+  poisonHookDuration: 4
+  poisonHookTickInterval: 0.5
+  poisonHookColor: {r: 0.4, g: 0.95, b: 0.2, a: 1}
   groundLayer:
     serializedVersion: 2
     m_Bits: 0
@@ -132279,9 +132284,9 @@ MonoBehaviour:
   item: 5
   amount: 1
   scrollTitle: A Torn Note
-  scrollText: "...the woman in the blue coat was taken aboard a black-sailed ship heading east.
+  scrollText: '...the woman in the blue coat was taken aboard a black-sailed ship heading east.
 
-(Type the real hint about the mother here, in the chest's Inspector.)"
+    (Type the real hint about the mother here, in the chest''s Inspector.)'
   givesBonus: 0
   bonusItem: 2
   bonusAmount: 1
@@ -134239,7 +134244,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1414552101
 Transform:
   m_ObjectHideFlags: 0
@@ -159400,7 +159405,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1755340247
 Transform:
   m_ObjectHideFlags: 0
@@ -161844,7 +161849,7 @@ MonoBehaviour:
   item: 3
   amount: 1
   scrollTitle: A torn note
-  scrollText: "Write the hint about the mother here."
+  scrollText: Write the hint about the mother here.
   givesBonus: 0
   bonusItem: 2
   bonusAmount: 1
@@ -190021,7 +190026,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &2111782281
 Transform:
   m_ObjectHideFlags: 0

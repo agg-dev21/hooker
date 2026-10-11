@@ -1,0 +1,57 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d2c3d12e83a4300bf7e513468e15bfb, type: 3}
+  m_Name: CompanionSettings
+  m_EditorClassIdentifier: Assembly-CSharp::CompanionSettings
+  followDistance: 1.6
+  followHeight: 0.4
+  followSmoothTime: 0.25
+  bobHeight: 0.15
+  bobSpeed: 2
+  dangerRadius: 12
+  safeTimeToReturn: 1.2
+  fadeTime: 0.4
+  cooldown: 10
+  chargeTime: 0.35
+  beamLength: 18
+  strikeDistance: 6
+  beamThickness: 3
+  beamHeight: 10
+  beamDamage: 25
+  beamShowTime: 0.35
+  beamFps: 14
+  beamHitFrame: 4
+  idleFrames:
+  - {fileID: -3410520495929146326, guid: 10aa309489f015a428bf556c42af7b8c, type: 3}
+  - {fileID: 5662674913346694691, guid: 10aa309489f015a428bf556c42af7b8c, type: 3}
+  idleFps: 3
+  appearFrames:
+  - {fileID: -1908451260357289910, guid: 0a8c4c516cb4a4d4180d602c37209dac, type: 3}
+  - {fileID: 2800038237864527144, guid: 0a8c4c516cb4a4d4180d602c37209dac, type: 3}
+  - {fileID: -3412599406747046257, guid: 0a8c4c516cb4a4d4180d602c37209dac, type: 3}
+  - {fileID: 2664161702771538796, guid: 0a8c4c516cb4a4d4180d602c37209dac, type: 3}
+  - {fileID: 4225031739817099528, guid: 0a8c4c516cb4a4d4180d602c37209dac, type: 3}
+  appearFps: 14
+  beamFrames:
+  - {fileID: -7506221323943370081, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: -3280526457111695861, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: 6838289762099019969, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: -7572703043414234707, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: -1376096019320089630, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: 5182252717004917051, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: 3512103342212547261, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  - {fileID: -5718287987157518019, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
+  size: {x: 0.8, y: 1.6}
+  color: {r: 1, g: 0.92, b: 0.65, a: 1}
+  beamColor: {r: 1, g: 0.97, b: 0.75, a: 0.9}
+  glowColor: {r: 1, g: 0.9, b: 0.6, a: 1}
+  sprite: {fileID: 0}

@@ -2,18 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// Madame O (the Level 3 boss) has TWO attacks (the older ones below are switched off with Use Old Attacks):
+//   A) Chain Bind  - a red mark follows you, then locks; chains burst out of the ground there. Caught = damage and
+//                    you can't move for Grab Hold Time (3 s), and Oscar vomits at you. Dash away to dodge.
+//   B) Chain Throw - she throws chains straight at you (3 at once in phase 2).
 // The Level 3 boss: the Chain Siren, half woman, half octopus. She never moves: she sits on her throne
 // on the left side of the arena and attacks with iron chains. Every attack is telegraphed (red warning lines).
 //   1) Low Lash   - a chain sweeps along the floor across the whole arena: JUMP over it.
 //   2) High Lash  - a chain sweeps at head height + 1: stay on the ground (don't jump into it).
 //   3) Chain Rain - chains slam down from the ceiling where the red marks are.
-//   4) Chain Grab - a chain shoots straight at you. Hit = damage and you get yanked toward her. Dash or hook away.
+//   4) Chain Grab - a chain shoots straight at you. Hit = damage, you get yanked toward her, then you can't
+//                   move for Grab Hold Time (3 s). If the lizard is in the fight, he vomits right at you. Dash to dodge it.
+// Beating her unlocks Siren's Chain for the player (PlayerChain).
 //   5) Anchor     - she throws an anchor that lands on you with a shockwave.
 // Phase 2 (below half health): everything is faster, lashes come in pairs, more chains rain, two grabs in a row.
 // Touching her tentacles hurts. If the player dies she heals fully and the fight starts over.
 // She can fight together with the lizard (PoisonBoss): they take turns attacking (BossTurns).
 [RequireComponent(typeof(Health))]
-public class OctopusBoss : MonoBehaviour
+public class OctopusBoss : MonoBehaviour, IChainStunnable
 {
     [Header("Arena")]
     [SerializeField] float groundY = 0f;      // top of the floor
@@ -48,6 +54,33 @@ public class OctopusBoss : MonoBehaviour
     [SerializeField] float grabRange = 32f;
     [SerializeField] int grabDamage = 10;
     [SerializeField] float grabPull = 16f;     // how hard you get yanked toward her
+    [SerializeField] float grabPullTime = 0.3f; // the yank lasts this long, then you are held in place
+    [SerializeField] float grabHoldTime = 3f;   // how long you can't move
+    [SerializeField] bool lizardVomitsOnGrab = true; // the lizard vomits at you while you are held
+
+    [Header("Madame O's two attacks")]
+    [SerializeField] bool useOldAttacks = false;   // ON = also lashes, chain rain, grab and anchor
+    [SerializeField] float bindWarnTime = 0.9f;    // the mark follows you this long...
+    [SerializeField] float bindLockTime = 0.35f;   // ...then stays put this long before the chains burst out
+    [SerializeField] float bindRadius = 1.6f;      // how close to the mark you get caught
+    [SerializeField] int bindDamage = 12;
+    [SerializeField] float bindFps = 12f;
+    [SerializeField] int bindHitFrame = 3;          // frame of the bind animation where the chains catch you
+    [SerializeField] int throwChains = 1;           // chains per throw (phase 2: 3)
+    [SerializeField] float throwSpread = 14f;       // angle between chains
+    [SerializeField] float throwSpeed = 18f;
+    [SerializeField] int throwDamage = 12;
+    [SerializeField] float throwWarnTime = 0.45f;
+
+    [Header("Art (filled by Tools > Set Up Madame O Art)")]
+    [SerializeField] SpriteRenderer artRenderer;    // child that shows her (the body box stays for hits)
+    [SerializeField] bool artFacesRight = false;    // her drawing throws to the left
+    [SerializeField] Sprite[] idleFrames;
+    [SerializeField] float idleFps = 8f;
+    [SerializeField] Sprite[] attackFrames;
+    [SerializeField] float attackFps = 14f;
+    [SerializeField] Sprite[] bindFrames;           // chains bursting out of the ground (pivot at the bottom)
+    [SerializeField] Sprite chainSprite;            // one thrown chain (drawn standing up)
 
     [Header("Anchor")]
     [SerializeField] float anchorAirTime = 1.1f;
@@ -79,7 +112,11 @@ public class OctopusBoss : MonoBehaviour
     Color[] partColors;
     readonly List<GameObject> spawned = new List<GameObject>();
 
-    float Speed => phase2 ? phase2SpeedUp : 1f;
+    float Speed => (phase2 ? phase2SpeedUp : 1f) * SlowFactor;
+    // Player's Siren's Chain: stunned, then slower for a while (see ChainStun)
+    float slowUntil, slowFactor = 1f, resumeDelay = -1f;
+    float SlowFactor => Time.time < slowUntil ? slowFactor : 1f;
+
     Vector2 HandPos => hands ? (Vector2)hands.position : (Vector2)transform.position;
 
     void Awake()
@@ -111,8 +148,19 @@ public class OctopusBoss : MonoBehaviour
     void OnEnable()  => PlayerRespawn.Respawned += ResetFight;
     void OnDisable() { PlayerRespawn.Respawned -= ResetFight; BossTurns.End(this); }
 
+    float animTime, attackPoseUntil;
+
     void Update()
     {
+        if (artRenderer && idleFrames != null && idleFrames.Length > 0)
+        {
+            animTime += Time.deltaTime;
+            bool attacking = Time.time < attackPoseUntil && attackFrames != null && attackFrames.Length > 0;
+            artRenderer.sprite = attacking
+                ? attackFrames[Mathf.Min(attackFrames.Length - 1, Mathf.FloorToInt(animTime * attackFps))]
+                : idleFrames[Mathf.FloorToInt(animTime * idleFps) % idleFrames.Length];
+            if (player) artRenderer.flipX = (player.position.x > transform.position.x) == artFacesRight ? false : true;
+        }
         if (!phase2 && health.CurrentHealth > 0 && health.CurrentHealth <= health.MaxHealth * phase2At)
         {
             phase2 = true;
@@ -124,7 +172,8 @@ public class OctopusBoss : MonoBehaviour
 
     IEnumerator FightLoop()
     {
-        yield return new WaitForSeconds(startDelay);
+        yield return new WaitForSeconds(resumeDelay >= 0f ? resumeDelay : startDelay); // after a chain stun: only the stun
+        resumeDelay = -1f;
         while (true)
         {
             if (!player) { yield return null; continue; }
@@ -134,11 +183,14 @@ public class OctopusBoss : MonoBehaviour
             BossTurns.Begin(this);
 
             int attack;
-            do attack = Random.Range(0, 5); while (attack == lastAttack);
+            if (useOldAttacks) { do attack = Random.Range(0, 7); while (attack == lastAttack); }
+            else { do attack = Random.Range(5, 7); while (attack == lastAttack && Random.value < 0.6f); } // mostly alternates
             lastAttack = attack;
 
             switch (attack)
             {
+                case 5: yield return Bind(); break;
+                case 6: yield return Throw(); break;
                 case 0: yield return Lash(lowLashY); if (phase2) yield return Lash(highLashY); break;
                 case 1: yield return Lash(highLashY); if (phase2) yield return Lash(lowLashY); break;
                 case 2: yield return ChainRain(); break;
@@ -254,6 +306,16 @@ public class OctopusBoss : MonoBehaviour
             if (Physics2D.OverlapPoint(tip, LayerMask.GetMask("Ground"))) break; // hit a wall
             yield return null;
         }
+
+        if (caught && player)
+        {
+            // After the yank: held in place, and the lizard gets a free shot
+            yield return new WaitForSeconds(grabPullTime);
+            if (player.TryGetComponent(out PlayerController2D pc)) pc.Root(grabHoldTime);
+            if (lizardVomitsOnGrab)
+                foreach (PoisonBoss lizard in FindObjectsByType<PoisonBoss>(FindObjectsSortMode.None))
+                    lizard.VomitAt(player.position);
+        }
         yield return chain.Retract(30f);
     }
 
@@ -290,6 +352,118 @@ public class OctopusBoss : MonoBehaviour
                 hit.attachedRigidbody.linearVelocity = new Vector2(Mathf.Sign(hit.transform.position.x - landX), 0.8f) * 12f;
             break;
         }
+    }
+
+    // ---------------- A) Chain Bind ----------------
+
+    IEnumerator Bind()
+    {
+        PlayAttackPose();
+        // A red mark on the floor follows the player, then locks
+        float FloorUnder(float x)
+        {
+            RaycastHit2D hit = Physics2D.Raycast(new Vector2(x, player.position.y + 0.5f), Vector2.down, 30f, LayerMask.GetMask("Ground"));
+            return hit ? hit.point.y : groundY;
+        }
+        Vector2 spot = new Vector2(player.position.x, FloorUnder(player.position.x));
+        GameObject mark = Bar(spot - Vector2.right * bindRadius, Vector2.right, bindRadius * 2f, 0.3f, warnColor, false);
+        for (float t = 0f; t < bindWarnTime / Speed; t += Time.deltaTime)
+        {
+            spot = new Vector2(player.position.x, FloorUnder(player.position.x));
+            mark.transform.position = spot - Vector2.right * bindRadius;
+            FlashParts(Mathf.PingPong(t * 8f, 1f) > 0.5f);
+            yield return null;
+        }
+        FlashParts(false);
+        yield return new WaitForSeconds(bindLockTime / Speed);
+        Destroy(mark);
+
+        // Chains burst out of the ground
+        GameObject fx = null;
+        SpriteRenderer fsr = null;
+        if (bindFrames != null && bindFrames.Length > 0)
+        {
+            fx = new GameObject("ChainBind");
+            fx.transform.position = spot;
+            fsr = fx.AddComponent<SpriteRenderer>();
+            fsr.sortingOrder = 9;
+            spawned.Add(fx);
+        }
+        int frames = fsr ? bindFrames.Length : 1;
+        for (int f = 0; f < frames; f++)
+        {
+            if (fsr) fsr.sprite = bindFrames[f];
+            if (f == Mathf.Min(bindHitFrame, frames - 1)) TryBind(spot);
+            yield return new WaitForSeconds(1f / bindFps);
+        }
+        if (fx) { spawned.Remove(fx); Destroy(fx, 0.3f); }
+    }
+
+    // Caught inside the burst (and not dashing): damage, held in place, Oscar gets his shot
+    void TryBind(Vector2 spot)
+    {
+        if (!player || Mathf.Abs(player.position.x - spot.x) > bindRadius || player.position.y - spot.y > 3f) return;
+        if (!player.TryGetComponent(out Health h) || h.IsInvincible) return;
+        h.TakeDamage(bindDamage);
+        if (player.TryGetComponent(out PlayerController2D pc)) pc.Root(grabHoldTime);
+        if (lizardVomitsOnGrab)
+            foreach (PoisonBoss lizard in FindObjectsByType<PoisonBoss>(FindObjectsSortMode.None))
+                lizard.VomitAt(player.position);
+    }
+
+    // ---------------- B) Chain Throw ----------------
+
+    IEnumerator Throw()
+    {
+        yield return Flash(throwWarnTime / Speed);
+        PlayAttackPose();
+        yield return new WaitForSeconds(0.15f);
+        int count = phase2 ? Mathf.Max(3, throwChains) : throwChains;
+        Vector2 from = HandPos;
+        Vector2 aim = ((Vector2)player.position - from).normalized;
+        for (int i = 0; i < count; i++)
+        {
+            float angle = (i - (count - 1) * 0.5f) * throwSpread;
+            StartCoroutine(FlyingChain(from, Quaternion.Euler(0f, 0f, angle) * aim));
+        }
+        yield return new WaitForSeconds(0.4f);
+    }
+
+    IEnumerator FlyingChain(Vector2 from, Vector2 dir)
+    {
+        var go = new GameObject("ThrownChain");
+        go.transform.position = from;
+        var sr = go.AddComponent<SpriteRenderer>();
+        sr.sortingOrder = 8;
+        if (chainSprite) sr.sprite = chainSprite;
+        else { sr.sprite = boxSprite; sr.color = chainColor; go.transform.localScale = new Vector3(0.25f, 1.6f, 1f); }
+        go.transform.up = dir; // the chain is drawn standing up: point it where it flies
+        spawned.Add(go);
+
+        int ground = LayerMask.GetMask("Ground");
+        for (float t = 0f; t < 4f && go; t += Time.deltaTime)
+        {
+            Vector2 p = (Vector2)go.transform.position + dir * throwSpeed * Speed * Time.deltaTime;
+            go.transform.position = p;
+            if (Physics2D.OverlapPoint(p, ground)) break; // hit a wall or the floor
+            if (player && Vector2.Distance(p, player.position) < 0.9f)
+            {
+                if (player.TryGetComponent(out Health h) && !h.IsInvincible)
+                {
+                    h.TakeDamage(throwDamage);
+                    if (playerRb) playerRb.linearVelocity = dir * 8f + Vector2.up * 3f;
+                }
+                break;
+            }
+            yield return null;
+        }
+        if (go) { spawned.Remove(go); Destroy(go); }
+    }
+
+    void PlayAttackPose()
+    {
+        animTime = 0f;
+        attackPoseUntil = Time.time + (attackFrames != null ? attackFrames.Length / Mathf.Max(attackFps, 0.01f) : 0f);
     }
 
     // ---------------- Helpers ----------------
@@ -395,8 +569,24 @@ public class OctopusBoss : MonoBehaviour
 
     // ---------------- Reset and death ----------------
 
+
+    // The player's Siren's Chain hit him: he stops what he is doing for stunTime, then is slower for slowTime
+    public void ChainStun(float stunTime, float slowMultiplier, float slowTime)
+    {
+        if (!health || health.CurrentHealth <= 0) return;
+        slowFactor = Mathf.Clamp(slowMultiplier, 0.05f, 1f);
+        slowUntil = Time.time + stunTime + slowTime;
+        StopAllCoroutines();
+        BossTurns.End(this);
+        ClearSpawned();
+        FlashParts(false);
+        resumeDelay = stunTime;
+        StartCoroutine(FightLoop());
+    }
+
     void ResetFight()
     {
+        if (player && player.TryGetComponent(out PlayerController2D pc)) pc.Unroot();
         BossTurns.End(this);
         if (!health || health.CurrentHealth <= 0) return;
         StopAllCoroutines();
@@ -411,6 +601,8 @@ public class OctopusBoss : MonoBehaviour
 
     void OnDied()
     {
+        PlayerChain.UnlockSirenChain(); // the player gets her chain
+        if (player && player.TryGetComponent(out PlayerController2D pc)) pc.Unroot();
         BossTurns.End(this);
         StopAllCoroutines();
         ClearSpawned();

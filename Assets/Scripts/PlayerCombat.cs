@@ -59,6 +59,10 @@ public class PlayerCombat : MonoBehaviour
 
     int Facing => controller ? controller.FacingDirection : 1;
     public float AttackSpeedMultiplier { get; set; } = 1f; // items (speed boost) change this
+    public float LastPunchTime { get; private set; } = -99f; // for the player's animation (PlayerArt)
+    public float LastHookTime { get; private set; } = -99f;
+    public Vector2 LastAttackDir { get; private set; } = Vector2.right;
+    public bool HookOut => hookOut;
 
     void Awake()
     {
@@ -79,11 +83,12 @@ public class PlayerCombat : MonoBehaviour
     void Update()
     {
         if (Time.timeScale == 0f) return; // game paused
+        if (Companion.IsAiming) return;   // aiming Ariel's light: clicks are for her
 
         punchTimer -= Time.deltaTime * AttackSpeedMultiplier; // speed boost: attacks recharge faster
         hookTimer -= Time.deltaTime * AttackSpeedMultiplier;
 
-        bool canHook = hookTimer <= 0f && !hookOut;
+        bool canHook = hookTimer <= 0f && !hookOut && !(controller && controller.IsRooted); // no hooking while chained
 
         // Controller hook (RB / RT): fires right away toward the stick (or straight ahead)
         if (canHook && GameInput.HookPadPressed)
@@ -212,6 +217,8 @@ public class PlayerCombat : MonoBehaviour
     void Punch(Vector2 dir) // dir comes from the mouse or the arrow keys
     {
         punchTimer = punchCooldown;
+        LastPunchTime = Time.time;
+        LastAttackDir = dir;
         HashSet<Health> alreadyHit = new HashSet<Health>(); // hit each enemy only once per punch
 
         Vector2 punchCenter = (Vector2)transform.position + dir * punchDistance;
@@ -236,6 +243,8 @@ public class PlayerCombat : MonoBehaviour
     IEnumerator Hook(Vector2 dir) // dir comes from the mouse or the arrow keys
     {
         hookOut = true;
+        LastHookTime = Time.time;
+        LastAttackDir = dir;
         hookTimer = hookCooldown;
         Vector2 tip = transform.position;
         float traveled = 0f;

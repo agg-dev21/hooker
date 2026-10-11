@@ -51,6 +51,7 @@ public class PlayerController2D : MonoBehaviour
     readonly List<Collider2D> passedThrough = new List<Collider2D>(); // enemies we are currently allowed to pass through
     float dashTimer;
     float dashCooldownTimer;
+    float rootTimer;     // chained: can't move, jump, dash or hook for this long
 
     public int FacingDirection { get; private set; } = 1;
     public float SpeedMultiplier { get; set; } = 1f; // items (speed boost) change this
@@ -58,6 +59,21 @@ public class PlayerController2D : MonoBehaviour
     public bool IsDashing => isDashing;
     public float MoveInput => moveInput;
     public Vector2 Velocity => rb.linearVelocity;
+    public bool IsRooted => rootTimer > 0f;
+
+    // Chained in place (the father's chain): no moving, jumping, dashing or hooking for this long.
+    // Punching still works. The player hangs still, even in the air.
+    public void Root(float seconds)
+    {
+        rootTimer = Mathf.Max(rootTimer, seconds);
+        isJumping = false;
+        jumpBufferCounter = 0f;
+        moveInput = 0f;
+        if (isDashing) EndDash();
+    }
+
+    // Free again right away (fight reset, respawn)
+    public void Unroot() => rootTimer = 0f;
 
     void Awake()
     {
@@ -87,6 +103,14 @@ public class PlayerController2D : MonoBehaviour
         jumpBufferCounter -= Time.deltaTime;
         dashCooldownTimer -= Time.deltaTime;
 
+        if (rootTimer > 0f)
+        {
+            rootTimer -= Time.deltaTime;
+            moveInput = 0f;
+            jumpBufferCounter = 0f;
+            return;
+        }
+
         ReadInput();
 
         if (jumpBufferCounter > 0f && coyoteCounter > 0f && !isDashing)
@@ -105,6 +129,13 @@ public class PlayerController2D : MonoBehaviour
     void FixedUpdate()
     {
         if (!isDashing) RestorePassedThrough();
+
+        if (rootTimer > 0f)
+        {
+            rb.linearVelocity = Vector2.zero;
+            rb.gravityScale = 0f;
+            return;
+        }
 
         if (isDashing)
         {

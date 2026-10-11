@@ -18,7 +18,7 @@ using UnityEngine;
 // If the player dies he gets all his health back and the fight starts over.
 // Needs: Health, a BoxCollider2D (his body) and a SpriteRenderer.
 [RequireComponent(typeof(Health), typeof(BoxCollider2D))]
-public class PoisonBoss : MonoBehaviour
+public class PoisonBoss : MonoBehaviour, IChainStunnable
 {
     [Header("Arena")]
     [SerializeField] float groundY = 0f;     // top of the floor
@@ -85,6 +85,9 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField] float vomitArc = 35f;       // degrees: globs spread between flat and this far up
     [SerializeField] int vomitDamage = 6;        // per glob, plus poison
     [SerializeField] float vomitGlobSize = 0.5f;
+    [SerializeField] int aimedVomitGlobs = 3;          // Level 3: when the Siren chains you, he vomits straight at you
+    [SerializeField] float aimedVomitDelay = 0.3f;     // wind-up before those globs
+    [SerializeField] float aimedVomitFlightTime = 0.8f; // how long they fly before landing on you
     [SerializeField] float vomitPuddleWidth = 2.5f;
 
     [Header("5) Claws (close range, not poisonous)")]
@@ -115,6 +118,9 @@ public class PoisonBoss : MonoBehaviour
 
     [Header("On Death")]
     [SerializeField] GameObject healthBarRoot;  // hidden when he dies
+    [SerializeField] bool runsAwayWhenBeaten = false; // Level 2: at 0 health he flees instead of dying (he is back in Level 3)
+    [SerializeField] float runAwaySpeed = 18f;
+    [SerializeField] string runAwayMessage = "Oscar runs away!";
     [SerializeField] GameObject[] removeOnDeath; // e.g. the exit gate
     [SerializeField] GameObject[] showOnDeath;   // e.g. the exit door
 
@@ -140,6 +146,10 @@ public class PoisonBoss : MonoBehaviour
     [SerializeField] Color poisonColor = new Color(0.35f, 0.9f, 0.15f, 0.9f);
 
     Health health;
+
+    // Player's Siren's Chain: stunned, then slower for a while (see ChainStun)
+    float slowUntil, slowFactor = 1f, resumeDelay = -1f;
+    float SlowFactor => Time.time < slowUntil ? slowFactor : 1f;
     PoisonHazard touchHazard;
     Rigidbody2D rb;
     BoxCollider2D body;
@@ -151,7 +161,7 @@ public class PoisonBoss : MonoBehaviour
     int lastAttack = -1;
     readonly List<GameObject> spawned = new List<GameObject>();
 
-    float Speed => phase2 ? phase2SpeedUp : 1f;
+    float Speed => (phase2 ? phase2SpeedUp : 1f) * SlowFactor;
 
     void Awake()
     {
@@ -165,6 +175,13 @@ public class PoisonBoss : MonoBehaviour
         halfWidth = Mathf.Abs(transform.lossyScale.x) * body.size.x * 0.5f;
         halfHeight = Mathf.Abs(transform.lossyScale.y) * body.size.y * 0.5f;
         health.onDied.AddListener(OnDied);
+        health.BeforeDeath = () =>
+        {
+            if (!runsAwayWhenBeaten) return false; // normal death
+            OnDied();                              // gate opens, poison hook unlocks, bar hides...
+            StartCoroutine(RunAway());
+            return true;                           // ...but he isn't destroyed
+        };
     }
 
     void Start()
@@ -267,7 +284,8 @@ public class PoisonBoss : MonoBehaviour
 
     IEnumerator FightLoop()
     {
-        yield return new WaitForSeconds(startDelay);
+        yield return new WaitForSeconds(resumeDelay >= 0f ? resumeDelay : startDelay); // after a chain stun: only the stun
+        resumeDelay = -1f;
         while (true)
         {
             if (!player) { yield return null; continue; }
@@ -425,6 +443,34 @@ public class PoisonBoss : MonoBehaviour
             yield return new WaitForSeconds(0.05f);
         }
         yield return new WaitForSeconds(0.2f);
+        PlayIdle();
+    }
+
+    // Level 3: the Siren chained the player in place, so he vomits right at them (it lands)
+    public void VomitAt(Vector2 target)
+    {
+        if (!isActiveAndEnabled || !health || health.CurrentHealth <= 0) return;
+        StartCoroutine(AimedVomit(target));
+    }
+
+    IEnumerator AimedVomit(Vector2 target)
+    {
+        float dir = target.x < rb.position.x ? -1f : 1f;
+        Face(dir);
+        Play(Part(spewFrames, spewWindupFrames, (spewFrames != null ? spewFrames.Length : 0) - spewWindupFrames), spewFps, true);
+        yield return new WaitForSeconds(aimedVomitDelay);
+        Vector2 mouth = rb.position + new Vector2(dir * halfWidth, halfHeight * 0.4f);
+        float g = Mathf.Abs(Physics2D.gravity.y) * 1.5f; // same fall as the normal globs
+        for (int i = 0; i < aimedVomitGlobs; i++)
+        {
+            // Arc that lands on the target after the flight time (a little spread so it looks like vomit)
+            float time = Mathf.Max(0.2f, aimedVomitFlightTime * Random.Range(0.9f, 1.1f));
+            Vector2 to = target + new Vector2(Random.Range(-0.25f, 0.25f), 0f) - mouth;
+            Vector2 v = new Vector2(to.x / time, (to.y + 0.5f * g * time * time) / time);
+            StartCoroutine(Glob(mouth, v));
+            yield return new WaitForSeconds(0.08f);
+        }
+        yield return new WaitForSeconds(0.3f);
         PlayIdle();
     }
 
@@ -711,6 +757,24 @@ public class PoisonBoss : MonoBehaviour
     // ---------------- Reset and death ----------------
 
     // The player died: full health, back to the start, fight starts over
+
+    // The player's Siren's Chain hit him: he stops what he is doing for stunTime, then is slower for slowTime
+    public void ChainStun(float stunTime, float slowMultiplier, float slowTime)
+    {
+        if (!health || health.CurrentHealth <= 0) return;
+        slowFactor = Mathf.Clamp(slowMultiplier, 0.05f, 1f);
+        slowUntil = Time.time + stunTime + slowTime;
+        StopAllCoroutines();
+        BossTurns.End(this);
+        ClearSpawned();
+        SetTouchDamage(touchDamage);
+        rb.position = new Vector2(rb.position.x, startPos.y); // on a ledge: drops back to the floor
+        Tint(bodyColor);
+        PlayIdle();
+        resumeDelay = stunTime;
+        StartCoroutine(FightLoop());
+    }
+
     void ResetFight()
     {
         BossTurns.End(this);
@@ -739,6 +803,31 @@ public class PoisonBoss : MonoBehaviour
         foreach (GameObject go in removeOnDeath) if (go) go.SetActive(false);
         foreach (GameObject go in showOnDeath) if (go) go.SetActive(true);
         if (CameraFollow2D.Instance) CameraFollow2D.Instance.Shake(0.6f, 0.5f);
+    }
+
+    // Beaten in Level 2: he spins off out of the arena, away from the player, and is gone
+    IEnumerator RunAway()
+    {
+        if (touchHazard && touchHazard.TryGetComponent(out Collider2D touchCol)) touchCol.enabled = false;
+        if (TryGetComponent(out Collider2D bodyCol)) bodyCol.enabled = false; // doesn't block the player
+        if (!string.IsNullOrEmpty(runAwayMessage)) PlayerItems.Toast(runAwayMessage);
+
+        float dir = player && player.position.x > rb.position.x ? -1f : 1f; // away from the player
+        Face(dir);
+        yield return new WaitForSeconds(0.6f); // a moment to see it
+        Play(Part(dashFrames, dashWindupFrames, (dashFrames != null ? dashFrames.Length : 0) - dashWindupFrames), dashFps, true);
+        float targetX = dir > 0f ? arenaMaxX + 6f : arenaMinX - 6f;
+        var renderers = GetComponentsInChildren<SpriteRenderer>();
+        while (Mathf.Abs(rb.position.x - targetX) > 0.1f)
+        {
+            rb.MovePosition(new Vector2(Mathf.MoveTowards(rb.position.x, targetX, runAwaySpeed * Time.deltaTime), startPos.y));
+            // Fades out as he leaves the arena
+            float outside = dir > 0f ? rb.position.x - arenaMaxX : arenaMinX - rb.position.x;
+            float a = Mathf.Clamp01(1f - outside / 5f);
+            foreach (SpriteRenderer r in renderers) if (r && r.enabled) { Color c = r.color; c.a = a; r.color = c; }
+            yield return null;
+        }
+        gameObject.SetActive(false);
     }
 
     void OnDrawGizmosSelected()

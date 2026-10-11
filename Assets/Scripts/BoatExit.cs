@@ -51,6 +51,6 @@ public class BoatExit : MonoBehaviour
         }
 
         if (!string.IsNullOrEmpty(nextScene))
-            SceneManager.LoadScene(nextScene);
+            SceneManager.LoadScene(RunOrder.Resolve(nextScene)); // random boss order (see RunOrder)
     }
 }
