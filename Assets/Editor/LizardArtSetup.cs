@@ -92,12 +92,12 @@ public static class LizardArtSetup
         art.transform.localScale = new Vector3(1f / s.x, 1f / s.y, 1f);
         art.transform.localPosition = new Vector3(body.offset.x, body.offset.y - body.size.y * 0.5f, 0f);
         var sr = art.AddComponent<SpriteRenderer>();
-        sr.sprite = idle[0];
+        sr.sprite = idle;
         sr.sortingOrder = 5;
 
         var so = new SerializedObject(boss);
         so.FindProperty("artRenderer").objectReferenceValue = sr;
-        so.FindProperty("idleFrame").objectReferenceValue = idle[0];
+        so.FindProperty("idleFrame").objectReferenceValue = idle;
         SetArray(so.FindProperty("dashFrames"), dash);
         SetArray(so.FindProperty("spewFrames"), spew);
         SetArray(so.FindProperty("poisonFrames"), poison);
