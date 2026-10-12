@@ -29,18 +29,52 @@ public class Chest : MonoBehaviour
 
     bool playerNear;
     SpriteRenderer sr;
+    SpriteRenderer art; // the chest drawing (Resources/ItemSettings), when there is one
 
     void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
         if (prompt) prompt.SetActive(false);
+        AddArt();
         // Already opened earlier in this game (you came back to explore): stays open and empty
         if (PlayerPrefs.GetInt(SaveKey, 0) == 1)
         {
             IsOpen = true;
-            if (sr) sr.color = openedColor;
-            transform.localScale = openedScale;
+            ShowOpened();
         }
+    }
+
+    // The chest drawing replaces the plain box, standing on the bottom of the box
+    void AddArt()
+    {
+        ItemSettings s = ItemSettings.Current;
+        if (!s || !s.chestClosed) return;
+        var go = new GameObject("ChestArt");
+        go.transform.SetParent(transform, false);
+        art = go.AddComponent<SpriteRenderer>();
+        art.sprite = s.chestClosed;
+        if (sr)
+        {
+            art.sortingLayerID = sr.sortingLayerID;
+            art.sortingOrder = sr.sortingOrder;
+            sr.enabled = false;
+        }
+        Vector3 ls = transform.lossyScale;
+        float sx = Mathf.Abs(ls.x) < 0.0001f ? 1f : Mathf.Abs(ls.x);
+        float sy = Mathf.Abs(ls.y) < 0.0001f ? 1f : Mathf.Abs(ls.y);
+        go.transform.localScale = new Vector3(s.chestScale / sx, s.chestScale / sy, 1f);
+        go.transform.localPosition = new Vector3(0f, -0.5f, 0f); // bottom of the box (the drawing's pivot is its bottom)
+    }
+
+    void ShowOpened()
+    {
+        if (art)
+        {
+            if (ItemSettings.Current.chestOpen) art.sprite = ItemSettings.Current.chestOpen;
+            return; // the drawing shows it open: no colour or size change
+        }
+        if (sr) sr.color = openedColor;
+        transform.localScale = openedScale;
     }
 
     // One save per chest per game: the game number, the scene, and where the chest is
@@ -58,8 +92,7 @@ public class Chest : MonoBehaviour
         if (IsOpen) return;
         IsOpen = true;
         if (!RunOrder.InTutorial) { PlayerPrefs.SetInt(SaveKey, 1); PlayerPrefs.Save(); }
-        if (sr) sr.color = openedColor;
-        transform.localScale = openedScale;
+        ShowOpened();
         if (prompt) prompt.SetActive(false);
         if (givesItem)
         {

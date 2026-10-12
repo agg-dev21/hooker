@@ -21,6 +21,8 @@ public static class SetUpEverything
         "Tools/Art/KK",
         "Tools/Art/Ocean And Dock",
         "Tools/Art/Health Bars",
+        "Tools/Art/Hook Points",
+        "Tools/Art/Planks",
         "Tools/Companion/Add Jail To Level 2",
         "Tools/Add Story Dialogue",
         "Tools/Tutorial/Hook Lesson In Jump Room",

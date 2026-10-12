@@ -60,6 +60,11 @@ public static class CompanionItemArtSetup
                 looks.GetArrayElementAtIndex(i).FindPropertyRelative("icon").objectReferenceValue = icon;
                 icons++;
             }
+            // Chests: closed and open, standing on their bottom edge (the drawings have 8 empty pixels below)
+            Sprite closed = SingleSprite(ItemFolder + "/chest_closed.png", 160f, new Vector2(0.5f, 8f / 512f));
+            Sprite open = SingleSprite(ItemFolder + "/chest_open.png", 160f, new Vector2(0.5f, 8f / 512f));
+            if (closed) so.FindProperty("chestClosed").objectReferenceValue = closed;
+            if (open) so.FindProperty("chestOpen").objectReferenceValue = open;
             so.ApplyModifiedPropertiesWithoutUndo();
         }
         AssetDatabase.SaveAssets();
@@ -68,16 +73,25 @@ public static class CompanionItemArtSetup
             "Companion: idle " + idle.Length + ", appear " + appear.Length + ", light strike " + beam.Length + " frames" +
             (companion ? "" : "\n(Resources/CompanionSettings is missing!)") +
             "\nItems: " + icons + " icons set (Speed Boost keeps its coloured square).\n\n" +
-            "Change any item's icon in Assets/Resources/ItemSettings (Looks).", "OK");
+            "Chests: " + (items && items.chestClosed ? "closed and open pictures set." : "pictures missing (Art/Items/chest_closed, chest_open).") + "\n\n" +
+            "Change any item's icon or the chest pictures in Assets/Resources/ItemSettings.", "OK");
     }
 
-    static Sprite SingleSprite(string path)
+    static Sprite SingleSprite(string path) => SingleSprite(path, 400f, new Vector2(0.5f, 0.5f));
+
+    static Sprite SingleSprite(string path, float pixelsPerUnit, Vector2 pivot)
     {
         if (!File.Exists(path)) return null;
+        AssetDatabase.ImportAsset(path); // a picture just copied in may not be imported yet
         var importer = (TextureImporter)AssetImporter.GetAtPath(path);
         importer.textureType = TextureImporterType.Sprite;
         importer.spriteImportMode = SpriteImportMode.Single;
-        importer.spritePixelsPerUnit = 400f;
+        importer.spritePixelsPerUnit = pixelsPerUnit;
+        var settings = new TextureImporterSettings();
+        importer.ReadTextureSettings(settings);
+        settings.spriteAlignment = (int)SpriteAlignment.Custom;
+        importer.SetTextureSettings(settings);
+        importer.spritePivot = pivot;
         importer.filterMode = FilterMode.Point; // pixel art icons stay crisp
         importer.textureCompression = TextureImporterCompression.Uncompressed;
         importer.mipmapEnabled = false;

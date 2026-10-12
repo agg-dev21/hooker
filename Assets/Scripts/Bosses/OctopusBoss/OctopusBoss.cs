@@ -25,6 +25,7 @@ public partial class OctopusBoss : MonoBehaviour, IChainStunnable
     [SerializeField] float groundY = 0f;      // top of the floor
     [SerializeField] float ceilingY = 18f;    // chain rain comes from here
     [SerializeField] float arenaMaxX = 33f;   // right wall: lashes reach this far
+    [SerializeField] float arenaMinX = -1f;   // left wall: if she is ever pushed past a wall, the floor or the ceiling, she teleports home
     [SerializeField] float rainMinX = 9f;     // chain rain lands between these
     [SerializeField] float rainMaxX = 32f;
     [SerializeField] Transform hands;         // where her chains come from
@@ -157,13 +158,35 @@ public partial class OctopusBoss : MonoBehaviour, IChainStunnable
     float animTime, attackPoseUntil;
 
     // After everything else this frame (punch knockback, hook, chains): put her back on her throne
-    void LateUpdate()
+    void LateUpdate() => StayHome();
+    void FixedUpdate() => StayHome();
+
+    void StayHome()
     {
-        if (immovable && transform.position != homePosition) transform.position = homePosition;
+        Vector3 p = transform.position;
+        bool outside = p.x < arenaMinX || p.x > arenaMaxX || p.y < groundY - 3f || p.y > ceilingY + 3f;
+        if (outside)
+        {
+            transform.position = homePosition; // pushed out of the arena: teleport back to her throne
+            teleportFadeLeft = 0.35f;
+        }
+        else if (immovable && p != homePosition) transform.position = homePosition;
+    }
+
+    // A quick fade-in after she teleports, so it reads as a teleport and not a glitch
+    float teleportFadeLeft;
+    void FadeInAfterTeleport()
+    {
+        if (teleportFadeLeft <= 0f || !artRenderer) return;
+        teleportFadeLeft -= Time.deltaTime;
+        Color c = artRenderer.color;
+        c.a = 1f - Mathf.Clamp01(teleportFadeLeft / 0.35f);
+        artRenderer.color = c;
     }
 
     void Update()
     {
+        FadeInAfterTeleport();
         if (artRenderer && idleFrames != null && idleFrames.Length > 0)
         {
             animTime += Time.deltaTime;

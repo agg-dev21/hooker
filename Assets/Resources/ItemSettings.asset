@@ -14,8 +14,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ItemSettings
   shieldAmount: 40
   shieldDuration: 15
+  shieldUntilDeath: 1
   poisonResistance: 0.75
   poisonResistanceDuration: 20
+  poisonResistanceUntilDeath: 1
   curesPoisonOnUse: 1
   healAmount: 40
   reviveHealth: 50
@@ -26,8 +28,12 @@ MonoBehaviour:
   moveSpeedMultiplier: 1.4
   attackSpeedMultiplier: 1.5
   speedDuration: 10
+  speedUntilDeath: 1
   invulnerableDuration: 4
   maxStack: 9
+  chestClosed: {fileID: 21300000, guid: 38a08c502403deb45baf475379630f4a, type: 3}
+  chestOpen: {fileID: 21300000, guid: 718955459cbbc24498eeb429f1051a33, type: 3}
+  chestScale: 1
   looks:
   - name: Shield
     color: {r: 0.35, g: 0.65, b: 1, a: 1}

@@ -55,6 +55,11 @@ public class ItemSettings : ScriptableObject
     [Header("Inventory")]
     public int maxStack = 9;               // most of one item you can carry (scrolls are kept one by one)
 
+    [Header("Chests (filled by Tools > Art > Ariel And Items)")]
+    public Sprite chestClosed;             // empty: the plain gold box
+    public Sprite chestOpen;
+    public float chestScale = 1f;          // size of the chest drawing (1 = about 2 tiles wide)
+
     [Header("Looks (in the same order as the items)")]
     public ItemLook[] looks =
     {

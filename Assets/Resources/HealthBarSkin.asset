@@ -15,6 +15,8 @@ MonoBehaviour:
   player:
     frame: {fileID: 21300000, guid: 3dc7c1a6b7503b64aad982febe640f7d, type: 3}
     fill: {fileID: 21300000, guid: e218885b9e35c1e4b81f58a24ae321fc, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 0
     framePixels: {x: 812, y: 184}
     windowPixels:
       serializedVersion: 2
@@ -25,6 +27,8 @@ MonoBehaviour:
   boss:
     frame: {fileID: 21300000, guid: 92e8093097d85a04aa37e1165ee4d088, type: 3}
     fill: {fileID: 21300000, guid: 5e4b3f9748f97a34d9d2ac1d07293562, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 0
     framePixels: {x: 784, y: 172}
     windowPixels:
       serializedVersion: 2
@@ -32,3 +36,63 @@ MonoBehaviour:
       y: 72
       width: 700
       height: 44
+  hardy:
+    frame: {fileID: 21300000, guid: 5098ced4ac99494478d28696a2a2b60d, type: 3}
+    fill: {fileID: 21300000, guid: 54eac25b789677c44980a1da00bb9c2f, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 1
+    framePixels: {x: 1224, y: 232}
+    windowPixels:
+      serializedVersion: 2
+      x: 120
+      y: 120
+      width: 1056
+      height: 24
+  oscar:
+    frame: {fileID: 21300000, guid: a66b9de35398485439f88324d6e31f57, type: 3}
+    fill: {fileID: 21300000, guid: 0d092f78124542a4a9a953a4011f30b9, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 1
+    framePixels: {x: 1224, y: 192}
+    windowPixels:
+      serializedVersion: 2
+      x: 120
+      y: 128
+      width: 1056
+      height: 24
+  oscarLevel3:
+    frame: {fileID: 21300000, guid: a66b9de35398485439f88324d6e31f57, type: 3}
+    fill: {fileID: 21300000, guid: 0d092f78124542a4a9a953a4011f30b9, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 1
+    framePixels: {x: 1224, y: 192}
+    windowPixels:
+      serializedVersion: 2
+      x: 120
+      y: 128
+      width: 1056
+      height: 24
+  madameO:
+    frame: {fileID: 21300000, guid: 94a416ae8fa2d4440abfe59023885710, type: 3}
+    fill: {fileID: 21300000, guid: 9603dc1759a53ea4ea8fd5e1cdaf7334, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 1
+    framePixels: {x: 1224, y: 264}
+    windowPixels:
+      serializedVersion: 2
+      x: 224
+      y: 184
+      width: 856
+      height: 24
+  kk:
+    frame: {fileID: 21300000, guid: 02b84c9f3f8d3934b93c2306c250e9f3, type: 3}
+    fill: {fileID: 21300000, guid: bd16cfe407d8a164980398b5e4e9919b, type: 3}
+    fillColor: {r: 1, g: 1, b: 1, a: 1}
+    fillOnTop: 1
+    framePixels: {x: 1128, y: 136}
+    windowPixels:
+      serializedVersion: 2
+      x: 24
+      y: 96
+      width: 1056
+      height: 24

@@ -70,6 +70,7 @@ MonoBehaviour:
   - {fileID: 3512103342212547261, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
   - {fileID: -5718287987157518019, guid: 4a4defa3e3a678242879bfbd0660f2cf, type: 3}
   size: {x: 0.8, y: 1.6}
+  drawScale: 1.65
   color: {r: 1, g: 0.92, b: 0.65, a: 1}
   beamColor: {r: 1, g: 0.97, b: 0.75, a: 0.9}
   glowColor: {r: 1, g: 0.9, b: 0.6, a: 1}

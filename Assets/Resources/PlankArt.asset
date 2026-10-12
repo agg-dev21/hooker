@@ -1,0 +1,29 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 018078ebe61e93e4d8c07e8e64f4d1c2, type: 3}
+  m_Name: PlankArt
+  m_EditorClassIdentifier: Hooker.Runtime::PlankArt
+  wood:
+    floor: {fileID: 21300000, guid: b8cb0b774e965aa44814a045118edc87, type: 3}
+    platform: {fileID: 21300000, guid: 9ae002e7f1f7f994cb79ec02ec899f7d, type: 3}
+    post: {fileID: 0}
+  grassy:
+    floor: {fileID: 21300000, guid: 570a6c15808a7ae469dc61986f390afd, type: 3}
+    platform: {fileID: 21300000, guid: 92b393be3e6382a41b737449c75a51bf, type: 3}
+    post: {fileID: 21300000, guid: f0a3853ef69e460488f496b6254876ce, type: 3}
+  metal:
+    floor: {fileID: 21300000, guid: f5a497fa201ec29449b3fcea63061d18, type: 3}
+    platform: {fileID: 21300000, guid: f5a497fa201ec29449b3fcea63061d18, type: 3}
+    post: {fileID: 21300000, guid: 6e164e60259af1542bf393a0f1c63b94, type: 3}
+  level4UsesMetal: 0
+  dressingOn: 1
+  maxPostLength: 8

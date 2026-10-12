@@ -30,8 +30,8 @@ public class HealthBar : MonoBehaviour
         HealthBarSkin skin = HealthBarSkin.Current;
         if (!skin || !fill) return;
         bool isPlayer = target && target.GetComponent<PlayerController2D>();
-        HealthBarSkin.Look look = isPlayer ? skin.player : skin.boss;
-        if (look == null || !look.fill || !look.frame) return;
+        HealthBarSkin.Look look = isPlayer ? skin.player : skin.ForBoss(target);
+        if (look == null || !look.frame) return;
         var root = fill.rectTransform.parent as RectTransform; // the bar's background box
         if (!root) return;
 
@@ -48,13 +48,17 @@ public class HealthBar : MonoBehaviour
         // The background box becomes exactly the window, and the fill covers it
         float oldY = root.anchoredPosition.y;
         root.sizeDelta = new Vector2(win.width * k, win.height * k);
-        if (root.TryGetComponent(out Image bg)) { bg.sprite = null; bg.color = new Color(0.05f, 0.04f, 0.07f, 0.9f); }
+        if (root.TryGetComponent(out Image bg))
+        {
+            bg.sprite = null;
+            bg.color = look.fillOnTop ? Color.clear : new Color(0.05f, 0.04f, 0.07f, 0.9f); // the empty bar art is the background
+        }
         RectTransform frt = fill.rectTransform;
         frt.anchorMin = Vector2.zero;
         frt.anchorMax = Vector2.one;
         frt.offsetMin = frt.offsetMax = Vector2.zero;
-        fill.sprite = look.fill;
-        fill.color = Color.white;
+        fill.sprite = look.fill ? look.fill : UiKit.WhiteSprite; // no fill picture: a plain bar in the look's colour
+        fill.color = look.fillColor;
         fill.type = Image.Type.Filled;
         fill.fillMethod = Image.FillMethod.Horizontal;
         fill.fillOrigin = (int)Image.OriginHorizontal.Left;
@@ -89,11 +93,15 @@ public class HealthBar : MonoBehaviour
             }
         }
 
-        // The frame on top, its window exactly over the fill (a child of the fill, so the fill's cut doesn't cut it)
+        // The frame on top, its window exactly over the fill (a child of the fill, so the fill's cut doesn't cut it).
+        // Fill On Top: the frame is the empty bar, behind the fill (first child of the background box).
         Transform old = fill.transform.Find("Frame");
         if (old) Destroy(old.gameObject);
+        old = root.Find("Frame");
+        if (old) Destroy(old.gameObject);
         var go = new GameObject("Frame", typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(fill.transform, false);
+        go.transform.SetParent(look.fillOnTop ? root : fill.transform, false);
+        if (look.fillOnTop) go.transform.SetAsFirstSibling();
         var rt = (RectTransform)go.transform;
         rt.anchorMin = rt.anchorMax = new Vector2(0.5f, 0.5f);
         rt.pivot = new Vector2(0.5f, 0.5f);
