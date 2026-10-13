@@ -55,7 +55,7 @@ public class DevTools : MonoBehaviour
     static void NextBossStep()
     {
         const System.Reflection.BindingFlags Any = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Public;
-        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None))
+        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>())
         {
             if (!(mb is IChainStunnable)) continue; // every boss (Hardy, Oscar, Madame O, KK)
             if (!mb.TryGetComponent(out Health h) || h.CurrentHealth <= 0) continue;

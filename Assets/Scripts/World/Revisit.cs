@@ -23,14 +23,14 @@ public class Revisit : MonoBehaviour
         {
             case "Level_1_Deck":
                 if (!RunOrder.HardyDone) return;
-                foreach (HardyBoss b in FindObjectsByType<HardyBoss>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Destroy(b.gameObject);
+                foreach (HardyBoss b in FindObjectsByType<HardyBoss>(FindObjectsInactive.Include)) Destroy(b.gameObject);
                 RemoveStoryTalk();
                 LevelEndPrompt.Show(RunOrder.SailScene, 1.5f, "Hardy's deck is quiet now.\nSet sail?");
                 break;
 
             case "Level_2_Boss":
                 if (!RunOrder.OscarDone) return;
-                foreach (PoisonBoss b in FindObjectsByType<PoisonBoss>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+                foreach (PoisonBoss b in FindObjectsByType<PoisonBoss>(FindObjectsInactive.Include))
                 {
                     b.SendMessage("OnDied", SendMessageOptions.DontRequireReceiver); // opens his exit like when he ran away
                     Destroy(b.gameObject);
@@ -40,8 +40,8 @@ public class Revisit : MonoBehaviour
 
             case "Level_3_Boss":
                 if (!RunOrder.MadameDone) return;
-                foreach (OctopusBoss b in FindObjectsByType<OctopusBoss>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Destroy(b.gameObject);
-                foreach (PoisonBoss b in FindObjectsByType<PoisonBoss>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Destroy(b.gameObject);
+                foreach (OctopusBoss b in FindObjectsByType<OctopusBoss>(FindObjectsInactive.Include)) Destroy(b.gameObject);
+                foreach (PoisonBoss b in FindObjectsByType<PoisonBoss>(FindObjectsInactive.Include)) Destroy(b.gameObject);
                 RemoveStoryTalk(); // the gate opens by itself once both are gone
                 break;
 
@@ -56,8 +56,8 @@ public class Revisit : MonoBehaviour
     // The boss intro and "beaten" lines only belong to the first visit
     static void RemoveStoryTalk()
     {
-        foreach (SceneDialogue d in FindObjectsByType<SceneDialogue>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Destroy(d.gameObject);
-        foreach (DefeatDialogue d in FindObjectsByType<DefeatDialogue>(FindObjectsInactive.Include, FindObjectsSortMode.None)) Destroy(d.gameObject);
+        foreach (SceneDialogue d in FindObjectsByType<SceneDialogue>(FindObjectsInactive.Include)) Destroy(d.gameObject);
+        foreach (DefeatDialogue d in FindObjectsByType<DefeatDialogue>(FindObjectsInactive.Include)) Destroy(d.gameObject);
     }
 
     // A spot where the player starts: stand on it and press Interact to sail back

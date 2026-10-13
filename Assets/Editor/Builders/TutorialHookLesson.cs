@@ -30,7 +30,7 @@ public static class TutorialHookLesson
         if (File.Exists(PunchScene))
         {
             Scene punch = EditorSceneManager.OpenScene(PunchScene, OpenSceneMode.Single);
-            foreach (SceneExit exit in Object.FindObjectsByType<SceneExit>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (SceneExit exit in Object.FindObjectsByType<SceneExit>(FindObjectsInactive.Include))
             {
                 var so = new SerializedObject(exit);
                 so.FindProperty("nextScene").stringValue = "Tutorial_7_Dock";
@@ -63,7 +63,7 @@ public static class TutorialHookLesson
             // The sign just before the wall explains the hook
             TutorialSign nearest = null;
             float best = float.MaxValue;
-            foreach (TutorialSign s in Object.FindObjectsByType<TutorialSign>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            foreach (TutorialSign s in Object.FindObjectsByType<TutorialSign>(FindObjectsInactive.Include))
             {
                 float d = Mathf.Abs(s.transform.position.x - 36f);
                 if (d < best) { best = d; nearest = s; }

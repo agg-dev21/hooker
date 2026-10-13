@@ -33,7 +33,7 @@ public class OneWayPlatform : MonoBehaviour
     static void AttachToAll()
     {
         int added = 0;
-        foreach (PlatformEffector2D e in FindObjectsByType<PlatformEffector2D>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+        foreach (PlatformEffector2D e in FindObjectsByType<PlatformEffector2D>(FindObjectsInactive.Exclude))
             if (e.useOneWay && !e.GetComponent<OneWayPlatform>()) { e.gameObject.AddComponent<OneWayPlatform>(); added++; }
         if (added > 0) Debug.Log("OneWayPlatform: added drop-through to " + added + " platform(s)");
     }

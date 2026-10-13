@@ -24,7 +24,7 @@ public static class Level2ExtraDoors
 
         // Same look and target as the existing boss door
         BossDoor original = null;
-        foreach (BossDoor d in Object.FindObjectsByType<BossDoor>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (BossDoor d in Object.FindObjectsByType<BossDoor>(FindObjectsInactive.Include))
             if (!d.name.StartsWith("BossDoor_Extra")) { original = d; break; }
         string bossScene = "Level_2_Boss";
         Color color = new Color(0.55f, 0.15f, 0.6f);

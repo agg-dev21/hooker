@@ -147,7 +147,7 @@ public partial class Companion : MonoBehaviour
     void FindBosses()
     {
         var list = new List<Health>();
-        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (MonoBehaviour mb in FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include))
             if (mb is IChainStunnable && mb.TryGetComponent(out Health h)) list.Add(h);
         bossHealth = list.ToArray();
 

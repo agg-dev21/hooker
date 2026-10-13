@@ -68,7 +68,7 @@ public static class PlankDressing
     static void Platforms(Tilemap map, HashSet<Vector2Int> cells, PlankArt.Set set, float maxPost, Transform root, int order, int layer)
     {
         Sprite plank = set.platform ? set.platform : set.floor;
-        foreach (PlatformEffector2D e in Object.FindObjectsByType<PlatformEffector2D>(FindObjectsInactive.Exclude, FindObjectsSortMode.None))
+        foreach (PlatformEffector2D e in Object.FindObjectsByType<PlatformEffector2D>(FindObjectsInactive.Exclude))
         {
             if (!e.useOneWay || !e.TryGetComponent(out Collider2D col)) continue;
             Bounds pb = col.bounds;

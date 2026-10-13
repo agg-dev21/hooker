@@ -117,7 +117,7 @@ public partial class OctopusBoss
             yield return new WaitForSeconds(grabPullTime);
             if (player.TryGetComponent(out PlayerController2D pc)) pc.Root(grabHoldTime);
             if (lizardVomitsOnGrab)
-                foreach (PoisonBoss lizard in FindObjectsByType<PoisonBoss>(FindObjectsSortMode.None))
+                foreach (PoisonBoss lizard in FindObjectsByType<PoisonBoss>())
                     lizard.VomitAt(player.position);
         }
         yield return chain.Retract(30f);
@@ -211,7 +211,7 @@ public partial class OctopusBoss
         h.TakeDamage(bindDamage);
         if (player.TryGetComponent(out PlayerController2D pc)) pc.Root(grabHoldTime);
         if (lizardVomitsOnGrab)
-            foreach (PoisonBoss lizard in FindObjectsByType<PoisonBoss>(FindObjectsSortMode.None))
+            foreach (PoisonBoss lizard in FindObjectsByType<PoisonBoss>())
                 lizard.VomitAt(player.position);
     }
 

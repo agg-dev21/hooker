@@ -121,7 +121,7 @@ public static class PoisonTowerDecorator
                 }
 
         // 6) Light: dimmer and greener so the lanterns and mushrooms glow
-        foreach (Light2D l in Object.FindObjectsByType<Light2D>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        foreach (Light2D l in Object.FindObjectsByType<Light2D>(FindObjectsInactive.Include))
             if (l.lightType == Light2D.LightType.Global) { l.intensity = GlobalLight; l.color = new Color(0.8f, 1f, 0.82f); }
         Camera cam = Object.FindAnyObjectByType<Camera>(FindObjectsInactive.Include);
         if (cam) { cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(0.03f, 0.05f, 0.04f); }
