@@ -95,6 +95,7 @@ public class Health : MonoBehaviour
         invincibleTimer = invincibleTime;
         onDamaged?.Invoke();
         if (sr && flashOnHit) StartCoroutine(Flash());
+        if (isPlayer) GameFeel.PlayerHurt(amount, maxHealth); // screen shake
 
         if (CurrentHealth <= 0) { Die(); return; }
 

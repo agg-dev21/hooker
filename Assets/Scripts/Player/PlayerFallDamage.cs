@@ -88,5 +88,6 @@ public class PlayerFallDamage : MonoBehaviour
             health.TakeTickDamage(damage); // still hurts during invincibility
         }
         else health.TakeDamage(damage);
+        GameFeel.FallHurt(damage, health.MaxHealth); // screen shake on a hard landing
     }
 }
