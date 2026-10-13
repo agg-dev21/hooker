@@ -6,8 +6,8 @@ All gameplay code is in `Assets/Scripts` (assembly **Hooker.Runtime**). All edit
 
 | Folder | What lives there |
 |---|---|
-| Core | Game flow and global systems: GameManager, GameInput, RunOrder, ScreenFade, PauseEverywhere, DevSettings/DevTools |
-| Camera | CameraFollow2D, BackdropFollow |
+| Core | Game flow and global systems: GameManager, GameInput, RunOrder, ScreenFade, PauseEverywhere, GameFeel (hit-stop, screen shake), DevSettings/DevTools |
+| Camera | CameraFollow2D, BackdropFollow, ArenaBackdrop |
 | Player | Movement, combat, art, fall damage, respawn, player balance |
 | Player/Abilities | Boss-earned abilities: PlayerAbility (spikes), PlayerChain + ChainHold, PlayerUpgrades, AbilityArt |
 | Combat | Health and everything that deals damage: ContactDamage, DamageZone, KillZone, Projectile, HealthPickup, IChainStunnable |
