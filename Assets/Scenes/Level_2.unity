@@ -21651,7 +21651,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &404337145
 Transform:
   m_ObjectHideFlags: 0
@@ -33854,7 +33854,7 @@ MonoBehaviour:
     rid: 7848858482183241728
   m_FalloffIntensity: 0.5
   m_Color: {r: 0.8, g: 1, b: 0.82, a: 1}
-  m_Intensity: 0.6
+  m_Intensity: 1
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
   m_ApplyToSortingLayers: 00000000i
@@ -63626,7 +63626,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &844167749
 Transform:
   m_ObjectHideFlags: 0
@@ -72000,7 +72000,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &985791116
 Transform:
   m_ObjectHideFlags: 0
@@ -90179,7 +90179,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1280712376
 Transform:
   m_ObjectHideFlags: 0
@@ -111007,7 +111007,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1631032052
 Transform:
   m_ObjectHideFlags: 0
