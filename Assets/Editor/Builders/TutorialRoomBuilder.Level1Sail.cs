@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 // Part of TutorialRoomBuilder (see TutorialRoomBuilder.cs for its settings and the main loop).
 // Level 1 Sail: the boat scene and the props built for it.
@@ -185,59 +183,5 @@ public static partial class TutorialRoomBuilder
         so.ApplyModifiedPropertiesWithoutUndo();
         AssetDatabase.SaveAssets();
         return ball;
-    }
-
-    // ---------------- BOAT (Tutorial_7_Dock) ----------------
-    // The dock ends, a boat waits at the end. Step on it: it sails off screen, fades to black, loads Level_1.
-
-    // (menu removed: replaced by Tools > Rebuild Tutorial)
-    static void BuildBoat()
-    {
-        string path = ScenePath("Tutorial_7_Dock");
-        if (!File.Exists(path)) return;
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-
-        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-        if (GameObject.Find("Boat"))
-        {
-            EditorUtility.DisplayDialog("Build Boat Scene", "Tutorial_7_Dock already has a Boat, so nothing was changed.", "OK");
-            return;
-        }
-
-        Tilemap map = FindGroundTilemap();
-        FillTiles(map, null, 3, -5, 9, 2, false); // dock ends at x 3, water after
-        RebuildColliders(map);
-
-        // Boat right after the dock, top at floor level so you can walk onto it
-        GameObject boat = MakeBox("Boat", null, map, new Vector2(5f, -3.5f), new Vector2(4f, 1f), BoatColor);
-        boat.layer = LayerMask.NameToLayer("Ground"); // so the player counts as standing on it
-        var board = boat.AddComponent<BoxCollider2D>(); // trigger on top: stepping on starts the sail
-        board.isTrigger = true;
-        board.size = new Vector2(0.8f, 1f);
-        board.offset = new Vector2(0f, 1f);
-
-        // Black fade image over the whole screen, invisible at start
-        Canvas canvas = Object.FindAnyObjectByType<Canvas>();
-        var fadeGo = new GameObject("Fade", typeof(RectTransform), typeof(Image));
-        fadeGo.transform.SetParent(canvas.transform, false);
-        fadeGo.transform.SetAsLastSibling();
-        var rt = (RectTransform)fadeGo.transform;
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = Vector2.zero;
-        rt.offsetMax = Vector2.zero;
-        var img = fadeGo.GetComponent<Image>();
-        img.color = new Color(0f, 0f, 0f, 0f);
-        img.raycastTarget = false;
-
-        var exit = boat.AddComponent<BoatExit>();
-        var so = new SerializedObject(exit);
-        so.FindProperty("nextScene").stringValue = Level1Name;
-        so.FindProperty("fadeImage").objectReferenceValue = img;
-        so.ApplyModifiedPropertiesWithoutUndo();
-
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        EditorUtility.DisplayDialog("Build Boat Scene", "Done! Tutorial_7_Dock now has a boat that sails to Level_1.", "OK");
     }
 }

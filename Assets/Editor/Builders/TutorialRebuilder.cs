@@ -28,8 +28,6 @@ public static class TutorialRebuilder
     static readonly Color CrateColor = new Color(0.6f, 0.4f, 0.2f);
     static readonly Color PlankColor = new Color(0.45f, 0.32f, 0.2f);
     static readonly Color WaterColor = new Color(0.1f, 0.35f, 0.55f, 0.85f);
-    static readonly Color ShooterColor = new Color(0.85f, 0.15f, 0.15f);
-    const string ProjectilePrefab = "Assets/Prefabs/Projectile.prefab";
 
     [MenuItem("Tools/Rebuild Tutorial")]
     static void RebuildAll()
@@ -195,55 +193,6 @@ public static class TutorialRebuilder
         Sign(root, 47f, 8.5f, "Cracked BLUE walls hide secret rooms!\nPress {Interact} at a chest to open it.", 9f);
     }
 
-    // ---------------- 5 Hook ----------------
-
-    static void HookRoom(Transform root, int w, int ceil)
-    {
-        Sign(root, 4.5f, 7.5f, "{Hook} or RIGHT CLICK throws your hook.\nAim with the arrows or the mouse.\nHook the gold ring to fly up.", 9f);
-        Fill(9, 0, 3, 10);                        // too tall to jump
-        Ring("Ring_Wall", root, new Vector2(7.5f, 12.5f), 10f);
-        Checkpoint("Checkpoint_1", root, new Vector2(13f, 0.75f));
-
-        Pit(root, 15, 33);
-        Ring("Ring_1", root, new Vector2(19f, 9f), 10f);
-        Ring("Ring_2", root, new Vector2(25f, 10f), 10f);
-        Ring("Ring_3", root, new Vector2(31f, 9f), 10f);
-        OneWayAt("RestLedge", root, new Vector2(25f, 5.5f), 2f, PlankColor);
-        Sign(root, 24f, 13.5f, "Ring after ring: hook the next one mid-air.");
-        Checkpoint("Checkpoint_2", root, new Vector2(35f, 0.75f));
-
-        Sign(root, 39f, 7.5f, "Your hook hurts MORE from far away.\nHook the dummy from a distance.", 9f);
-        GameObject dummy = Box("TargetDummy", root, new Vector2(45f, 1.5f), new Vector2(1f, 3f), DummyColor);
-        dummy.layer = GroundLayer;
-        AddHealth(dummy, 24);
-    }
-
-    // ---------------- 6 Bullets ----------------
-
-    static void BulletRoom(Transform root, int w, int ceil)
-    {
-        Sign(root, 5f, 6.5f, "While you DASH, nothing can hurt you.\nDash through bullets. Only 5 health here!");
-        Shooter(root, "Shooter_1", new Vector2(14f, 1f), 1f);
-        Checkpoint("Checkpoint_1", root, new Vector2(18f, 0.75f));
-
-        Sign(root, 22f, 8f, "Two at once. Time your dashes.", 8f);
-        Shooter(root, "Shooter_2", new Vector2(27f, 1f), 0.8f);
-        Fill(30, 3, 3, 1);
-        Shooter(root, "Shooter_3", new Vector2(31.5f, 5f), 0.8f);
-        Checkpoint("Checkpoint_2", root, new Vector2(35f, 0.75f));
-
-        Sign(root, 38f, 7f, "Dash through enemies too,\nor fight them.", 8f);
-        Crab("Crab", root, new Vector2(42f, 0.5f));
-
-        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>(FindObjectsInactive.Include);
-        if (player && player.TryGetComponent(out Health health))
-        {
-            var hso = new SerializedObject(health);
-            hso.FindProperty("maxHealth").intValue = 5; // every bullet counts
-            hso.ApplyModifiedPropertiesWithoutUndo();
-        }
-    }
-
     // ---------------- 7 Dock ----------------
 
     static void DockRoom(Transform root, int w, int ceil)
@@ -314,16 +263,5 @@ public static class TutorialRebuilder
         Fill(x0, -1, x1 - x0, 1, false);
         Deco("PitDark", parent, new Vector2((x0 + x1) * 0.5f, -3f), new Vector2(x1 - x0, 4f), new Color(0.05f, 0.05f, 0.08f), -5);
         KillZone("KillZone_Pit", parent, new Vector2((x0 + x1) * 0.5f, -4f), new Vector2(x1 - x0 + 1f, 1f));
-    }
-
-    static void Shooter(Transform parent, string name, Vector2 pos, float fireRate)
-    {
-        GameObject shooter = Box(name, parent, pos, new Vector2(1f, 2f), ShooterColor);
-        AddHealth(shooter, 8);
-        var so = new SerializedObject(shooter.AddComponent<EnemyShooter>());
-        so.FindProperty("projectilePrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>(ProjectilePrefab);
-        so.FindProperty("range").floatValue = 13f;
-        so.FindProperty("fireRate").floatValue = fireRate;
-        so.ApplyModifiedPropertiesWithoutUndo();
     }
 }

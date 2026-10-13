@@ -14,7 +14,7 @@ public partial class OctopusBoss
         Vector2 from = new Vector2(HandPos.x, y);
         float length = arenaMaxX - from.x;
 
-        GameObject warn = Bar(from, Vector2.right, length, 0.5f, warnColor, false);
+        GameObject warn = Bar(from, Vector2.right, length, 0.5f, warnColor);
         yield return Flash(lashWarnTime / Speed);
         Destroy(warn);
 
@@ -40,7 +40,7 @@ public partial class OctopusBoss
         }
 
         var warns = new List<GameObject>();
-        foreach (float x in xs) warns.Add(Bar(new Vector2(x, ceilingY), Vector2.down, ceilingY - groundY, 0.6f, warnColor, false));
+        foreach (float x in xs) warns.Add(Bar(new Vector2(x, ceilingY), Vector2.down, ceilingY - groundY, 0.6f, warnColor));
         yield return Flash(rainWarnTime / Speed);
         foreach (GameObject w in warns) Destroy(w);
 
@@ -72,7 +72,7 @@ public partial class OctopusBoss
         Vector2 dir = ((Vector2)player.position - from).normalized;
 
         // Aim line follows you for a moment, then locks
-        GameObject warn = Bar(from, dir, grabRange, 0.25f, warnColor, false);
+        GameObject warn = Bar(from, dir, grabRange, 0.25f, warnColor);
         for (float t = 0f; t < grabWarnTime / Speed; t += Time.deltaTime)
         {
             if (t < grabWarnTime / Speed * 0.6f && player)
@@ -132,8 +132,8 @@ public partial class OctopusBoss
         float landX = player ? player.position.x : (rainMinX + rainMaxX) * 0.5f;
         Vector2 to = new Vector2(landX, groundY + 0.6f);
 
-        GameObject mark = Bar(new Vector2(landX - anchorRadius, groundY + 0.15f), Vector2.right, anchorRadius * 2f, 0.3f, warnColor, false);
-        GameObject anchor = Bar(from, Vector2.right, 1.2f, 1.2f, chainColor, false);
+        GameObject mark = Bar(new Vector2(landX - anchorRadius, groundY + 0.15f), Vector2.right, anchorRadius * 2f, 0.3f, warnColor);
+        GameObject anchor = Bar(from, Vector2.right, 1.2f, 1.2f, chainColor);
         float time = anchorAirTime / Speed;
         for (float t = 0f; t < time; t += Time.deltaTime)
         {
@@ -170,7 +170,7 @@ public partial class OctopusBoss
             return hit ? hit.point.y : groundY;
         }
         Vector2 spot = new Vector2(player.position.x, FloorUnder(player.position.x));
-        GameObject mark = Bar(spot - Vector2.right * bindRadius, Vector2.right, bindRadius * 2f, 0.3f, warnColor, false);
+        GameObject mark = Bar(spot - Vector2.right * bindRadius, Vector2.right, bindRadius * 2f, 0.3f, warnColor);
         for (float t = 0f; t < bindWarnTime / Speed; t += Time.deltaTime)
         {
             spot = new Vector2(player.position.x, FloorUnder(player.position.x));

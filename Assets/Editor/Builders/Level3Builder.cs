@@ -211,7 +211,7 @@ public static class Level3Builder
         so.FindProperty("period").floatValue = 3f;
         so.ApplyModifiedPropertiesWithoutUndo();
 
-        GameObject chain = Deco("Chain", root.transform, pivot + Vector2.down * length * 0.5f, new Vector2(0.15f, length), ChainColor, 2);
+        Deco("Chain", root.transform, pivot + Vector2.down * length * 0.5f, new Vector2(0.15f, length), ChainColor, 2);
         GameObject anchor = Box("AnchorHead", root.transform, pivot + Vector2.down * length, new Vector2(1.6f, 1.2f), new Color(0.3f, 0.32f, 0.36f));
         var col = anchor.GetComponent<BoxCollider2D>();
         col.isTrigger = true;

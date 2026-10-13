@@ -7,7 +7,6 @@ using UnityEngine;
 public class BoatDrive : MonoBehaviour
 {
     [SerializeField] PlayerController2D rider;     // empty = finds the player in the scene
-    [SerializeField] Vector2 riderOffset = new Vector2(0f, 1.5f); // (old: the player now always stands in the middle of the boat)
     [SerializeField] float maxSpeed = 7f;
     [SerializeField] float acceleration = 10f;
     [SerializeField] float deceleration = 8f;

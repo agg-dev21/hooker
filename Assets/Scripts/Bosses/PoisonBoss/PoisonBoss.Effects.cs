@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // Part of PoisonBoss (see PoisonBoss.cs for its settings and the main loop).

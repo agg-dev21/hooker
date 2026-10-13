@@ -1,11 +1,9 @@
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 // Part of TutorialRoomBuilder (see TutorialRoomBuilder.cs for its settings and the main loop).
 // Level 1 (the ship's lower decks), its secret rooms and the outside room.
@@ -256,31 +254,6 @@ public static partial class TutorialRoomBuilder
     // ---------------- Secret room obstacles ----------------
     // Like the Level 2 secret rooms: each room has an obstacle guarding the chest, and a health potion as a reward.
     // Hardy-themed (goo tendrils, barrels, cannons, crates), no poison. You come in on the right; the chest is in the middle.
-
-    // (menu removed: one-time, already done)
-    static void AddSecretRoomObstaclesToLevel1()
-    {
-        string path = ScenePath(Level1Name);
-        if (!File.Exists(path)) return;
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-        Tilemap map = FindGroundTilemap();
-
-        int done = 0;
-        for (int k = 0; k < Floors; k++)
-        {
-            // The real room lives under "SecretRooms" (the decoration has groups with the same name)
-            GameObject secrets = GameObject.Find("SecretRooms");
-            Transform room = secrets ? secrets.transform.Find("SecretRoom_F" + (k + 1)) : null;
-            if (!room) continue;
-            AddSecretRoomObstacles(k, room, map);
-            done++;
-        }
-
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        EditorUtility.DisplayDialog("Secret Room Obstacles", "Added obstacles and a health potion to " + done + " secret rooms.\n\nRun it again any time: it replaces the old ones.", "OK");
-    }
 
     static void AddSecretRoomObstacles(int k, Transform room, Tilemap map)
     {

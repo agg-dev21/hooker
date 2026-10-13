@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 // The plank drawings that dress the levels (Assets/Resources/PlankArt.asset, made by Tools > Art > Planks).
 // Each part of the game has its own set, to match the place it is (used by PlankDressing):

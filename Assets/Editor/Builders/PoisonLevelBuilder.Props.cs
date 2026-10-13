@@ -1,10 +1,5 @@
-using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using UnityEngine.Tilemaps;
 
 // Part of PoisonLevelBuilder (see PoisonLevelBuilder.cs for its settings and the main loop).
 // The pieces the level is made of: poison hazards, rings, platforms, chests, checkpoints.

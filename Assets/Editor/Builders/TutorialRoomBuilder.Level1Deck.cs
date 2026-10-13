@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -33,21 +32,6 @@ public static partial class TutorialRoomBuilder
         so.FindProperty("maxBounds").vector2Value = new Vector2(DeckRight + 0.33f, deckBottom + DeckCameraSize * 2f); // one screen tall: never moves up/down
         so.FindProperty("lockToFloors").boolValue = false;
         so.ApplyModifiedPropertiesWithoutUndo();
-    }
-
-    // Changes only the camera in the existing Level_1_Deck (keeps Hardy and everything else)
-    // (menu removed: one-time fix, already done)
-    static void UpdateDeckCamera()
-    {
-        string path = ScenePath(DeckSceneName);
-        if (!File.Exists(path)) return;
-        if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
-        Scene scene = EditorSceneManager.OpenScene(path, OpenSceneMode.Single);
-        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>();
-        SetDeckCamera(player.transform);
-        EditorSceneManager.MarkSceneDirty(scene);
-        EditorSceneManager.SaveScene(scene);
-        EditorUtility.DisplayDialog("Update Deck Camera", "The deck camera now follows the player left and right (same zoom as Level 1).", "OK");
     }
 
     [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Deck")]

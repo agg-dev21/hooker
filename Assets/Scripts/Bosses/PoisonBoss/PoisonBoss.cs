@@ -49,7 +49,6 @@ public partial class PoisonBoss : MonoBehaviour, IChainStunnable
     [Header("1) Charge")]
     [SerializeField] float chargeWarnTime = 0.5f;
     [SerializeField] float chargeSpeed = 22f;
-    [SerializeField] int chargeDamage = 14;      // (old touch-based charge damage, not used by the lizard dash)
     [SerializeField] int dashHitDamage = 22;     // lizard dash: hitting the player hurts a lot (no poison)
     [SerializeField] float dashKnockback = 16f;
     [SerializeField] float crashStunTime = 0.8f; // dodged: he hits the wall and is stunned this long
@@ -73,11 +72,6 @@ public partial class PoisonBoss : MonoBehaviour, IChainStunnable
     [Header("3) Rain")]
     [SerializeField] int rainDrops = 9;
     [SerializeField] float rainTime = 2.5f;
-
-    [Header("4) Spit (old, replaced by Vomit)")]
-    [SerializeField] Projectile spitPrefab;
-    [SerializeField] int spitCount = 3;
-    [SerializeField] float spitSpread = 18f; // degrees between globs
 
     [Header("4) Vomit")]
     [SerializeField] float vomitWarnTime = 0.35f;

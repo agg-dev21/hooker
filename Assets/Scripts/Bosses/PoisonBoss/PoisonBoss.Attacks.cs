@@ -1,9 +1,8 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // Part of PoisonBoss (see PoisonBoss.cs for its settings and the main loop).
-// Every attack: Charge, Vomit, Glob, Claws, mast attack, Slam, Rain and Spit.
+// Every attack: Charge, Vomit, Glob, Claws, mast attack, Slam and Rain.
 public partial class PoisonBoss
 {
     // ---------------- 1) Charge ----------------
@@ -188,7 +187,7 @@ public partial class PoisonBoss
 
     IEnumerator Claws()
     {
-        float dir = DirToPlayer;
+        float dir;
         // Step in until the player is within reach (or time runs out)
         for (float t = 0f; t < clawApproachTime; t += Time.fixedDeltaTime)
         {
@@ -287,29 +286,6 @@ public partial class PoisonBoss
             if (i % 3 == 0 && player) x = Mathf.Clamp(player.position.x + Random.Range(-1.5f, 1.5f), arenaMinX, arenaMaxX); // some aimed at you
             SpawnDrop(new Vector2(x, ceilingY - 0.5f));
             yield return new WaitForSeconds(rainTime / drops / Speed);
-        }
-    }
-
-    // ---------------- 4) Spit ----------------
-
-    IEnumerator Spit()
-    {
-        yield return Warn(0.45f / Speed);
-        if (!spitPrefab) yield break;
-        int volleys = phase2 ? 2 : 1;
-        for (int v = 0; v < volleys; v++)
-        {
-            Vector2 mouth = rb.position + Vector2.up * halfHeight * 0.4f;
-            Vector2 aim = ((Vector2)player.position - mouth).normalized;
-            for (int i = 0; i < spitCount; i++)
-            {
-                float angle = (i - (spitCount - 1) * 0.5f) * spitSpread;
-                Vector2 dir = Quaternion.Euler(0f, 0f, angle) * aim;
-                Projectile p = Instantiate(spitPrefab, mouth + dir * (halfWidth + 0.3f), Quaternion.identity);
-                if (p.TryGetComponent(out SpriteRenderer psr)) psr.color = poisonColor;
-                p.Launch(dir);
-            }
-            yield return new WaitForSeconds(0.45f);
         }
     }
 }

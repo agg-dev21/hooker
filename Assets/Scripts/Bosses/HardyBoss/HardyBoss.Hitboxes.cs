@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // Part of HardyBoss (see HardyBoss.cs for its settings and the main loop).

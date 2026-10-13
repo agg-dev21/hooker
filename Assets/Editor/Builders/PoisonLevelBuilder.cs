@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -119,7 +118,7 @@ public static partial class PoisonLevelBuilder
         BuildSecretRooms(secrets, hazards, props);
 
         RebuildColliders(map);
-        PlacePlayerAndCamera(scene);
+        PlacePlayerAndCamera();
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
@@ -348,7 +347,7 @@ public static partial class PoisonLevelBuilder
 
     // ---------------- Player and camera ----------------
 
-    static void PlacePlayerAndCamera(Scene scene)
+    static void PlacePlayerAndCamera()
     {
         PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>(FindObjectsInactive.Include);
         if (!player) { Debug.LogError("Build Level 2: no Player in Room_Template"); return; }
@@ -359,18 +358,6 @@ public static partial class PoisonLevelBuilder
         player.transform.position = new Vector3(20f, 54f + UpperLift + feet + 0.05f, 0f); // purple dot
 
         SetUpCamera(player.transform);
-    }
-
-    // Menu item: apply the camera settings to the open Level_2 without rebuilding the level
-    // (menu removed: one-time fix, already done)
-    static void UpdateCamera()
-    {
-        PlayerController2D player = Object.FindAnyObjectByType<PlayerController2D>(FindObjectsInactive.Include);
-        if (!player) { EditorUtility.DisplayDialog("Level 2 Camera", "Open Level_2 first (no Player found).", "OK"); return; }
-        SetUpCamera(player.transform);
-        EditorSceneManager.MarkSceneDirty(player.gameObject.scene);
-        EditorSceneManager.SaveScene(player.gameObject.scene);
-        EditorUtility.DisplayDialog("Level 2 Camera", "Camera updated and scene saved.", "OK");
     }
 
     static void SetUpCamera(Transform player)

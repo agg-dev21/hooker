@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 // Part of OctopusBoss (see OctopusBoss.cs for its settings and the main loop).
@@ -24,8 +23,8 @@ public partial class OctopusBoss
             if (bodyParts[i]) bodyParts[i].color = on ? flashColor * partColors[i] : partColors[i];
     }
 
-    // A bar from 'from' going 'length' in direction 'dir' (warnings, anchor). Optional hitbox.
-    GameObject Bar(Vector2 from, Vector2 dir, float length, float thickness, Color color, bool hurts)
+    // A bar from 'from' going 'length' in direction 'dir' (warnings, anchor).
+    GameObject Bar(Vector2 from, Vector2 dir, float length, float thickness, Color color)
     {
         var root = new GameObject("BossBar");
         root.transform.position = from;
@@ -45,13 +44,11 @@ public partial class OctopusBoss
     // An iron chain that grows out of a point. Damages (and knocks back) the player while out.
     class Chain
     {
-        readonly OctopusBoss boss;
         readonly Transform root;
         readonly DamageZone zone;
 
         public Chain(OctopusBoss boss, Vector2 from, Vector2 dir, float thickness, int damage, float knockback)
         {
-            this.boss = boss;
             var go = new GameObject("BossChain");
             root = go.transform;
             root.position = from;

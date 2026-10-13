@@ -1,9 +1,4 @@
-using System.Collections;
-using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.Rendering.Universal;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 

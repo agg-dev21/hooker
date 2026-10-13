@@ -7,7 +7,6 @@ public class Burn : MonoBehaviour
 {
     [SerializeField] int tickDamage = 1;
     [SerializeField] float tickInterval = 1f;
-    [SerializeField] float duration = 3f;
     [SerializeField] bool showTint = true;   // orange tint while burning (steady, no flashing)
     [SerializeField] Color burnColor = new Color(1f, 0.6f, 0.35f);
 
@@ -35,7 +34,6 @@ public class Burn : MonoBehaviour
     {
         if (timeLeft <= 0f) tickTimer = interval; // new burn: first tick happens one interval later
         tickDamage = damage;
-        duration = time;
         tickInterval = interval;
         timeLeft = time;
     }

@@ -201,7 +201,6 @@ public static class OctopusBossBuilder
         so.FindProperty("arenaMaxX").floatValue = 34f;
         so.FindProperty("startDelay").floatValue = 2f; // Madame O opens the fight, then he joins in
         so.FindProperty("restTime").floatValue = 0.8f;
-        so.FindProperty("spitPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>("Assets/Prefabs/Projectile.prefab");
         so.FindProperty("healthBarRoot").objectReferenceValue = bar;
         so.FindProperty("ledgeTopY").floatValue = 3.5f; // the two side ledges
         so.ApplyModifiedPropertiesWithoutUndo();

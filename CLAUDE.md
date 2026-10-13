@@ -15,7 +15,7 @@ Hooker is a Unity **6000.6.5f1** 2D action platformer (URP, new Input System, Te
 dotnet build Hooker.Editor.csproj -nologo -v q    # builds Hooker.Runtime too (~20 s)
 dotnet build Hooker.Runtime.csproj -nologo -v q   # gameplay code only
 ```
-- The build should finish with 0 errors. Two warnings are known and expected: `PoisonBoss.chargeDamage` is unused, and `DevSettings` uses the deprecated `DEVELOPMENT_BUILD` directive.
+- The build should finish with 0 errors. One warning is known and expected: `DevSettings` uses the deprecated `DEVELOPMENT_BUILD` directive.
 - The `.csproj` files only list files Unity knew about when it last regenerated them. A **newly created** `.cs` file isn't compiled until Unity regenerates the project, so its errors only show up in the Unity Console.
 
 **Tests:** `com.unity.test-framework` is installed but there are **no tests yet**. Batch-mode runs only work when the project is *not* open in the editor:

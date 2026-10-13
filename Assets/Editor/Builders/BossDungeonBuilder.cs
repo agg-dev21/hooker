@@ -25,7 +25,6 @@ public static class BossDungeonBuilder
     const string TemplateScene = "Assets/Scenes/Room_Template.unity";
     const string ScenesFolder = "Assets/Scenes";
     const string FallbackTile = "Assets/Tiles/Square.asset";
-    const string ProjectilePrefab = "Assets/Prefabs/Projectile.prefab";
     const int BossHealth = 300;
     const float CameraSize = 10f; // the whole arena on screen
 
@@ -88,7 +87,7 @@ public static class BossDungeonBuilder
         GameObject[] exit = BuildExit(props);
         BuildArena(props);
         BuildEntrance(decor);
-        GameObject boss = AddBoss(root, exit);
+        AddBoss(root, exit);
 
         RebuildColliders(map);
         PlacePlayerAndCamera();
@@ -275,7 +274,6 @@ public static class BossDungeonBuilder
         so.FindProperty("ceilingY").floatValue = 19.5f;
         so.FindProperty("arenaMinX").floatValue = 0f;
         so.FindProperty("arenaMaxX").floatValue = 36f;
-        so.FindProperty("spitPrefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Projectile>(ProjectilePrefab);
         so.FindProperty("healthBarRoot").objectReferenceValue = bar;
         so.FindProperty("runsAwayWhenBeaten").boolValue = true; // he flees here and comes back in Level 3
         SetArray(so.FindProperty("removeOnDeath"), exit[0]);

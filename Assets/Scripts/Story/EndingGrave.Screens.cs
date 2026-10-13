@@ -2,6 +2,7 @@ using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // Part of EndingGrave (see EndingGrave.cs for its settings and the main loop).
 // The two full-screen pages: Mom's letter (on old paper) and THE END card, plus the UI helpers that build them.
@@ -34,30 +35,29 @@ public partial class EndingGrave
     void BuildLetter()
     {
         letterUi = Canvas("LetterCanvas", 900);
-        var dim = Panel("Dim", letterUi.transform, new Color(0f, 0f, 0f, 0.65f));
-        Stretch(dim.rectTransform);
+        Fill(Panel("Dim", letterUi.transform, new Color(0f, 0f, 0f, 0.65f)), 0f);
         var paper = Panel("Paper", letterUi.transform, Paper);
-        paper.rectTransform.sizeDelta = new Vector2(980f, 760f);
-        var edge = Panel("Edge", paper.transform, new Color(0.7f, 0.6f, 0.42f));
-        Stretch(edge.rectTransform); edge.rectTransform.offsetMin = new Vector2(14f, 14f); edge.rectTransform.offsetMax = new Vector2(-14f, -14f);
-        var inner = Panel("Inner", edge.transform, Paper);
-        Stretch(inner.rectTransform); inner.rectTransform.offsetMin = new Vector2(4f, 4f); inner.rectTransform.offsetMax = new Vector2(-4f, -4f);
+        paper.sizeDelta = new Vector2(980f, 760f);
+        var edge = Panel("Edge", paper, new Color(0.7f, 0.6f, 0.42f));
+        Fill(edge, 14f);
+        var inner = Panel("Inner", edge, Paper);
+        Fill(inner, 4f);
 
-        var title = UIText("Title", inner.transform, "For my son", 46f, InkTitle, TextAlignmentOptions.Center);
+        var title = UIText("Title", inner, "For my son", 46f, InkTitle, TextAlignmentOptions.Center);
         title.fontStyle = FontStyles.Italic | FontStyles.Bold;
         title.rectTransform.anchorMin = new Vector2(0f, 1f); title.rectTransform.anchorMax = new Vector2(1f, 1f);
         title.rectTransform.pivot = new Vector2(0.5f, 1f); title.rectTransform.sizeDelta = new Vector2(0f, 80f);
         title.rectTransform.anchoredPosition = new Vector2(0f, -30f);
 
-        letterBody = UIText("Body", inner.transform, "", 32f, Ink, TextAlignmentOptions.TopLeft);
+        letterBody = UIText("Body", inner, "", 32f, Ink, TextAlignmentOptions.TopLeft);
         letterBody.fontStyle = FontStyles.Italic;
         letterBody.lineSpacing = 8f;
-        Stretch(letterBody.rectTransform);
+        Fill(letterBody.rectTransform, 0f);
         letterBody.rectTransform.offsetMin = new Vector2(70f, 80f);
         letterBody.rectTransform.offsetMax = new Vector2(-70f, -120f);
 
-        letterPageText = UIText("Page", inner.transform, "", 24f, new Color(0.45f, 0.35f, 0.2f), TextAlignmentOptions.Bottom);
-        Stretch(letterPageText.rectTransform);
+        letterPageText = UIText("Page", inner, "", 24f, new Color(0.45f, 0.35f, 0.2f), TextAlignmentOptions.Bottom);
+        Fill(letterPageText.rectTransform, 0f);
         letterPageText.rectTransform.offsetMin = new Vector2(0f, 24f);
         letterUi.SetActive(false);
     }
@@ -67,8 +67,8 @@ public partial class EndingGrave
     IEnumerator EndCard(bool withAriel)
     {
         GameObject card = Canvas("EndCard", 1000);
-        var black = Panel("Black", card.transform, new Color(0f, 0f, 0f, 0f));
-        Stretch(black.rectTransform);
+        Image black = Panel("Black", card.transform, new Color(0f, 0f, 0f, 0f)).GetComponent<Image>();
+        Fill(black.rectTransform, 0f);
         var end = UIText("TheEnd", card.transform, "THE END", 120f, new Color(Gold.r, Gold.g, Gold.b, 0f), TextAlignmentOptions.Center);
         end.fontStyle = FontStyles.Bold;
         end.characterSpacing = 14f;
@@ -116,16 +116,6 @@ public partial class EndingGrave
         return go;
     }
 
-    static Image Panel(string name, Transform parent, Color color)
-    {
-        var go = new GameObject(name, typeof(RectTransform), typeof(Image));
-        go.transform.SetParent(parent, false);
-        var img = go.GetComponent<Image>();
-        img.color = color;
-        img.raycastTarget = false;
-        return img;
-    }
-
     static TextMeshProUGUI UIText(string name, Transform parent, string text, float size, Color color, TextAlignmentOptions align)
     {
         var go = new GameObject(name, typeof(RectTransform));
@@ -138,12 +128,5 @@ public partial class EndingGrave
         t.alignment = align;
         t.raycastTarget = false;
         return t;
-    }
-
-    static void Stretch(RectTransform rt)
-    {
-        rt.anchorMin = Vector2.zero;
-        rt.anchorMax = Vector2.one;
-        rt.offsetMin = rt.offsetMax = Vector2.zero;
     }
 }

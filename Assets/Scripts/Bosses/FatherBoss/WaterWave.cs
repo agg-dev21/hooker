@@ -10,6 +10,7 @@ public class WaterWave : MonoBehaviour
     float firstTime, refreshTime;
     bool hitPlayer;
     Transform body, crest;
+    BoxCollider2D col;
     Transform art;          // the drawn water (when KK's art is set up)
     float knockback, slowFactor = 1f, slowTime;
     float artScale;
@@ -29,7 +30,7 @@ public class WaterWave : MonoBehaviour
 
         body = Part("Water", sprite, water, 5);
         crest = Part("Foam", sprite, foam, 6);
-        var col = gameObject.AddComponent<BoxCollider2D>();
+        col = gameObject.AddComponent<BoxCollider2D>();
         col.isTrigger = true;
         var rb = gameObject.AddComponent<Rigidbody2D>(); // so the trigger works while it moves
         rb.bodyType = RigidbodyType2D.Kinematic;
@@ -79,7 +80,6 @@ public class WaterWave : MonoBehaviour
         body.localPosition = new Vector3(0f, h * 0.5f, 0f);
         crest.localScale = new Vector3(width * 1.15f, Mathf.Min(0.25f, h), 1f);
         crest.localPosition = new Vector3(0f, h - 0.1f, 0f);
-        var col = GetComponent<BoxCollider2D>();
         col.size = new Vector2(width * 0.85f, h);
         col.offset = new Vector2(0f, h * 0.5f);
     }

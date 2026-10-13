@@ -22,7 +22,6 @@ public class OceanLayers : MonoBehaviour
     [SerializeField] Layer front = new Layer { height = -1.4f, drift = -1.4f, bob = 0.16f, bobSpeed = 1.5f, tint = new Color(1f, 1f, 1f, 0.9f), sortingOffset = 30 };
 
     Transform mainT, backT, frontT;
-    Vector3 basePos;
     float tileWidth;
 
     void Start()
@@ -30,7 +29,6 @@ public class OceanLayers : MonoBehaviour
         var sr = GetComponent<SpriteRenderer>();
         if (!sr.sprite) { enabled = false; return; }
         tileWidth = sr.sprite.rect.width / sr.sprite.pixelsPerUnit;
-        basePos = transform.position;
 
         // The layers are copies of this sea; this object stays put, the copies move
         mainT = Copy("SeaMain", sr, main);

@@ -1,10 +1,6 @@
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // Part of PlayerItems (see PlayerItems.cs for its settings and the main loop).
 // Opening, closing and using the inventory screen (keyboard, controller and mouse drag).

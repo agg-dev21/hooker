@@ -8,7 +8,7 @@ using static LevelKit;
 // Editor-only. Adds two menu items:
 //   Tools > Story > Build Ending (Mother's Grave)
 //       Makes the scene Ending_Grave: a quiet cliff over the sea at dusk with Mom's grave,
-//       her letter and her wedding ring on it (see EndingGrave.cs for the whole scene and every line).
+//       her letter and her wedding ring on it (see EndingGrave.cs for the whole scene, EndingGrave.Words.cs for every line).
 //   Tools > Story > Add Ending Hook And Ariel Talks
 //       Level_4_Boss: KK's last words when he is beaten, then the fade to Ending_Grave.
 //       Level_3 and Level_4: Raphael and Ariel talk as they go (only if Ariel is with him).

@@ -1,11 +1,6 @@
-using System.Collections.Generic;
-using System.IO;
 using UnityEditor;
-using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
-using UnityEngine.UI;
 
 // Part of TutorialRoomBuilder (see TutorialRoomBuilder.cs for its settings and the main loop).
 // Scene helpers shared by the builders in this class (prompts, colliders, tilemap lookups).
@@ -44,21 +39,6 @@ public static partial class TutorialRoomBuilder
     }
 
     // ---------------- "Press E" pop-ups ----------------
-    // Adds a "Press E" text above every SecretDoor and Chest in the open scene that does not have one yet.
-
-    // (menu removed: one-time fix, already done)
-    static void AddPromptsToScene()
-    {
-        int added = 0;
-        foreach (SecretDoor door in Object.FindObjectsByType<SecretDoor>(FindObjectsInactive.Include))
-            if (AddPrompt(door.gameObject, door)) added++;
-        foreach (Chest chest in Object.FindObjectsByType<Chest>(FindObjectsInactive.Include))
-            if (AddPrompt(chest.gameObject, chest)) added++;
-
-        if (added > 0) EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
-        EditorUtility.DisplayDialog("Add Press E Pop-ups", "Added " + added + " pop-ups. Press Ctrl + S to save the scene.", "OK");
-    }
-
     // Puts a "Press E" text just above the object and links it to the component's Prompt slot.
     // The text is a sibling (not a child) so it does not get stretched by the object's scale.
     static bool AddPrompt(GameObject target, Component owner)

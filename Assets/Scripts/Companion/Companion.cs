@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.InputSystem;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -80,7 +79,6 @@ public partial class Companion : MonoBehaviour
     bool Drawn => HasArt || S.sprite;
 
     PlayerController2D player;
-    Collider2D playerCol;
     SpriteRenderer body;
     Light2D glow;
     Vector3 velocity;
@@ -109,7 +107,6 @@ public partial class Companion : MonoBehaviour
     {
         if (RunOrder.InTutorial) { Destroy(gameObject); return; } // never in the tutorial rooms
         player = FindAnyObjectByType<PlayerController2D>();
-        if (player) playerCol = player.GetComponent<Collider2D>();
 
         var look = new GameObject("Body");
         look.transform.SetParent(transform, false);

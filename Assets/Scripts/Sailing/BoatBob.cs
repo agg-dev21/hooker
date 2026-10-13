@@ -9,10 +9,7 @@ public class BoatBob : MonoBehaviour
     [SerializeField] float tilt = 3f;         // degrees
     [SerializeField] float tiltSpeed = 1.2f;
 
-    float baseY;
     float lastOffset;
-
-    void Start() => baseY = transform.position.y;
 
     void LateUpdate()
     {

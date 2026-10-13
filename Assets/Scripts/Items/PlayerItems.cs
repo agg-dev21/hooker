@@ -3,8 +3,6 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
-using static UiKit; // Panel, Fill, Label, WhiteSprite (shared UI helpers)
 
 // The player's items: a 4-slot quick bar at the bottom of the screen, the inventory screen, and the item effects.
 //   Quick bar   - 1 / 2 / 3 / 4 picks a slot, Use Item (F / RT) uses the item in it. New items go into a free slot

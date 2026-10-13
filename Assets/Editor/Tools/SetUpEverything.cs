@@ -1,5 +1,4 @@
 using UnityEditor;
-using UnityEngine;
 
 // Editor-only helper. Adds Tools > Set Up All Art And Jail.
 // Runs every art setup tool in a row, then adds the companion jail to Level 2:
