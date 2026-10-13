@@ -6,6 +6,9 @@ using UnityEngine.UI;
 // damage shows smoothly, no animation needed). If the health bar art is set up (HealthBarSkin), the bar uses it:
 // Raphael's look for the player's bar (top-left), the boss look for every other bar (top middle, stacked if
 // there are two bosses, name under the bar). The art is scaled evenly so nothing stretches or overlaps.
+// The player's bar hides itself when it isn't needed (so it doesn't cover the level): it slides in when you
+// take damage or heal, during boss fights, while your health is low, and while the game is paused,
+// then slides back out a few seconds later. Boss bars always stay.
 public class HealthBar : MonoBehaviour
 {
     [SerializeField] Health target; // whose health to show
@@ -16,13 +19,73 @@ public class HealthBar : MonoBehaviour
     const float BossWidth = 0.32f;   // a boss frame is this share of the screen width (top middle), so they never touch
     const float BossNameHeight = 30f;
 
-    void Start() => ApplySkin();
+    [Header("Player bar: show only when it matters")]
+    [SerializeField] bool autoHide = true;            // off = the player's bar is always on screen
+    [SerializeField] float showTime = 3f;             // seconds it stays after a hit or a heal
+    [SerializeField, Range(0f, 1f)] float lowHealth = 0.3f; // at or below this share of health it always shows
+    [SerializeField] float slideSpeed = 4f;
+
+    static readonly System.Collections.Generic.List<HealthBar> all = new System.Collections.Generic.List<HealthBar>();
+    public bool IsPlayerBar => target && target.GetComponent<PlayerController2D>();
+    RectTransform barRoot;
+    CanvasGroup barGroup;
+    Vector2 shownPos;
+    float shownUntil = -1f, shown = 1f;
+    int lastHealth = -1;
+
+    void OnEnable() { if (!all.Contains(this)) all.Add(this); }
+    void OnDisable() => all.Remove(this);
+
+    void Start()
+    {
+        ApplySkin();
+        barRoot = fill ? fill.rectTransform.parent as RectTransform : null;
+        if (barRoot)
+        {
+            shownPos = barRoot.anchoredPosition;
+            barGroup = barRoot.GetComponent<CanvasGroup>();
+            if (!barGroup) barGroup = barRoot.gameObject.AddComponent<CanvasGroup>();
+        }
+        shownUntil = Time.unscaledTime + 2f; // show it briefly when a level starts
+    }
 
     void Update()
     {
         if (!target) { gameObject.SetActive(false); return; } // its boss is gone (beaten, or already beaten earlier)
         if (!fill) return;
         fill.fillAmount = (float)target.CurrentHealth / target.MaxHealth;
+        if (autoHide && IsPlayerBar) AutoHide();
+    }
+
+    // The player's bar: slide in when it matters, slide out (up off the screen) when it doesn't
+    void AutoHide()
+    {
+        if (!barRoot) return;
+        int hp = target.CurrentHealth;
+        if (hp != lastHealth)
+        {
+            if (lastHealth >= 0) shownUntil = Time.unscaledTime + showTime; // took damage or healed
+            lastHealth = hp;
+        }
+
+        bool needed = Time.unscaledTime < shownUntil
+                      || hp <= target.MaxHealth * lowHealth
+                      || Time.timeScale == 0f          // paused: let the player check their health
+                      || BossFight();
+        shown = Mathf.MoveTowards(shown, needed ? 1f : 0f, slideSpeed * Time.unscaledDeltaTime);
+        float k = Mathf.SmoothStep(0f, 1f, shown);
+
+        float slide = barRoot.rect.height * 3f + Margin * 4f; // far enough up that the whole frame is off screen
+        barRoot.anchoredPosition = shownPos + Vector2.up * (1f - k) * slide;
+        if (barGroup) barGroup.alpha = k;
+    }
+
+    // Any boss bar on screen with its boss still alive
+    static bool BossFight()
+    {
+        foreach (HealthBar bar in all)
+            if (bar && !bar.IsPlayerBar && bar.target && bar.target.CurrentHealth > 0 && bar.isActiveAndEnabled) return true;
+        return false;
     }
 
     void ApplySkin()
