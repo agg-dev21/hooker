@@ -8,8 +8,8 @@ using UnityEngine.SceneManagement;
 // Puts the team's arena picture (Assets/Art/Hardy/hardy_arena.png: the dark night, the three glowing masts,
 // the railing and the cabin) behind Hardy's boss fight on the deck (Level_1_Deck).
 // The picture is STATIC: it stays put in the world while the camera moves past it, like real scenery.
-// The deck is 3 screens long, so the picture is placed side by side across it (every other copy mirrored,
-// so the edges match up), sized to the camera's height with its deck lined up on the real deck.
+// ONE picture, never repeated: it is made big enough to span the whole deck (3 screens long),
+// with its deck lined up on the real deck, so the camera never sees past its edges.
 // The picture is the WHOLE background: the old deck decoration (sky, stars, moon, mast, sails, railing, goo)
 // and the moving ocean are hidden (not deleted), a dark night fills the picture's empty sky,
 // and the light is turned up so the picture shows in its real colours. Run it again any time; it replaces the old picture.
@@ -48,16 +48,16 @@ public static class HardyArenaBackground
         foreach (GameObject r in scene.GetRootGameObjects())
             if (r.name == "HardyArenaBackground") Object.DestroyImmediate(r);
 
-        // Height: tall enough to cover the view above and below the deck, with its deck line on the real deck
-        float height = Mathf.Max((DeckY - (ViewBottom - Margin)) / DeckLine, ((ViewTop + Margin) - DeckY) / (1f - DeckLine));
+        // One picture: wide enough for the whole deck, and tall enough to cover the view above and below it
+        float span = (ViewRight - ViewLeft) + Margin * 2f;
+        float aspect = pic.bounds.size.x / pic.bounds.size.y;
+        float height = Mathf.Max(span / aspect,
+            Mathf.Max((DeckY - (ViewBottom - Margin)) / DeckLine, ((ViewTop + Margin) - DeckY) / (1f - DeckLine)));
         float scale = height / pic.bounds.size.y;
         float width = pic.bounds.size.x * scale;
-        float centerY = DeckY - DeckLine * height + height * 0.5f;
-
-        // Side by side across the deck, centred on it, every other copy mirrored
-        float span = (ViewRight - ViewLeft) + Margin * 2f;
-        int copies = Mathf.CeilToInt(span / width);
-        float startX = (ViewLeft + ViewRight) * 0.5f - copies * width * 0.5f;
+        float centerY = DeckY - DeckLine * height + height * 0.5f; // its deck line on the real deck
+        const int copies = 1;
+        float startX = (ViewLeft + ViewRight) * 0.5f - width * 0.5f;
 
         var bg = new GameObject("HardyArenaBackground");
 
