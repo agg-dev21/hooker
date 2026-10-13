@@ -224,7 +224,9 @@ public partial class PlayerItems
         barRoot.transform.SetParent(uiRoot.transform, false);
         var bar = (RectTransform)barRoot.transform;
         bar.anchorMin = bar.anchorMax = new Vector2(0.5f, 0f);
-        bar.anchoredPosition = new Vector2(0f, 30f);
+        bar.pivot = new Vector2(0.5f, 0f);          // measured from its bottom edge...
+        bar.sizeDelta = new Vector2(440f, 90f);     // ...as big as the 4 slots (they sit on its bottom edge)
+        bar.anchoredPosition = new Vector2(0f, 28f); // so the whole bar is on screen, 28 above the bottom
 
         // Active effects, under the health bar
         effectsText = Label("Effects", uiRoot.transform, "", 24f, Vector2.zero);
