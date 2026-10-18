@@ -14,7 +14,7 @@ public static partial class TutorialRoomBuilder
     // fades to black and loads Level_2 (stays black until Level_2 exists).
     // Also sets Hardy (if he is in the deck) to fade to this scene when he dies.
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Sail")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 1 Sail", priority = 3000)]
     static void BuildLevel1Sail()
     {
         string path = ScenePath(SailSceneName);

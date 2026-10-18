@@ -24,7 +24,7 @@ public static class BossMastBuilder
     const float RingLaunch = 18f;      // upward push after reaching the ring (enough to pop up through the nest)
     static readonly Color RingColor = new Color(1f, 0.85f, 0.2f);
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 2 Boss: Add Masts")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 2 Boss: Add Masts", priority = 3000)]
     static void AddMasts()
     {
         if (!File.Exists(BossScene))

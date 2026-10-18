@@ -2,7 +2,7 @@ using UnityEngine;
 
 // An item lying in a level. Touch it to put it in your inventory. Bobs up and down.
 // For a scroll, type its Title and Text below.
-// Needs a Collider2D with Is Trigger ON (Tools > Items > Add Item Pickup sets everything up).
+// Needs a Collider2D with Is Trigger ON (Tools > Other > Items > Add Item Pickup sets everything up).
 [RequireComponent(typeof(Collider2D))]
 public class ItemPickup : MonoBehaviour
 {

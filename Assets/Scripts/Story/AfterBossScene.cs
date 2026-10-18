@@ -7,7 +7,7 @@ using UnityEngine.SceneManagement;
 // Used after the final boss: KK's last words, then the cliff with Mom's grave (Ending_Grave).
 //
 // It also installs itself: whenever Level_4_Boss loads without one (for example if
-// Tools > Story > Add Ending Hook And Ariel Talks was never run), it adds KK's last words
+// Tools > Other > Story > Add Ending Hook And Ariel Talks was never run), it adds KK's last words
 // and the fade to Ending_Grave by itself. Nothing needs to be set up in the scene.
 public class AfterBossScene : MonoBehaviour
 {
@@ -38,7 +38,7 @@ public class AfterBossScene : MonoBehaviour
         yield return new WaitForSeconds(delay);
         if (!Application.CanStreamedLevelBeLoaded(sceneName))
             Debug.LogError("AfterBossScene: '" + sceneName + "' is not in the Scene List (File > Build Profiles). " +
-                           "Build it with Tools > Story > Build Ending (Mother's Grave).");
+                           "Build it with Tools > Other > Story > Build Ending (Mother's Grave).");
         ScreenFade.FadeToScene(sceneName, 1.5f, 1.5f);
     }
 

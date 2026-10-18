@@ -16,7 +16,7 @@ public static partial class TutorialRoomBuilder
     // Left x of the 3-wide hole that leads up onto floor k (k = 1..4)
     static int HoleX(int k) => k % 2 == 1 ? 62 : -12;
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 (Ship)")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 1 (Ship)", priority = 3000)]
     static void BuildLevel1()
     {
         string path = ScenePath(Level1Name);

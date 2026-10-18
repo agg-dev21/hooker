@@ -16,7 +16,7 @@ public static class MadameOArtSetup
     const string Folder = "Assets/Art/MadameO";
     const string BossScene = "Assets/Scenes/Level_3_Boss.unity";
 
-    [MenuItem("Tools/Art/Madame O")]
+    [MenuItem("Tools/Art/Madame O", priority = 104)]
     static void SetUp()
     {
         // About 5.8 tiles tall (she is drawn about 1015 px tall)
@@ -26,7 +26,7 @@ public static class MadameOArtSetup
         Sprite chain = SingleSprite(Folder + "/madameo_chain.png", 300f);
         if (idle.Length == 0)
         {
-            EditorUtility.DisplayDialog("Set Up Madame O Art", "Could not find " + Folder + "/madameo_idle.png.", "OK");
+            EditorKit.Message("Set Up Madame O Art", "Could not find " + Folder + "/madameo_idle.png.", "OK");
             return;
         }
         if (!File.Exists(BossScene) || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -35,7 +35,7 @@ public static class MadameOArtSetup
         OctopusBoss siren = Object.FindAnyObjectByType<OctopusBoss>(FindObjectsInactive.Include);
         if (!siren)
         {
-            EditorUtility.DisplayDialog("Set Up Madame O Art", "Sheets sliced, but Madame O isn't in Level_3_Boss.", "OK");
+            EditorKit.Message("Set Up Madame O Art", "Sheets sliced, but Madame O isn't in Level_3_Boss.", "OK");
             return;
         }
 
@@ -68,7 +68,7 @@ public static class MadameOArtSetup
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Selection.activeGameObject = siren.gameObject;
-        EditorUtility.DisplayDialog("Set Up Madame O Art",
+        EditorKit.Message("Set Up Madame O Art",
             "Done! Madame O uses her drawings: idle " + idle.Length + ", attack " + attack.Length + ", chain bind " + bind.Length + " frames.\n\n" +
             "If she faces the wrong way, tick or untick 'Art Faces Right' on her.", "OK");
     }

@@ -5,7 +5,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Add Story Dialogue.
+// Editor-only helper. Adds Tools > Other > Add Story Dialogue.
 // Puts the story conversations into the scenes (an object called "StoryDialogue" in each):
 //   Tutorial_1_Move  Raphael's opening
 //   Level_1_Deck     Hardy: before the fight and when he is beaten
@@ -19,7 +19,7 @@ public static class StoryDialogueTool
 {
     const string Hero = "Raphael";
 
-    [MenuItem("Tools/Add Story Dialogue")]
+    [MenuItem("Tools/Other/Add Story Dialogue", priority = 3000)]
     static void AddAll()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

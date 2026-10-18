@@ -19,7 +19,7 @@ public static class PoisonArtSetup
     const string AssetPath = "Assets/Resources/PoisonArt.asset";
     const float PixelsPerUnit = 88f; // same as the lizard
 
-    [MenuItem("Tools/Art/Poison")]
+    [MenuItem("Tools/Art/Poison", priority = 120)]
     static void SetUp()
     {
         Sprite[] drop = Slice("poison_drop", 39, new Vector2(0.5f, 0.5f));
@@ -28,7 +28,7 @@ public static class PoisonArtSetup
         Sprite[] drips = Slice("poison_drips", 320, new Vector2(0.5f, 0.5f));
         if (drop.Length == 0 || splash.Length == 0 || puddle.Length == 0 || drips.Length == 0)
         {
-            EditorUtility.DisplayDialog("Set Up Poison Art", "Some sheets are missing from " + ArtFolder + ".", "OK");
+            EditorKit.Message("Set Up Poison Art", "Some sheets are missing from " + ArtFolder + ".", "OK");
             return;
         }
 
@@ -48,7 +48,7 @@ public static class PoisonArtSetup
 
         Selection.activeObject = art;
         EditorGUIUtility.PingObject(art);
-        EditorUtility.DisplayDialog("Set Up Poison Art",
+        EditorKit.Message("Set Up Poison Art",
             "Done! Every poison puddle, drop, glob, slime wall and poisoned character now uses the poison drawings.\n\n" +
             "Select Assets/Resources/PoisonArt to change sizes and speeds.", "OK");
     }

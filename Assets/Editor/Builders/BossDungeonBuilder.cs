@@ -44,7 +44,7 @@ public static class BossDungeonBuilder
     static Sprite boxSprite;
     static int groundLayer;
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 2 Boss (Dungeon)")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 2 Boss (Dungeon)", priority = 3000)]
     static void Build()
     {
         string path = $"{ScenesFolder}/{SceneName}.unity";

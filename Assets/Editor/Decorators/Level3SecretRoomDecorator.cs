@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using static LevelKit;
 
-// Editor-only helper. Adds Tools > Decorate > Level 3 Secret Rooms.
+// Editor-only helper. Adds Tools > Other > Decorate > Level 3 Secret Rooms.
 // Level 3's two hidden rooms get Madame O's sunken prison look: wet blue stone, seaweed on the floor,
 // rusty chains and real water drips from the ceiling, barnacles, a shallow rippling puddle, broken cell bars
 // and cold blue lanterns. Decoration only (no colliders). Everything sits in "SecretRoomDecor".
@@ -27,7 +27,7 @@ public static class Level3SecretRoomDecorator
     static readonly Color Puddle = new Color(0.2f, 0.5f, 0.7f, 0.55f);
     static readonly Color Lamp = new Color(0.5f, 0.85f, 1f);
 
-    [MenuItem("Tools/Decorate/Level 3 Secret Rooms")]
+    [MenuItem("Tools/Other/Decorate/Level 3 Secret Rooms", priority = 3000)]
     static void Decorate()
     {
         if (!File.Exists(ScenePath) || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

@@ -28,7 +28,7 @@ public static class Level4Builder
     // Water pits (x from, x to). Everything else along the hallway is floor.
     static readonly Vector2Int[] Pits = { new Vector2Int(16, 20), new Vector2Int(36, 42), new Vector2Int(58, 62), new Vector2Int(64, 68) };
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 4 (Flooded Hall)")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 4 (Flooded Hall)", priority = 3000)]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;

@@ -6,10 +6,10 @@ public static class DevToolsMenu
 {
     const string AssetPath = "Assets/Resources/DevSettings.asset";
 
-    [MenuItem("Tools/Dev Tools/Turn On")]
+    [MenuItem("Tools/Dev Tools/Turn On", priority = 50)]
     static void TurnOn() => Set(true);
 
-    [MenuItem("Tools/Dev Tools/Turn Off")]
+    [MenuItem("Tools/Dev Tools/Turn Off", priority = 50)]
     static void TurnOff() => Set(false);
 
     static void Set(bool on)

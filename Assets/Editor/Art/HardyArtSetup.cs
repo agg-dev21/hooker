@@ -26,7 +26,7 @@ public static class HardyArtSetup
     const string SquareTile = "Assets/Tiles/Square.asset";
     const float PixelsPerUnit = 60f; // a 400 px frame is about 6.7 tiles tall: Hardy's body is about 6 tiles
 
-    [MenuItem("Tools/Art/Hardy")]
+    [MenuItem("Tools/Art/Hardy", priority = 102)]
     static void SetUp()
     {
         Vector2 center = new Vector2(0.5f, 0.5f);
@@ -40,12 +40,12 @@ public static class HardyArtSetup
 
         if (walk.Length == 0)
         {
-            EditorUtility.DisplayDialog("Set Up Hardy Art", "Could not find " + ArtFolder + "/hardy_walking.png.", "OK");
+            EditorKit.Message("Set Up Hardy Art", "Could not find " + ArtFolder + "/hardy_walking.png.", "OK");
             return;
         }
         if (!File.Exists(DeckScene))
         {
-            EditorUtility.DisplayDialog("Set Up Hardy Art", "Sheets sliced. Level_1_Deck does not exist yet, so nothing was put on Hardy.", "OK");
+            EditorKit.Message("Set Up Hardy Art", "Sheets sliced. Level_1_Deck does not exist yet, so nothing was put on Hardy.", "OK");
             return;
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -54,7 +54,7 @@ public static class HardyArtSetup
         HardyBoss boss = Object.FindAnyObjectByType<HardyBoss>();
         if (!boss)
         {
-            EditorUtility.DisplayDialog("Set Up Hardy Art", "Sheets sliced, but Hardy is not in the deck. Run Tools > Rebuild Levels > Level 1 Deck: Add Hardy first, then this again.", "OK");
+            EditorKit.Message("Set Up Hardy Art", "Sheets sliced, but Hardy is not in the deck. Run Tools > Rebuild Levels > Level 1 Deck: Add Hardy first, then this again.", "OK");
             return;
         }
 
@@ -94,7 +94,7 @@ public static class HardyArtSetup
         EditorSceneManager.SaveScene(scene);
         SaveAbilityArt(tentacleFx);
         Selection.activeGameObject = boss.gameObject;
-        EditorUtility.DisplayDialog("Set Up Hardy Art",
+        EditorKit.Message("Set Up Hardy Art",
             "Done! Hardy is now about 6 tiles tall and uses the new art.\n\n" +
             "Walk " + walk.Length + ", Spikes pose " + spikesPose.Length + ", Spike effect " + spikeFx.Length +
             ", Tentacle pose " + tentaclePose.Length + ", Horizontal effect " + tentacleFx.Length + ", Punch " + punch.Length + ", Jump slam " + jumpSlam.Length + " frames.", "OK");
@@ -167,29 +167,29 @@ public static class HardyArtSetup
     }
 
     // Testing helpers for the ability unlock
-    [MenuItem("Tools/Abilities/Unlock Hardy's Spikes (testing)")]
+    [MenuItem("Tools/Other/Abilities/Unlock Hardy's Spikes (testing)", priority = 3000)]
     static void UnlockForTesting()
     {
         PlayerPrefs.SetInt(PlayerAbility.HardySpikesSave, 1);
         PlayerPrefs.Save();
-        EditorUtility.DisplayDialog("Abilities", "Hardy's Spikes unlocked. Press Q (or LB) in Play mode.", "OK");
+        EditorKit.Message("Abilities", "Hardy's Spikes unlocked. Press Q (or LB) in Play mode.", "OK");
     }
 
-    [MenuItem("Tools/Abilities/Unlock Poison Hook (testing)")]
+    [MenuItem("Tools/Other/Abilities/Unlock Poison Hook (testing)", priority = 3000)]
     static void UnlockPoisonHookForTesting()
     {
         PlayerPrefs.SetInt(PlayerUpgrades.PoisonHookSave, 1);
         PlayerPrefs.Save();
-        EditorUtility.DisplayDialog("Abilities", "Poison Hook unlocked: hook hits now poison enemies.", "OK");
+        EditorKit.Message("Abilities", "Poison Hook unlocked: hook hits now poison enemies.", "OK");
     }
 
-    [MenuItem("Tools/Abilities/Lock All Abilities Again")]
+    [MenuItem("Tools/Other/Abilities/Lock All Abilities Again", priority = 3000)]
     static void LockForTesting()
     {
         PlayerPrefs.DeleteKey(PlayerAbility.HardySpikesSave);
         PlayerPrefs.DeleteKey(PlayerAbility.HardySpikesSave + ".new");
         PlayerPrefs.DeleteKey(PlayerUpgrades.PoisonHookSave);
         PlayerPrefs.Save();
-        EditorUtility.DisplayDialog("Abilities", "All abilities are locked again (like a new game).", "OK");
+        EditorKit.Message("Abilities", "All abilities are locked again (like a new game).", "OK");
     }
 }

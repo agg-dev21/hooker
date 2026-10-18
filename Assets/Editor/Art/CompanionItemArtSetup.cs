@@ -28,7 +28,7 @@ public static class CompanionItemArtSetup
         (ItemType.Invulnerability, "item_ring_blue"),
     };
 
-    [MenuItem("Tools/Art/Ariel And Items")]
+    [MenuItem("Tools/Art/Ariel And Items", priority = 101)]
     static void SetUp()
     {
         // Companion: about 1.8 tiles tall (her drawing is about 750 px), the light column 5 x 10 tiles
@@ -69,7 +69,7 @@ public static class CompanionItemArtSetup
         }
         AssetDatabase.SaveAssets();
 
-        EditorUtility.DisplayDialog("Companion And Item Art",
+        EditorKit.Message("Companion And Item Art",
             "Companion: idle " + idle.Length + ", appear " + appear.Length + ", light strike " + beam.Length + " frames" +
             (companion ? "" : "\n(Resources/CompanionSettings is missing!)") +
             "\nItems: " + icons + " icons set (Speed Boost keeps its coloured square).\n\n" +

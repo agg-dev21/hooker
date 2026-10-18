@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Decorations > Turn Off In All Levels / Turn On In All Levels,
-// and Tools > Obstacles > Turn Off In All Levels / Turn On In All Levels (see the bottom of this file).
+// Editor-only helper. Adds Tools > Other > Decorations > Turn Off In All Levels / Turn On In All Levels,
+// and Tools > Other > Obstacles > Turn Off In All Levels / Turn On In All Levels (see the bottom of this file).
 // Hides (or shows again) the decoration in every level. Nothing is deleted.
 // Solid pieces inside a decoration group (walls you can't walk through) always stay.
 // The decorations made the levels dark and lit them with their own lamps, so with them off
@@ -28,10 +28,10 @@ public static class DecorationSwitch
     };
     const float FullLight = 1f;
 
-    [MenuItem("Tools/Decorations/Turn Off In All Levels")]
+    [MenuItem("Tools/Other/Decorations/Turn Off In All Levels", priority = 3000)]
     static void TurnOff() => SetAll(false);
 
-    [MenuItem("Tools/Decorations/Turn On In All Levels")]
+    [MenuItem("Tools/Other/Decorations/Turn On In All Levels", priority = 3000)]
     static void TurnOn() => SetAll(true);
 
     static void SetAll(bool on)
@@ -86,7 +86,7 @@ public static class DecorationSwitch
     static string Key(string scene) => "Hooker.DecorLight." + scene;
 
     // ---------------- Obstacles ----------------
-    // Tools > Obstacles > Turn Off In All Levels / Turn On In All Levels.
+    // Tools > Other > Obstacles > Turn Off In All Levels / Turn On In All Levels.
     // Hides crate stacks, barrels, tendrils, cannons, poison puddles, spike balls, vents, chains and so on.
     // Also the obstacles inside the secret rooms (chests, doors, potions and guards stay).
     // Kill zones always stay (they catch you if you fall into a pit or the water).
@@ -120,10 +120,10 @@ public static class DecorationSwitch
         return count;
     }
 
-    [MenuItem("Tools/Obstacles/Turn Off In All Levels")]
+    [MenuItem("Tools/Other/Obstacles/Turn Off In All Levels", priority = 3000)]
     static void ObstaclesOff() => SetObstacles(false);
 
-    [MenuItem("Tools/Obstacles/Turn On In All Levels")]
+    [MenuItem("Tools/Other/Obstacles/Turn On In All Levels", priority = 3000)]
     static void ObstaclesOn() => SetObstacles(true);
 
     static void SetObstacles(bool on)

@@ -48,3 +48,4 @@ MonoBehaviour:
   dashFps: 18
   landTime: 0.1
   heightOffset: 0
+  drawScale: 1.3

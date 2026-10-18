@@ -3,11 +3,11 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Balance > Even Out Hardy And Oscar.
+// Editor-only helper. Adds Tools > Other > Balance > Even Out Hardy And Oscar.
 // Either of them can be the first boss (50 / 50), so they should feel about as hard as each other.
 // Oscar (Level_2_Boss) was too hard: he hits less, makes less poison, rests longer and is open longer after a crash.
 // Hardy (Level_1_Deck) was too easy: a bit more health, hits a bit harder and rests less.
-// Oscar in Level 3 is not changed (Tools > Level 3 Boss > Make Harder sets him there).
+// Oscar in Level 3 is not changed (Tools > Other > Level 3 Boss > Make Harder sets him there).
 // Change the numbers below and run it again any time.
 public static class HardyOscarBalance
 {
@@ -44,7 +44,7 @@ public static class HardyOscarBalance
     const float HardyPhase2Speed = 1.4f;  // 1.3
     const float RandomSpikeEvery = 0.75f; // 0.9 (phase 2)
 
-    [MenuItem("Tools/Balance/Even Out Hardy And Oscar")]
+    [MenuItem("Tools/Other/Balance/Even Out Hardy And Oscar", priority = 3000)]
     static void Apply()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

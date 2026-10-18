@@ -18,7 +18,7 @@ public static class KKArtSetup
     const string Folder = "Assets/Art/KK";
     const string BossScene = "Assets/Scenes/Level_4_Boss.unity";
 
-    [MenuItem("Tools/Art/KK")]
+    [MenuItem("Tools/Art/KK", priority = 105)]
     static void SetUp()
     {
         // About 4.5 tiles tall (he is drawn about 1420 px tall)
@@ -31,7 +31,7 @@ public static class KKArtSetup
         Sprite[] blast = CompanionItemArtSetup.Slice(Folder, "kk2_beam", 1600, 400, new Vector2(0f, 0.5f), 100f);
         if (idle.Length == 0)
         {
-            EditorUtility.DisplayDialog("Set Up KK Art", "Could not find " + Folder + "/kk_idle.png.", "OK");
+            EditorKit.Message("Set Up KK Art", "Could not find " + Folder + "/kk_idle.png.", "OK");
             return;
         }
         if (!File.Exists(BossScene) || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -40,7 +40,7 @@ public static class KKArtSetup
         FatherBoss kk = Object.FindAnyObjectByType<FatherBoss>(FindObjectsInactive.Include);
         if (!kk)
         {
-            EditorUtility.DisplayDialog("Set Up KK Art", "Sheets sliced, but KK isn't in Level_4_Boss yet. Run Tools > Rebuild Levels > Level 4 Boss: Add KK, then this again.", "OK");
+            EditorKit.Message("Set Up KK Art", "Sheets sliced, but KK isn't in Level_4_Boss yet. Run Tools > Rebuild Levels > Level 4 Boss: Add KK, then this again.", "OK");
             return;
         }
 
@@ -88,7 +88,7 @@ public static class KKArtSetup
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Selection.activeGameObject = kk.gameObject;
-        EditorUtility.DisplayDialog("Set Up KK Art",
+        EditorKit.Message("Set Up KK Art",
             "Done! KK uses his drawings: idle " + idle.Length + ", attack " + attack.Length + ", surf " + surf.Length + ", waves " + waves.Length + ", monster " + monster.Length + ", blast " + blast.Length + " frames.", "OK");
     }
 }

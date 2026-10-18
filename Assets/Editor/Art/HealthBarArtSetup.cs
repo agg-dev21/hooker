@@ -18,7 +18,7 @@ public static class HealthBarArtSetup
     const string Folder = "Assets/Art/UI";
     const string AssetPath = "Assets/Resources/HealthBarSkin.asset";
 
-    [MenuItem("Tools/Art/Health Bars")]
+    [MenuItem("Tools/Art/Health Bars", priority = 122)]
     static void SetUp()
     {
         var skin = AssetDatabase.LoadAssetAtPath<HealthBarSkin>(AssetPath);
@@ -46,7 +46,7 @@ public static class HealthBarArtSetup
         EditorUtility.SetDirty(skin);
         AssetDatabase.SaveAssets();
         Selection.activeObject = skin;
-        EditorUtility.DisplayDialog("Health Bars",
+        EditorKit.Message("Health Bars",
             (skin.player.frame && skin.boss.frame ? "Done! " : "Some pictures are missing from " + Folder + ". ") +
             "Raphael's bar is blue with a red fill. Hardy, Oscar, Madame O and KK each have their own bar " +
             "(any other boss gets the orange one).\n\n" +

@@ -23,14 +23,14 @@ public static class OceanArtSetup
     const float RoomDockEndX = 30f;
     const float WaveTopFromBottom = 576f; // ocean.png: where the water body starts (most wave tops), in pixels from the bottom
 
-    [MenuItem("Tools/Art/Ocean And Dock")]
+    [MenuItem("Tools/Art/Ocean And Dock", priority = 141)]
     static void SetUp()
     {
         Sprite dock = Import(Folder + "/dock_room.png", new Vector2(0f, 0f), false);
         Sprite ocean = Import(Folder + "/ocean.png", new Vector2(0.5f, 0f), true);
         if (!dock || !ocean)
         {
-            EditorUtility.DisplayDialog("Ocean And Dock", "Missing " + Folder + "/dock_room.png or ocean.png.", "OK");
+            EditorKit.Message("Ocean And Dock", "Missing " + Folder + "/dock_room.png or ocean.png.", "OK");
             return;
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -43,7 +43,7 @@ public static class OceanArtSetup
         report += Sea("Assets/Scenes/Tutorial_7_Dock.unity", ocean, -1f, 53f, 44f, -45, new string[0], false, true); // moving waves over the picture's sea
 
         if (!string.IsNullOrEmpty(start) && File.Exists(start)) EditorSceneManager.OpenScene(start, OpenSceneMode.Single);
-        EditorUtility.DisplayDialog("Ocean And Dock", report, "OK");
+        EditorKit.Message("Ocean And Dock", report, "OK");
     }
 
     // ---------------- Tutorial room 7 ----------------

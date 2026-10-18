@@ -17,8 +17,8 @@ public static class OctopusBossBuilder
 {
     const string SceneName = "Level_3_Boss";
     const string NextScene = "Level_4";
-    const int BossHealth = 600; // tougher than Hardy (see Tools > Level 3 Boss > Make Harder)
-    const int LizardHealth = 460; // see Tools > Level 3 Boss > Make Harder for the rest of his numbers
+    const int BossHealth = 600; // tougher than Hardy (see Tools > Other > Level 3 Boss > Make Harder)
+    const int LizardHealth = 460; // see Tools > Other > Level 3 Boss > Make Harder for the rest of his numbers
     public const float SirenLift = 7f; // Madame O sits this high above the floor, on a ledge in the top-left
 
     static readonly Color StoneColor = new Color(0.3f, 0.38f, 0.45f);
@@ -29,7 +29,7 @@ public static class OctopusBossBuilder
     static readonly Color ChainColor = new Color(0.5f, 0.5f, 0.56f);
     static readonly Color OneWayColor = new Color(0.4f, 0.45f, 0.5f);
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 3 Boss")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 3 Boss", priority = 3000)]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;
@@ -145,7 +145,7 @@ public static class OctopusBossBuilder
 
     // Existing Level_3_Boss: moves Madame O up onto a high throne without rebuilding the room
     // (keeps everything else, like Oscar's art). Running it twice does nothing the second time.
-    [MenuItem("Tools/Level 3 Boss/Raise Madame O")]
+    [MenuItem("Tools/Other/Level 3 Boss/Raise Madame O", priority = 3000)]
     static void RaiseInExistingScene()
     {
         string path = ScenesFolder + "/" + SceneName + ".unity";

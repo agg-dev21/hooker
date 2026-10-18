@@ -30,7 +30,7 @@ public static class LizardArtSetup
     // His hit box (world units), sized to fit the drawing. His feet stay on the floor (groundY).
     static readonly Vector2 BodySize = new Vector2(5.9f, 4.1f);
 
-    [MenuItem("Tools/Art/Oscar (Lizard)")]
+    [MenuItem("Tools/Art/Oscar (Lizard)", priority = 103)]
     static void SetUp()
     {
         Sprite[] idle = Slice("lizard_idle", 480, 480, new Vector2(0.5f, 24f / 480f));
@@ -39,7 +39,7 @@ public static class LizardArtSetup
         Sprite[] poison = Slice("lizard_poison", 320, 320, new Vector2(0.5f, 0f));
         if (idle.Length == 0)
         {
-            EditorUtility.DisplayDialog("Set Up Lizard Art", "Could not find " + ArtFolder + "/lizard_idle.png.", "OK");
+            EditorKit.Message("Set Up Lizard Art", "Could not find " + ArtFolder + "/lizard_idle.png.", "OK");
             return;
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -61,11 +61,11 @@ public static class LizardArtSetup
 
         if (done == 0)
         {
-            EditorUtility.DisplayDialog("Set Up Lizard Art", "Sheets sliced, but no lizard boss was found in Level_2_Boss or Level_3_Boss.", "OK");
+            EditorKit.Message("Set Up Lizard Art", "Sheets sliced, but no lizard boss was found in Level_2_Boss or Level_3_Boss.", "OK");
             return;
         }
 
-        EditorUtility.DisplayDialog("Set Up Lizard Art",
+        EditorKit.Message("Set Up Lizard Art",
             "Done! The lizard now uses his drawings on " + done + " boss(es).\n\nIdle " + idle.Length + ", Dash " + dash.Length + ", Spew " + spew.Length + ", Poison " + poison.Length + " frames.", "OK");
     }
 

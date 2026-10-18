@@ -3,7 +3,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Level 3 Boss > Make Harder.
+// Editor-only helper. Adds Tools > Other > Level 3 Boss > Make Harder.
 // Tunes Madame O and Oscar in Level_3_Boss so the twin fight is tougher than Hardy's:
 // more health, shorter rests, faster warnings, more damage, and they wait less for each other
 // (so their attacks overlap more). Change the numbers below and run it again any time.
@@ -49,7 +49,7 @@ public static class Level3Balance
     const int Phase2Drops = 4;            // Level 2: 3 per wave
     const float Phase2PoisonEvery = 0.85f; // Level 2: 1 second
 
-    [MenuItem("Tools/Level 3 Boss/Make Harder")]
+    [MenuItem("Tools/Other/Level 3 Boss/Make Harder", priority = 3000)]
     static void Apply()
     {
         const string path = "Assets/Scenes/Level_3_Boss.unity";

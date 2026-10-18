@@ -25,4 +25,7 @@ MonoBehaviour:
   - {fileID: 3197227336357570150, guid: de4475015d9066c41b280ea94b0fea25, type: 3}
   - {fileID: -2607482377994453256, guid: de4475015d9066c41b280ea94b0fea25, type: 3}
   - {fileID: -434105734466228895, guid: de4475015d9066c41b280ea94b0fea25, type: 3}
-  hardySpikesIcon: {fileID: 3197227336357570150, guid: de4475015d9066c41b280ea94b0fea25, type: 3}
+  hardySpikesIcon: {fileID: 21300000, guid: d4d6b7aa8cdbd7346b5149d4a65d912b, type: 3}
+  chainIcon: {fileID: 21300000, guid: 734bff5376fa94d4d80b4e2b44b2ab0b, type: 3}
+  arielIcon: {fileID: 21300000, guid: 3d5c7972c2ddd6b40a7dd7f7e4df44a4, type: 3}
+  poisonIcon: {fileID: 21300000, guid: 094a023222fd66444a906c298490604e, type: 3}

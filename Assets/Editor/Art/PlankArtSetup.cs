@@ -16,7 +16,7 @@ public static class PlankArtSetup
 
     static readonly Vector2 TopMiddle = new Vector2(0.5f, 1f);
 
-    [MenuItem("Tools/Art/Planks")]
+    [MenuItem("Tools/Art/Planks", priority = 144)]
     static void Run()
     {
         var art = AssetDatabase.LoadAssetAtPath<PlankArt>(AssetPath);
@@ -48,7 +48,7 @@ public static class PlankArtSetup
         Selection.activeObject = art;
 
         bool all = art.wood.floor && art.grassy.floor && art.metal.floor;
-        EditorUtility.DisplayDialog("Planks",
+        EditorKit.Message("Planks",
             (all ? "Done! " : "Some pictures are missing from " + Folder + ". ") +
             "Tutorial and Level 1 get wood, Level 2 grassy wood, Level 3 metal, Level 4 wood.\n" +
             "They go along the top of every floor and on every jump-through platform, with posts under floating platforms.\n\n" +

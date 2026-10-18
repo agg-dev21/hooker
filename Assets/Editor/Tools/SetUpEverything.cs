@@ -1,11 +1,11 @@
 using UnityEditor;
 
-// Editor-only helper. Adds Tools > Set Up All Art And Jail.
+// Editor-only helper. Adds Tools > Other > Set Up All Art And Jail.
 // Runs every art setup tool in a row, then adds the companion jail to Level 2:
 //   Hardy, Oscar (lizard), poison, Raphael (player), companion + items, Madame O, KK (adds KK first if he is missing),
 //   jail, story dialogue.
 // Each tool shows its own "Done" message: click OK and the next one runs.
-// (The tutorial rebuild is not in here because it replaces the tutorial rooms: run Tools > Rebuild Tutorial yourself.)
+// (The tutorial rebuild is not in here because it replaces the tutorial rooms: run Tools > Other > Rebuild Tutorial yourself.)
 public static class SetUpEverything
 {
     static readonly string[] Steps =
@@ -16,21 +16,21 @@ public static class SetUpEverything
         "Tools/Art/Raphael (Player)",
         "Tools/Art/Ariel And Items",
         "Tools/Art/Madame O",
-        "Tools/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK",
+        "Tools/Other/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK",
         "Tools/Art/KK",
         "Tools/Art/Ocean And Dock",
         "Tools/Art/Health Bars",
         "Tools/Art/Hook Points",
         "Tools/Art/Planks",
         "Tools/Art/Ability Icons And Ground Effects",
-        "Tools/Companion/Add Jail To Level 2",
-        "Tools/Add Story Dialogue",
-        "Tools/Tutorial/Hook Lesson In Jump Room",
+        "Tools/Other/Companion/Add Jail To Level 2",
+        "Tools/Other/Add Story Dialogue",
+        "Tools/Other/Tutorial/Hook Lesson In Jump Room",
         "Tools/Art/Tutorial Backgrounds",
-        "Tools/Story/Place Hint Scrolls",
+        "Tools/Other/Story/Place Hint Scrolls",
     };
 
-    [MenuItem("Tools/Set Up All Art And Jail", priority = 0)]
+    [MenuItem("Tools/Other/Set Up All Art And Jail", priority = 2990)]
     static void Run()
     {
         if (!EditorUtility.DisplayDialog("Set Up All Art And Jail",
@@ -42,7 +42,7 @@ public static class SetUpEverything
         foreach (string step in Steps)
         {
             // KK is only added if he isn't in Level 4 Boss yet (adding him again would reset his numbers)
-            if (step == "Tools/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK" && FatherAlreadyThere()) continue;
+            if (step == "Tools/Other/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK" && FatherAlreadyThere()) continue;
             if (!EditorApplication.ExecuteMenuItem(step)) failed += "\n" + step;
         }
         EditorUtility.DisplayDialog("Set Up All Art And Jail",

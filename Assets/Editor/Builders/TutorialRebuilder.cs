@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using static LevelKit;
 
-// Editor-only. Adds Tools > Rebuild Tutorial.
+// Editor-only. Adds Tools > Other > Rebuild Tutorial.
 // Rebuilds the 7 tutorial rooms from Room_Template as short rooms (about 2 screens each) where the camera
 // follows the player. Each room teaches one skill step by step: a sign explains it right before it is needed,
 // then it gets harder. Checkpoints sit between the parts. Signs show the player's current buttons (TutorialSign).
@@ -29,7 +29,7 @@ public static class TutorialRebuilder
     static readonly Color PlankColor = new Color(0.45f, 0.32f, 0.2f);
     static readonly Color WaterColor = new Color(0.1f, 0.35f, 0.55f, 0.85f);
 
-    [MenuItem("Tools/Rebuild Tutorial")]
+    [MenuItem("Tools/Other/Rebuild Tutorial", priority = 3000)]
     static void RebuildAll()
     {
         if (!EditorUtility.DisplayDialog("Rebuild Tutorial",

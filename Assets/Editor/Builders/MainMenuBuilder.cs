@@ -7,7 +7,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem.UI;
 using UnityEngine.SceneManagement;
 
-// Editor-only. Adds Tools > Build Main Menu.
+// Editor-only. Adds Tools > Other > Build Main Menu.
 // Makes the scene MainMenu (the HOOKER title screen, see TitleScreen.cs) and puts it FIRST in the
 // Scene List, so the built game opens on it. Run it again any time to rebuild it.
 public static class MainMenuBuilder
@@ -16,7 +16,7 @@ public static class MainMenuBuilder
     const string BackgroundArt = "Assets/Art/Ocean/dock_room.png";
     const string SeaArt = "Assets/Art/Ocean/ocean.png";
 
-    [MenuItem("Tools/Build Main Menu")]
+    [MenuItem("Tools/Other/Build Main Menu", priority = 3000)]
     static void Build()
     {
         if (File.Exists(ScenePath) && !EditorUtility.DisplayDialog("Build Main Menu",

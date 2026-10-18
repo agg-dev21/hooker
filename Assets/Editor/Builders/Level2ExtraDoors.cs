@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LevelKit;
 
-// Editor-only helper. Adds Tools > Level 2 > Add Extra Boss Doors.
+// Editor-only helper. Adds Tools > Other > Level 2 > Add Extra Boss Doors.
 // More ways into Oscar's room: two more boss doors on the bottom floor of the tower (middle and right),
 // besides the one in the left side room. Running it again replaces them.
 public static class Level2ExtraDoors
@@ -13,7 +13,7 @@ public static class Level2ExtraDoors
     const string ScenePath = "Assets/Scenes/Level_2.unity";
     static readonly Vector2[] Spots = { new Vector2(22f, 1.1f), new Vector2(38f, 1.1f) }; // bottom floor (top at y 0)
 
-    [MenuItem("Tools/Level 2/Add Extra Boss Doors")]
+    [MenuItem("Tools/Other/Level 2/Add Extra Boss Doors", priority = 3000)]
     static void Add()
     {
         if (!File.Exists(ScenePath) || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

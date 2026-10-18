@@ -17,6 +17,19 @@ public static class EditorKit
         EditorBuildSettings.scenes = list.ToArray();
     }
 
+    /// <summary>
+    /// The "Done" message at the end of a tool. While Tools > Update All Art runs (Collecting is on) the messages
+    /// are saved instead and shown together at the end, so you don't have to click OK after every tool.
+    /// </summary>
+    public static void Message(string title, string text, string ok = "OK")
+    {
+        if (Collecting) { Collected.Add(title + ":  " + text.Replace("\n\n", "\n")); return; }
+        EditorUtility.DisplayDialog(title, text, ok);
+    }
+
+    public static bool Collecting;
+    public static readonly List<string> Collected = new List<string>();
+
     /// <summary>Fills a serialized Sprite[] field with the given sprites.</summary>
     public static void SetArray(SerializedProperty prop, Sprite[] sprites)
     {

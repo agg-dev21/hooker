@@ -18,7 +18,7 @@ public static class PlayerArtSetup
     const float PixelsPerUnit = 460f;
     static readonly Vector2 Pivot = new Vector2(0.45f, 296f / 1600f); // between his feet
 
-    [MenuItem("Tools/Art/Raphael (Player)")]
+    [MenuItem("Tools/Art/Raphael (Player)", priority = 100)]
     static void SetUp()
     {
         Sprite[] run = Slice("player_run");
@@ -28,7 +28,7 @@ public static class PlayerArtSetup
         Sprite[] hook = Slice("player_hook");
         if (run.Length == 0)
         {
-            EditorUtility.DisplayDialog("Set Up Player Art", "Could not find " + ArtFolder + "/player_run.png.", "OK");
+            EditorKit.Message("Set Up Player Art", "Could not find " + ArtFolder + "/player_run.png.", "OK");
             return;
         }
 
@@ -47,7 +47,7 @@ public static class PlayerArtSetup
         AssetDatabase.SaveAssets();
 
         Selection.activeObject = set;
-        EditorUtility.DisplayDialog("Set Up Player Art",
+        EditorKit.Message("Set Up Player Art",
             "Done! The player now uses his drawings in every scene.\n\n" +
             "Run " + run.Length + ", Jump " + jump.Length + ", Dash " + dash.Length + ", Attack " + attack.Length + ", Hook " + hook.Length + " frames.\n\n" +
             "Select Assets/Resources/PlayerArtSet to change the animation speeds.", "OK");

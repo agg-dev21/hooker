@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 using static LevelKit;
 
-// Editor-only helper. Adds Tools > Decorate > Level 2 Poison Tower.
+// Editor-only helper. Adds Tools > Other > Decorate > Level 2 Poison Tower.
 // Oscar's level gets his look, like Hardy's ship has the goo: a damp, poisoned lizard den.
 //   Dark green stone walls behind everything, moss on the floors, vines and poison drips hanging from the
 //   ceilings, glowing poison mushrooms, bones, lizard claw marks, toxic fog in the pits, glowing green lanterns,
@@ -33,7 +33,7 @@ public static class PoisonTowerDecorator
     static readonly Color Fog = new Color(0.35f, 0.85f, 0.25f, 0.35f);
     static readonly Color LampGreen = new Color(0.55f, 1f, 0.45f);
 
-    [MenuItem("Tools/Decorate/Level 2 Poison Tower")]
+    [MenuItem("Tools/Other/Decorate/Level 2 Poison Tower", priority = 3000)]
     static void Decorate()
     {
         if (!File.Exists(ScenePath) || !EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

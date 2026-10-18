@@ -18,7 +18,7 @@ public static class HookPointArtSetup
     static readonly Vector2 RingPivot = new Vector2(0.5f, 0.8f);
     static readonly Vector2 KKRingPivot = new Vector2(0.49f, 0.875f);
 
-    [MenuItem("Tools/Art/Hook Points")]
+    [MenuItem("Tools/Art/Hook Points", priority = 143)]
     static void Run()
     {
         var art = AssetDatabase.LoadAssetAtPath<HookPointArt>(AssetPath);
@@ -36,7 +36,7 @@ public static class HookPointArtSetup
         Selection.activeObject = art;
 
         int found = (art.tutorialAndLevel1 ? 1 : 0) + (art.level2 ? 1 : 0) + (art.level3 ? 1 : 0) + (art.level4 ? 1 : 0);
-        EditorUtility.DisplayDialog("Hook Points",
+        EditorKit.Message("Hook Points",
             found + " of 4 hook drawings set.\n\n" +
             "Tutorial + Level 1, Level 2, Level 3 and Level 4 each have their own. Every hook ring uses them by itself.\n" +
             "To change one, or the size (Draw Scale), select Assets/Resources/HookPointArt.", "OK");

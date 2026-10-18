@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-// Editor-only helper. Adds Tools > Story > Place Hint Scrolls.
+// Editor-only helper. Adds Tools > Other > Story > Place Hint Scrolls.
 // Puts paper scrolls around the levels: hints about finding Ariel, about the next bosses, and jokes about the mother.
 // Touching one opens it right away (the game pauses) and keeps it in the inventory (not on the quick bar).
 // Also writes the note inside chests that give a scroll.
@@ -48,7 +48,7 @@ public static class HintScrolls
             "Things to pack:\n- Red lipstick\n- More red lipstick\n- A map of every port with a handsome man in it (all of them)\n\nNote to self: do NOT tell the baby where I went. He'll find out when he's older.\nHe'll find out a LOT when he's older."),
     };
 
-    [MenuItem("Tools/Story/Place Hint Scrolls")]
+    [MenuItem("Tools/Other/Story/Place Hint Scrolls", priority = 3000)]
     static void Place()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

@@ -27,17 +27,17 @@ public static class HardyArenaBackground
     static readonly Color NightColor = new Color(0.03f, 0.02f, 0.05f); // fills the picture's empty (see-through) sky
     const float LightIntensity = 1f; // full brightness, so the picture looks like the drawing
 
-    [MenuItem("Tools/Art/Hardy Arena Background")]
+    [MenuItem("Tools/Art/Hardy Arena Background", priority = 142)]
     static void SetUp()
     {
         if (!File.Exists(ArtPath))
         {
-            EditorUtility.DisplayDialog("Hardy Arena Background", "Put the picture at " + ArtPath + " first.", "OK");
+            EditorKit.Message("Hardy Arena Background", "Put the picture at " + ArtPath + " first.", "OK");
             return;
         }
         if (!File.Exists(ScenePath))
         {
-            EditorUtility.DisplayDialog("Hardy Arena Background", "Level_1_Deck doesn't exist.", "OK");
+            EditorKit.Message("Hardy Arena Background", "Level_1_Deck doesn't exist.", "OK");
             return;
         }
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -102,7 +102,7 @@ public static class HardyArenaBackground
 
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
-        EditorUtility.DisplayDialog("Hardy Arena Background", "Done! The arena picture is behind Hardy's fight in Level_1_Deck." +
+        EditorKit.Message("Hardy Arena Background", "Done! The arena picture is behind Hardy's fight in Level_1_Deck." +
             (hidden.Length > 0 ? "\n\nHidden (the picture replaces it):" + hidden : ""), "OK");
     }
 

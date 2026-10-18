@@ -22,7 +22,7 @@ public static class Level4BossRoomBuilder
     static readonly Color OneWayColor = new Color(0.4f, 0.45f, 0.5f);
     static readonly Color LanternColor = new Color(0.5f, 0.85f, 1f);
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 4 Boss Room")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 4 Boss Room", priority = 3000)]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;
@@ -60,11 +60,11 @@ public static class Level4BossRoomBuilder
 
     // ---------------- The father ----------------
 
-    const int FatherHealth = 800; // the toughest boss (see Tools > Level 4 Boss > Make KK Harder)
+    const int FatherHealth = 800; // the toughest boss (see Tools > Other > Level 4 Boss > Make KK Harder)
     static readonly Vector2 FatherSize = new Vector2(2f, 4f);
 
     // Puts the father (placeholder box) on "BossSpot (empty)" with his health bar. Running it again replaces him.
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 4 Boss: Add KK", priority = 3000)]
     static void AddFather()
     {
         string path = ScenesFolder + "/" + SceneName + ".unity";

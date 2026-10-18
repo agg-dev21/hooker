@@ -165,7 +165,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 400
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -188,10 +188,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 2048
+    maxTextureSize: 16384
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -258,19 +258,19 @@ TextureImporter:
       name: fx_hardy_slam_0
       rect:
         serializedVersion: 2
-        x: 6803
-        y: 1503
-        width: 42
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 0
+        y: 0
+        width: 1600
+        height: 1600
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 92dd82c6ea1868c60800000000000000
+      spriteID: 5814068de4ba4f640b53b1f765c0e9c0
       internalID: 7820080389114354985
       vertices: []
       indices: 
@@ -280,19 +280,19 @@ TextureImporter:
       name: fx_hardy_slam_1
       rect:
         serializedVersion: 2
-        x: 6567
-        y: 1359
-        width: 150
-        height: 130
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 1600
+        y: 0
+        width: 1600
+        height: 1600
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 01117adafaebd1df0800000000000000
+      spriteID: bf99c871e35d3004688a56174be76dae
       internalID: -207800346047213296
       vertices: []
       indices: 
@@ -302,19 +302,19 @@ TextureImporter:
       name: fx_hardy_slam_2
       rect:
         serializedVersion: 2
-        x: 7727
-        y: 1459
-        width: 42
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 3200
+        y: 0
+        width: 1600
+        height: 1600
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 1deca42f85de9e540800000000000000
+      spriteID: 7fa0c862cd72be94580736d32ac6a159
       internalID: 5037818624468504273
       vertices: []
       indices: 
@@ -324,19 +324,19 @@ TextureImporter:
       name: fx_hardy_slam_3
       rect:
         serializedVersion: 2
-        x: 7779
-        y: 1343
-        width: 130
-        height: 106
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 4800
+        y: 0
+        width: 1600
+        height: 1600
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 3266f92fac7c5ffb0800000000000000
+      spriteID: 35ac343071af29c4e8a9a5c06094c6e8
       internalID: -4614562568703351261
       vertices: []
       indices: 
@@ -346,19 +346,19 @@ TextureImporter:
       name: fx_hardy_slam_4
       rect:
         serializedVersion: 2
-        x: 8587
-        y: 1199
-        width: 190
-        height: 154
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 6400
+        y: 0
+        width: 1600
+        height: 1600
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 6b8c0c43387661200800000000000000
+      spriteID: d54f2a584a71766458354e5c461b24f3
       internalID: 150421450786916534
       vertices: []
       indices: 
@@ -368,746 +368,20 @@ TextureImporter:
       name: fx_hardy_slam_5
       rect:
         serializedVersion: 2
-        x: 9307
-        y: 1291
-        width: 98
-        height: 94
-      alignment: 0
-      pivot: {x: 0, y: 0}
+        x: 8000
+        y: 0
+        width: 1600
+        height: 1600
+      alignment: 9
+      pivot: {x: 0.5, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
-      tessellationDetail: -1
+      tessellationDetail: 0
       bones: []
-      spriteID: 53f149d3910af8870800000000000000
+      spriteID: 7e9753a5a7d4df5439e889fe296d8d66
       internalID: 8687338236488720181
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_6
-      rect:
-        serializedVersion: 2
-        x: 7071
-        y: 859
-        width: 506
-        height: 334
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: c4c3479dcebe57890800000000000000
-      internalID: -7460797805176275892
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_7
-      rect:
-        serializedVersion: 2
-        x: 7999
-        y: 0
-        width: 1601
-        height: 1201
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e9880d34acfbe1810800000000000000
-      internalID: 1738037381653629086
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_8
-      rect:
-        serializedVersion: 2
-        x: 8095
-        y: 1187
-        width: 102
-        height: 78
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2dd29e103a40a1250800000000000000
-      internalID: 5916046158662806994
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_9
-      rect:
-        serializedVersion: 2
-        x: 6451
-        y: 0
-        width: 1438
-        height: 1017
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6a2ffa559a66f5460800000000000000
-      internalID: 7232612404053406374
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_10
-      rect:
-        serializedVersion: 2
-        x: 7747
-        y: 995
-        width: 170
-        height: 154
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 7d68a320ba91a98c0800000000000000
-      internalID: -3991849897443031337
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_11
-      rect:
-        serializedVersion: 2
-        x: 5239
-        y: 699
-        width: 78
-        height: 126
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 5f3e8f0d545a00880800000000000000
-      internalID: -8646729565274053643
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_12
-      rect:
-        serializedVersion: 2
-        x: 5299
-        y: 779
-        width: 74
-        height: 46
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: b807e108f6b0ebcb0800000000000000
-      internalID: -4846423575485321077
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_13
-      rect:
-        serializedVersion: 2
-        x: 5751
-        y: 719
-        width: 66
-        height: 70
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 60dfc347d82749a80800000000000000
-      internalID: -8461011848056210170
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_14
-      rect:
-        serializedVersion: 2
-        x: 5891
-        y: 691
-        width: 62
-        height: 58
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a0a91f605711e1b30800000000000000
-      internalID: 4259861491864410634
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_15
-      rect:
-        serializedVersion: 2
-        x: 7775
-        y: 471
-        width: 210
-        height: 230
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ebe1f7360ea7353c0800000000000000
-      internalID: -4372015709086081346
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_16
-      rect:
-        serializedVersion: 2
-        x: 5179
-        y: 599
-        width: 30
-        height: 30
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f38dfe485b1ac71f0800000000000000
-      internalID: -1045783212465334209
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_17
-      rect:
-        serializedVersion: 2
-        x: 5343
-        y: 575
-        width: 74
-        height: 54
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a29b8ce5c95a8f950800000000000000
-      internalID: 6483113754623523114
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_18
-      rect:
-        serializedVersion: 2
-        x: 5507
-        y: 443
-        width: 270
-        height: 174
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f27a0a016a1960520800000000000000
-      internalID: 2667979971693160239
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_19
-      rect:
-        serializedVersion: 2
-        x: 3547
-        y: 479
-        width: 130
-        height: 110
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 487824d38daa361d0800000000000000
-      internalID: -3358653051370829948
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_20
-      rect:
-        serializedVersion: 2
-        x: 4251
-        y: 467
-        width: 130
-        height: 122
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 5668a2e4fb77a9660800000000000000
-      internalID: 7393353401815959141
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_21
-      rect:
-        serializedVersion: 2
-        x: 5151
-        y: 0
-        width: 842
-        height: 581
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9fbf95e64884c2ad0800000000000000
-      internalID: -2725723940841718791
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_22
-      rect:
-        serializedVersion: 2
-        x: 3527
-        y: 235
-        width: 42
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 985dbc9aa5ba91860800000000000000
-      internalID: 7501215060246386057
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_23
-      rect:
-        serializedVersion: 2
-        x: 3731
-        y: 0
-        width: 454
-        height: 425
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 0ddeacfec13ae47d0800000000000000
-      internalID: -2932226962694148656
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_24
-      rect:
-        serializedVersion: 2
-        x: 4367
-        y: 95
-        width: 126
-        height: 110
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 2e4a678f8fea99ed0800000000000000
-      internalID: -2406700141509171998
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_25
-      rect:
-        serializedVersion: 2
-        x: 6023
-        y: 171
-        width: 30
-        height: 30
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: a26d4f634826d1530800000000000000
-      internalID: 3827323578332010026
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_26
-      rect:
-        serializedVersion: 2
-        x: 2319
-        y: 123
-        width: 38
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9017eabc201734da0800000000000000
-      internalID: -5961797224887324407
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_27
-      rect:
-        serializedVersion: 2
-        x: 2459
-        y: 131
-        width: 38
-        height: 38
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 9acdc6333d3899000800000000000000
-      internalID: 43210614560840873
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_28
-      rect:
-        serializedVersion: 2
-        x: 4683
-        y: 111
-        width: 42
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: db137083e835d2980800000000000000
-      internalID: -8562095446270987843
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_29
-      rect:
-        serializedVersion: 2
-        x: 5983
-        y: 59
-        width: 102
-        height: 78
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: e1ce3c8d7e8120210800000000000000
-      internalID: 1297627026689354782
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_30
-      rect:
-        serializedVersion: 2
-        x: 803
-        y: 87
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 777a8cbefb34f4660800000000000000
-      internalID: 7372185606602401655
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_31
-      rect:
-        serializedVersion: 2
-        x: 2195
-        y: 87
-        width: 42
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 43382260022be7040800000000000000
-      internalID: 4647347716104553268
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_32
-      rect:
-        serializedVersion: 2
-        x: 2359
-        y: 0
-        width: 82
-        height: 93
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: f31a16edc4dabf940800000000000000
-      internalID: 5331045129583173951
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_33
-      rect:
-        serializedVersion: 2
-        x: 3535
-        y: 0
-        width: 130
-        height: 117
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 86d838b61c8062620800000000000000
-      internalID: 2748894249381760360
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_34
-      rect:
-        serializedVersion: 2
-        x: 735
-        y: 31
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: ed36ca695fa2bd720800000000000000
-      internalID: 2871936421662057438
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_35
-      rect:
-        serializedVersion: 2
-        x: 815
-        y: 15
-        width: 18
-        height: 18
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 29a7dfb0b528e8aa0800000000000000
-      internalID: -6156840313014093166
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_36
-      rect:
-        serializedVersion: 2
-        x: 2275
-        y: 15
-        width: 38
-        height: 38
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: 6ef670b9d12932ed0800000000000000
-      internalID: -2439945917252014106
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_37
-      rect:
-        serializedVersion: 2
-        x: 2495
-        y: 7
-        width: 34
-        height: 42
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: df52e968cc14ba320800000000000000
-      internalID: 2570220359032645117
-      vertices: []
-      indices: 
-      edges: []
-      weights: []
-    - serializedVersion: 2
-      name: fx_hardy_slam_38
-      rect:
-        serializedVersion: 2
-        x: 763
-        y: 0
-        width: 42
-        height: 29
-      alignment: 0
-      pivot: {x: 0, y: 0}
-      border: {x: 0, y: 0, z: 0, w: 0}
-      customData: 
-      outline: []
-      physicsShape: []
-      tessellationDetail: -1
-      bones: []
-      spriteID: fabb11449fabf1f40800000000000000
-      internalID: 5701481233025973167
       vertices: []
       indices: 
       edges: []
@@ -1116,7 +390,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: b9637b8d4c6c56647aa4017b1e6888c4
     internalID: 0
     vertices: []
     indices: 
@@ -1128,43 +402,10 @@ TextureImporter:
     nameFileIdTable:
       fx_hardy_slam_0: 7820080389114354985
       fx_hardy_slam_1: -207800346047213296
-      fx_hardy_slam_10: -3991849897443031337
-      fx_hardy_slam_11: -8646729565274053643
-      fx_hardy_slam_12: -4846423575485321077
-      fx_hardy_slam_13: -8461011848056210170
-      fx_hardy_slam_14: 4259861491864410634
-      fx_hardy_slam_15: -4372015709086081346
-      fx_hardy_slam_16: -1045783212465334209
-      fx_hardy_slam_17: 6483113754623523114
-      fx_hardy_slam_18: 2667979971693160239
-      fx_hardy_slam_19: -3358653051370829948
       fx_hardy_slam_2: 5037818624468504273
-      fx_hardy_slam_20: 7393353401815959141
-      fx_hardy_slam_21: -2725723940841718791
-      fx_hardy_slam_22: 7501215060246386057
-      fx_hardy_slam_23: -2932226962694148656
-      fx_hardy_slam_24: -2406700141509171998
-      fx_hardy_slam_25: 3827323578332010026
-      fx_hardy_slam_26: -5961797224887324407
-      fx_hardy_slam_27: 43210614560840873
-      fx_hardy_slam_28: -8562095446270987843
-      fx_hardy_slam_29: 1297627026689354782
       fx_hardy_slam_3: -4614562568703351261
-      fx_hardy_slam_30: 7372185606602401655
-      fx_hardy_slam_31: 4647347716104553268
-      fx_hardy_slam_32: 5331045129583173951
-      fx_hardy_slam_33: 2748894249381760360
-      fx_hardy_slam_34: 2871936421662057438
-      fx_hardy_slam_35: -6156840313014093166
-      fx_hardy_slam_36: -2439945917252014106
-      fx_hardy_slam_37: 2570220359032645117
-      fx_hardy_slam_38: 5701481233025973167
       fx_hardy_slam_4: 150421450786916534
       fx_hardy_slam_5: 8687338236488720181
-      fx_hardy_slam_6: -7460797805176275892
-      fx_hardy_slam_7: 1738037381653629086
-      fx_hardy_slam_8: 5916046158662806994
-      fx_hardy_slam_9: 7232612404053406374
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

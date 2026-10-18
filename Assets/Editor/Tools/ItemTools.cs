@@ -12,7 +12,7 @@ public static class ItemTools
 {
     const string SquareTile = "Assets/Tiles/Square.asset";
 
-    [MenuItem("Tools/Items/Item Settings")]
+    [MenuItem("Tools/Other/Items/Item Settings", priority = 3000)]
     static void SelectSettings()
     {
         var settings = Resources.Load<ItemSettings>("ItemSettings");
@@ -24,7 +24,7 @@ public static class ItemTools
         else EditorUtility.DisplayDialog("Items", "Assets/Resources/ItemSettings.asset is missing.", "OK");
     }
 
-    [MenuItem("Tools/Items/Add Item Pickup Here")]
+    [MenuItem("Tools/Other/Items/Add Item Pickup Here", priority = 3000)]
     static void AddPickup()
     {
         Vector3 pos = SceneView.lastActiveSceneView ? SceneView.lastActiveSceneView.pivot : Vector3.zero;
@@ -43,7 +43,7 @@ public static class ItemTools
         EditorSceneManager.MarkSceneDirty(go.scene);
     }
 
-    [MenuItem("Tools/Items/Give One Of Each (testing)")]
+    [MenuItem("Tools/Other/Items/Give One Of Each (testing)", priority = 3000)]
     static void GiveAll()
     {
         foreach (ItemType t in System.Enum.GetValues(typeof(ItemType)))
@@ -52,7 +52,7 @@ public static class ItemTools
         EditorUtility.DisplayDialog("Items", "One of every item is now in the inventory. Press Play to try them (Tab / 1-8 to pick, F to use).", "OK");
     }
 
-    [MenuItem("Tools/Items/Clear Inventory")]
+    [MenuItem("Tools/Other/Items/Clear Inventory", priority = 3000)]
     static void ClearAll()
     {
         Inventory.Clear();

@@ -15,7 +15,7 @@ public static class AbilityAndFxArtSetup
     const string FxFolder = "Assets/Art/GroundFx";
     const string FxAssetPath = "Assets/Resources/GroundFxArt.asset";
 
-    [MenuItem("Tools/Art/Ability Icons And Ground Effects")]
+    [MenuItem("Tools/Art/Ability Icons And Ground Effects", priority = 121)]
     static void Run()
     {
         // Icons
@@ -45,7 +45,7 @@ public static class AbilityAndFxArtSetup
         EditorUtility.SetDirty(fx);
         AssetDatabase.SaveAssets();
 
-        EditorUtility.DisplayDialog("Ability Icons And Ground Effects",
+        EditorKit.Message("Ability Icons And Ground Effects",
             (abilities ? icons + " of 4 ability icons set." : "Resources/AbilityArt is missing: run Tools > Art > Hardy first.") + "\n" +
             "Hardy's slam: " + fx.hardySlamFrames.Length + " frames, barrel blast: " + fx.barrelBlastFrames.Length + " frames.\n\n" +
             "Change them in Assets/Resources/AbilityArt and Assets/Resources/GroundFxArt.", "OK");

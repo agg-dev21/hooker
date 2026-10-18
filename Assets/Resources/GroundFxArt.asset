@@ -1,0 +1,30 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a51c25939561d6f4fb6f5c99815468bc, type: 3}
+  m_Name: GroundFxArt
+  m_EditorClassIdentifier: Hooker.Runtime::GroundFxArt
+  hardySlamFrames:
+  - {fileID: 7820080389114354985, guid: 6e81c97211b1cdd458c744be8d2f9158, type: 3}
+  - {fileID: -207800346047213296, guid: 6e81c97211b1cdd458c744be8d2f9158, type: 3}
+  - {fileID: 5037818624468504273, guid: 6e81c97211b1cdd458c744be8d2f9158, type: 3}
+  - {fileID: -4614562568703351261, guid: 6e81c97211b1cdd458c744be8d2f9158, type: 3}
+  - {fileID: 150421450786916534, guid: 6e81c97211b1cdd458c744be8d2f9158, type: 3}
+  - {fileID: 8687338236488720181, guid: 6e81c97211b1cdd458c744be8d2f9158, type: 3}
+  barrelBlastFrames:
+  - {fileID: 5855390624949655861, guid: e511cf286d2d7f84c9206020f42b9296, type: 3}
+  - {fileID: 3013482767723513521, guid: e511cf286d2d7f84c9206020f42b9296, type: 3}
+  - {fileID: -4835021156497953644, guid: e511cf286d2d7f84c9206020f42b9296, type: 3}
+  - {fileID: 4361620279285995585, guid: e511cf286d2d7f84c9206020f42b9296, type: 3}
+  - {fileID: 416455916050770386, guid: e511cf286d2d7f84c9206020f42b9296, type: 3}
+  - {fileID: 8997670527534699255, guid: e511cf286d2d7f84c9206020f42b9296, type: 3}
+  fps: 14
+  sizeMultiplier: 1

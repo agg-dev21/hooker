@@ -3,7 +3,7 @@ using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-// Editor-only helper. Adds Tools > Level 4 Boss > Make KK Harder.
+// Editor-only helper. Adds Tools > Other > Level 4 Boss > Make KK Harder.
 // KK is the last boss, so he is the toughest: more health, two lines of waves per attack, faster waves,
 // shorter rests and warnings, harder soaks, and every wave that hits knocks you back and slows you down.
 // Change the numbers below and run it again any time.
@@ -22,7 +22,7 @@ public static class Level4Balance
     const float SlowTime = 1.5f;         // ...for this long
     static readonly int[] SoakDamage = { 8, 14, 20, 50 }; // was 5, 10, 15, 40
 
-    [MenuItem("Tools/Level 4 Boss/Make KK Harder")]
+    [MenuItem("Tools/Other/Level 4 Boss/Make KK Harder", priority = 3000)]
     static void Apply()
     {
         const string path = "Assets/Scenes/Level_4_Boss.unity";

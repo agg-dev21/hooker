@@ -35,7 +35,7 @@ public static class TutorialBackgrounds
         ("Tutorial_6_DashThroughBullets","tutorial_town_right", false, true),
     };
 
-    [MenuItem("Tools/Art/Tutorial Backgrounds")]
+    [MenuItem("Tools/Art/Tutorial Backgrounds", priority = 140)]
     static void SetUp()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -80,7 +80,7 @@ public static class TutorialBackgrounds
         }
 
         if (!string.IsNullOrEmpty(start) && File.Exists(start)) EditorSceneManager.OpenScene(start, OpenSceneMode.Single);
-        EditorUtility.DisplayDialog("Tutorial Backgrounds", report, "OK");
+        EditorKit.Message("Tutorial Backgrounds", report, "OK");
     }
 
     static Sprite Import(string path)

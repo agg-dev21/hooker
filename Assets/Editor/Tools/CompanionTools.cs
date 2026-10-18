@@ -19,7 +19,7 @@ public static class CompanionTools
     static readonly Color BarColor = new Color(0.35f, 0.35f, 0.4f);
     static readonly Color CompanionColor = new Color(1f, 0.92f, 0.65f);
 
-    [MenuItem("Tools/Companion/Add Jail To Level 2")]
+    [MenuItem("Tools/Other/Companion/Add Jail To Level 2", priority = 3000)]
     static void AddJail()
     {
         if (!File.Exists(LevelScene))
@@ -123,7 +123,7 @@ public static class CompanionTools
         EditorUtility.DisplayDialog("Companion Jail",
             "Jail added to Level_2.\n\nThe entrance is the grey iron door in the bottom-left corner of the bottom floor. " +
             "Inside, stand at the gold lock and press E to free her.\n\n" +
-            "To test again later: Tools > Companion > Remove Companion (testing).", "OK");
+            "To test again later: Tools > Other > Companion > Remove Companion (testing).", "OK");
     }
 
     // An invisible solid box on the Ground layer
@@ -136,7 +136,7 @@ public static class CompanionTools
         go.AddComponent<BoxCollider2D>().size = size;
     }
 
-    [MenuItem("Tools/Companion/Give Companion (testing)")]
+    [MenuItem("Tools/Other/Companion/Give Companion (testing)", priority = 3000)]
     static void Give()
     {
         PlayerPrefs.SetInt(Companion.FoundSave, 1);
@@ -144,7 +144,7 @@ public static class CompanionTools
         EditorUtility.DisplayDialog("Companion", "She is with you now. Press Play; R fires her light.", "OK");
     }
 
-    [MenuItem("Tools/Companion/Remove Companion (testing)")]
+    [MenuItem("Tools/Other/Companion/Remove Companion (testing)", priority = 3000)]
     static void Remove()
     {
         PlayerPrefs.DeleteKey(Companion.FoundSave);

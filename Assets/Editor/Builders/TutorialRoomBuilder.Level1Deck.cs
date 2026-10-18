@@ -34,7 +34,7 @@ public static partial class TutorialRoomBuilder
         so.ApplyModifiedPropertiesWithoutUndo();
     }
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Deck")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 1 Deck", priority = 3000)]
     static void BuildLevel1Deck()
     {
         string path = ScenePath(DeckSceneName);
@@ -110,7 +110,7 @@ public static partial class TutorialRoomBuilder
     // Puts Hardy and his health bar (top middle of the screen) into Level_1_Deck.
     // All of Hardy's attack values are on the HardyBoss component in the Inspector.
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 1 Deck: Add Hardy")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 1 Deck: Add Hardy", priority = 3000)]
     static void AddHardy()
     {
         string path = ScenePath(DeckSceneName);

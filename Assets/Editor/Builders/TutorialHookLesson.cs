@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using static LevelKit;
 
-// Editor-only helper. Adds Tools > Tutorial > Hook Lesson In Jump Room.
+// Editor-only helper. Adds Tools > Other > Tutorial > Hook Lesson In Jump Room.
 //   - Takes the Hook room (Tutorial_5) and the Dash Through Bullets room (Tutorial_6) out of the game:
 //     the Punch room now leads straight to the Dock, and both rooms are switched off in the Scene List (not deleted).
 //   - Teaches the basic hook in the Jump room instead, WITHOUT changing its walls, floors or platforms
@@ -20,7 +20,7 @@ public static class TutorialHookLesson
     static readonly Vector2 RingSpot = new Vector2(38.5f, 10.5f); // above the gap before the 7-tall wall (x 40-41)
     const string HookSign = "Long falls hurt.\nToo tall to jump? {Hook} or RIGHT CLICK throws your hook: hook the gold ring to fly up to it.";
 
-    [MenuItem("Tools/Tutorial/Hook Lesson In Jump Room")]
+    [MenuItem("Tools/Other/Tutorial/Hook Lesson In Jump Room", priority = 3000)]
     static void Apply()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;

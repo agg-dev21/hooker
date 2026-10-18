@@ -26,7 +26,7 @@ public static class Level3Builder
     static readonly Color SeaweedColor = new Color(0.15f, 0.45f, 0.3f, 0.85f);
     static readonly Color LanternColor = new Color(0.5f, 0.85f, 1f);
 
-    [MenuItem("Tools/Rebuild Levels (wipes changes)/Level 3 (Sunken Prison)")]
+    [MenuItem("Tools/Other/Rebuild Levels (wipes changes)/Level 3 (Sunken Prison)", priority = 3000)]
     static void Build()
     {
         if (!NewSceneFromTemplate(SceneName, out Scene scene)) return;
