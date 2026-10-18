@@ -8,10 +8,10 @@ using UnityEngine.Tilemaps;
 // Editor-only helper. Adds Tools > Art > Tutorial Backgrounds.
 // Puts the team's tutorial environment art (Assets/Art/Tutorial, 5 pictures cut from one strip) behind tutorial rooms 1 to 6.
 // Each room gets the picture that fits its layout:
-//   1 Move    town (left)      you start outside, in town
+//   1 Move    town street      you start outside, in town (pixel art redraw)
 //   2 Jump    shipyard 2       three pillars, like the blocks you jump over
-//   3 Dash    shipyard 3       long low floor line with open space, like the gaps you dash across
-//   4 Punch   shipyard 1       crowded beams and blocks, like the walls you break
+//   3 Dash    town pit         a pit between two houses, like the gaps you dash across (pixel art redraw)
+//   4 Punch   town broken wall a wall smashed open, like the walls you break (pixel art redraw)
 //   5 Hook    shipyard 3 (flipped) a tall dark wall on the left, like the one you hook over
 //   6 Bullets town (right)     back outside, on the way to the dock (room 7 has its own dock picture)
 // The picture fills the camera and slides a little as you move (BackdropFollow).
@@ -27,10 +27,10 @@ public static class TutorialBackgrounds
 
     static readonly (string scene, string picture, bool flip, bool sky)[] Rooms =
     {
-        ("Tutorial_1_Move",              "tutorial_town_left",  false, true),
+        ("Tutorial_1_Move",              "tutorial_town_street", false, true),      // the town street, where you start
         ("Tutorial_2_Jump",              "tutorial_shipyard_2", false, false),
-        ("Tutorial_3_Dash",              "tutorial_shipyard_3", false, false),
-        ("Tutorial_4_Punch",             "tutorial_shipyard_1", false, false),
+        ("Tutorial_3_Dash",              "tutorial_town_pit",   false, true),       // a pit between two houses: dash across
+        ("Tutorial_4_Punch",             "tutorial_town_broken_wall", false, true), // a wall smashed open: like the walls you break
         ("Tutorial_5_Hook",              "tutorial_shipyard_3", true,  false),
         ("Tutorial_6_DashThroughBullets","tutorial_town_right", false, true),
     };
@@ -90,7 +90,8 @@ public static class TutorialBackgrounds
         var importer = (TextureImporter)AssetImporter.GetAtPath(path);
         importer.textureType = TextureImporterType.Sprite;
         importer.spriteImportMode = SpriteImportMode.Single;
-        importer.spritePixelsPerUnit = PixelsPerUnit;
+        importer.GetSourceTextureWidthAndHeight(out int width, out int _);
+        importer.spritePixelsPerUnit = PixelsPerUnit * width / 1200f; // every picture the same size in the game, whatever its pixel size
         importer.filterMode = FilterMode.Point;          // pixel art stays crisp
         importer.textureCompression = TextureImporterCompression.Uncompressed;
         importer.mipmapEnabled = false;

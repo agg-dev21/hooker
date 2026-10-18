@@ -227,8 +227,10 @@ public class PlayerChain : MonoBehaviour
         Fill(border, -4f);
         border.SetAsFirstSibling();
 
-        // Placeholder picture: a few chain links
-        for (int i = 0; i < 4; i++)
+        // The chain icon (it has its own frame drawn in), or a placeholder: a few chain links
+        AbilityArt art = AbilityArt.Current;
+        bool drawn = AbilityArt.Dress(frame, border, art ? art.chainIcon : null);
+        for (int i = 0; i < 4 && !drawn; i++)
         {
             RectTransform link = Panel("Link", frame, i % 2 == 0 ? new Color(0.7f, 0.72f, 0.8f) : new Color(0.45f, 0.47f, 0.55f));
             link.anchorMin = link.anchorMax = new Vector2(0.5f, 0.5f);

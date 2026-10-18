@@ -1,0 +1,1172 @@
+fileFormatVersion: 2
+guid: e511cf286d2d7f84c9206020f42b9296
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 5855390624949655861
+    second: fx_barrel_blast_0
+  - first:
+      213: 3013482767723513521
+    second: fx_barrel_blast_1
+  - first:
+      213: -4835021156497953644
+    second: fx_barrel_blast_2
+  - first:
+      213: 4361620279285995585
+    second: fx_barrel_blast_3
+  - first:
+      213: 416455916050770386
+    second: fx_barrel_blast_4
+  - first:
+      213: 8997670527534699255
+    second: fx_barrel_blast_5
+  - first:
+      213: 117646619137686803
+    second: fx_barrel_blast_6
+  - first:
+      213: -7727851198650044231
+    second: fx_barrel_blast_7
+  - first:
+      213: -628507939628217634
+    second: fx_barrel_blast_8
+  - first:
+      213: -4830274564499040760
+    second: fx_barrel_blast_9
+  - first:
+      213: 6671695085832262994
+    second: fx_barrel_blast_10
+  - first:
+      213: 1648548244768623734
+    second: fx_barrel_blast_11
+  - first:
+      213: -7635188676777517606
+    second: fx_barrel_blast_12
+  - first:
+      213: 9186694189781909580
+    second: fx_barrel_blast_13
+  - first:
+      213: 8225677020550523425
+    second: fx_barrel_blast_14
+  - first:
+      213: -5740396460575875424
+    second: fx_barrel_blast_15
+  - first:
+      213: 2082499576694015810
+    second: fx_barrel_blast_16
+  - first:
+      213: 3162320417387511368
+    second: fx_barrel_blast_17
+  - first:
+      213: 3073810048105737807
+    second: fx_barrel_blast_18
+  - first:
+      213: -3169362438068031115
+    second: fx_barrel_blast_19
+  - first:
+      213: -7816624053779709185
+    second: fx_barrel_blast_20
+  - first:
+      213: -2696042931536319025
+    second: fx_barrel_blast_21
+  - first:
+      213: -3557225247623013620
+    second: fx_barrel_blast_22
+  - first:
+      213: -6214667315487821366
+    second: fx_barrel_blast_23
+  - first:
+      213: -6802736700711924090
+    second: fx_barrel_blast_24
+  - first:
+      213: -7489594337279756191
+    second: fx_barrel_blast_25
+  - first:
+      213: 1047953279385671172
+    second: fx_barrel_blast_26
+  - first:
+      213: 3547419996969561263
+    second: fx_barrel_blast_27
+  - first:
+      213: 6403114209868373987
+    second: fx_barrel_blast_28
+  - first:
+      213: -2491613332563320405
+    second: fx_barrel_blast_29
+  - first:
+      213: -5818771100312486196
+    second: fx_barrel_blast_30
+  - first:
+      213: 6496323997972467511
+    second: fx_barrel_blast_31
+  - first:
+      213: -7494700092015788782
+    second: fx_barrel_blast_32
+  - first:
+      213: 5797131015558175674
+    second: fx_barrel_blast_33
+  - first:
+      213: 7095191988172294456
+    second: fx_barrel_blast_34
+  - first:
+      213: -5954889473909566803
+    second: fx_barrel_blast_35
+  - first:
+      213: -1259946002719110532
+    second: fx_barrel_blast_36
+  - first:
+      213: -5004674486898547077
+    second: fx_barrel_blast_37
+  - first:
+      213: 1624555505229732648
+    second: fx_barrel_blast_38
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 1
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 100
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationMethod: 0
+  spriteTessellationDetail: -1
+  spriteGeometrySubdivision: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 4
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: Android
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 4
+    buildTarget: WindowsStoreApps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: fx_barrel_blast_0
+      rect:
+        serializedVersion: 2
+        x: 6803
+        y: 1503
+        width: 42
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 539d64d00c6824150800000000000000
+      internalID: 5855390624949655861
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_1
+      rect:
+        serializedVersion: 2
+        x: 6567
+        y: 1359
+        width: 150
+        height: 130
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1b6cbe27c9a02d920800000000000000
+      internalID: 3013482767723513521
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_2
+      rect:
+        serializedVersion: 2
+        x: 7727
+        y: 1459
+        width: 42
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 49ce07d00ed86ecb0800000000000000
+      internalID: -4835021156497953644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_3
+      rect:
+        serializedVersion: 2
+        x: 7779
+        y: 1343
+        width: 130
+        height: 106
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 1485bfff886978c30800000000000000
+      internalID: 4361620279285995585
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_4
+      rect:
+        serializedVersion: 2
+        x: 8587
+        y: 1199
+        width: 190
+        height: 154
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2d9e0dcf27c87c500800000000000000
+      internalID: 416455916050770386
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_5
+      rect:
+        serializedVersion: 2
+        x: 9307
+        y: 1291
+        width: 98
+        height: 94
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 7f215bf4ca52edc70800000000000000
+      internalID: 8997670527534699255
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_6
+      rect:
+        serializedVersion: 2
+        x: 7071
+        y: 859
+        width: 506
+        height: 334
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 31d3abe0af6f1a100800000000000000
+      internalID: 117646619137686803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_7
+      rect:
+        serializedVersion: 2
+        x: 7999
+        y: 0
+        width: 1601
+        height: 1201
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 9b0336b574821c490800000000000000
+      internalID: -7727851198650044231
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_8
+      rect:
+        serializedVersion: 2
+        x: 8095
+        y: 1187
+        width: 102
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: eda82ffdb571747f0800000000000000
+      internalID: -628507939628217634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_9
+      rect:
+        serializedVersion: 2
+        x: 6451
+        y: 0
+        width: 1438
+        height: 1017
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8061e6f10ea67fcb0800000000000000
+      internalID: -4830274564499040760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_10
+      rect:
+        serializedVersion: 2
+        x: 7747
+        y: 995
+        width: 170
+        height: 154
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 25550c8155f969c50800000000000000
+      internalID: 6671695085832262994
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_11
+      rect:
+        serializedVersion: 2
+        x: 5239
+        y: 699
+        width: 78
+        height: 126
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 67c078ce4e1d0e610800000000000000
+      internalID: 1648548244768623734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_12
+      rect:
+        serializedVersion: 2
+        x: 5299
+        y: 779
+        width: 74
+        height: 46
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: add5797f95c5a0690800000000000000
+      internalID: -7635188676777517606
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_13
+      rect:
+        serializedVersion: 2
+        x: 5751
+        y: 719
+        width: 66
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c40881241b1bd7f70800000000000000
+      internalID: 9186694189781909580
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_14
+      rect:
+        serializedVersion: 2
+        x: 5891
+        y: 691
+        width: 62
+        height: 58
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12ae10f2ba9772270800000000000000
+      internalID: 8225677020550523425
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_15
+      rect:
+        serializedVersion: 2
+        x: 7775
+        y: 471
+        width: 210
+        height: 230
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 0ae177145d30650b0800000000000000
+      internalID: -5740396460575875424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_16
+      rect:
+        serializedVersion: 2
+        x: 5179
+        y: 599
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 2478fb9d45686ec10800000000000000
+      internalID: 2082499576694015810
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_17
+      rect:
+        serializedVersion: 2
+        x: 5343
+        y: 575
+        width: 74
+        height: 54
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 84ef8583aa1d2eb20800000000000000
+      internalID: 3162320417387511368
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_18
+      rect:
+        serializedVersion: 2
+        x: 5507
+        y: 443
+        width: 270
+        height: 174
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: f4e6e58f3fd58aa20800000000000000
+      internalID: 3073810048105737807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_19
+      rect:
+        serializedVersion: 2
+        x: 3547
+        y: 479
+        width: 130
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5713d7297a92404d0800000000000000
+      internalID: -3169362438068031115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_20
+      rect:
+        serializedVersion: 2
+        x: 4251
+        y: 467
+        width: 130
+        height: 122
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ff2cfab56d5c58390800000000000000
+      internalID: -7816624053779709185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_21
+      rect:
+        serializedVersion: 2
+        x: 5151
+        y: 0
+        width: 842
+        height: 581
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: fcd239eec3bb59ad0800000000000000
+      internalID: -2696042931536319025
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_22
+      rect:
+        serializedVersion: 2
+        x: 3527
+        y: 235
+        width: 42
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c0b1169fb7232aec0800000000000000
+      internalID: -3557225247623013620
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_23
+      rect:
+        serializedVersion: 2
+        x: 3731
+        y: 0
+        width: 454
+        height: 425
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ac13e17d00111c9a0800000000000000
+      internalID: -6214667315487821366
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_24
+      rect:
+        serializedVersion: 2
+        x: 4367
+        y: 95
+        width: 126
+        height: 110
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 68e8d8d5303d791a0800000000000000
+      internalID: -6802736700711924090
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_25
+      rect:
+        serializedVersion: 2
+        x: 6023
+        y: 171
+        width: 30
+        height: 30
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 168b9aeb1ad9f0890800000000000000
+      internalID: -7489594337279756191
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_26
+      rect:
+        serializedVersion: 2
+        x: 2319
+        y: 123
+        width: 38
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 4061dfe84f31b8e00800000000000000
+      internalID: 1047953279385671172
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_27
+      rect:
+        serializedVersion: 2
+        x: 2459
+        y: 131
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: facec7431b7fa3130800000000000000
+      internalID: 3547419996969561263
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_28
+      rect:
+        serializedVersion: 2
+        x: 4683
+        y: 111
+        width: 42
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3efd57fd27e6cd850800000000000000
+      internalID: 6403114209868373987
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_29
+      rect:
+        serializedVersion: 2
+        x: 5983
+        y: 59
+        width: 102
+        height: 78
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: ba1afea00e20c6dd0800000000000000
+      internalID: -2491613332563320405
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_30
+      rect:
+        serializedVersion: 2
+        x: 803
+        y: 87
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: cceb09073829f3fa0800000000000000
+      internalID: -5818771100312486196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_31
+      rect:
+        serializedVersion: 2
+        x: 2195
+        y: 87
+        width: 42
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 73f8ef4d144972a50800000000000000
+      internalID: 6496323997972467511
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_32
+      rect:
+        serializedVersion: 2
+        x: 2359
+        y: 0
+        width: 82
+        height: 93
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 21dbf4599f97df790800000000000000
+      internalID: -7494700092015788782
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_33
+      rect:
+        serializedVersion: 2
+        x: 3535
+        y: 0
+        width: 130
+        height: 117
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: abb9eb2b1fb837050800000000000000
+      internalID: 5797131015558175674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_34
+      rect:
+        serializedVersion: 2
+        x: 735
+        y: 31
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 8390534758f277260800000000000000
+      internalID: 7095191988172294456
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_35
+      rect:
+        serializedVersion: 2
+        x: 815
+        y: 15
+        width: 18
+        height: 18
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: da258e6e29bfb5da0800000000000000
+      internalID: -5954889473909566803
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_36
+      rect:
+        serializedVersion: 2
+        x: 2275
+        y: 15
+        width: 38
+        height: 38
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: c7a01c739c5c38ee0800000000000000
+      internalID: -1259946002719110532
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_37
+      rect:
+        serializedVersion: 2
+        x: 2495
+        y: 7
+        width: 34
+        height: 42
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b76a3ffe113db8ab0800000000000000
+      internalID: -5004674486898547077
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: fx_barrel_blast_38
+      rect:
+        serializedVersion: 2
+        x: 763
+        y: 0
+        width: 42
+        height: 29
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 82b9f1fef949b8610800000000000000
+      internalID: 1624555505229732648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    customData: 
+    physicsShape: []
+    bones: []
+    spriteID: 
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    spriteCustomMetadata:
+      entries: []
+    nameFileIdTable:
+      fx_barrel_blast_0: 5855390624949655861
+      fx_barrel_blast_1: 3013482767723513521
+      fx_barrel_blast_10: 6671695085832262994
+      fx_barrel_blast_11: 1648548244768623734
+      fx_barrel_blast_12: -7635188676777517606
+      fx_barrel_blast_13: 9186694189781909580
+      fx_barrel_blast_14: 8225677020550523425
+      fx_barrel_blast_15: -5740396460575875424
+      fx_barrel_blast_16: 2082499576694015810
+      fx_barrel_blast_17: 3162320417387511368
+      fx_barrel_blast_18: 3073810048105737807
+      fx_barrel_blast_19: -3169362438068031115
+      fx_barrel_blast_2: -4835021156497953644
+      fx_barrel_blast_20: -7816624053779709185
+      fx_barrel_blast_21: -2696042931536319025
+      fx_barrel_blast_22: -3557225247623013620
+      fx_barrel_blast_23: -6214667315487821366
+      fx_barrel_blast_24: -6802736700711924090
+      fx_barrel_blast_25: -7489594337279756191
+      fx_barrel_blast_26: 1047953279385671172
+      fx_barrel_blast_27: 3547419996969561263
+      fx_barrel_blast_28: 6403114209868373987
+      fx_barrel_blast_29: -2491613332563320405
+      fx_barrel_blast_3: 4361620279285995585
+      fx_barrel_blast_30: -5818771100312486196
+      fx_barrel_blast_31: 6496323997972467511
+      fx_barrel_blast_32: -7494700092015788782
+      fx_barrel_blast_33: 5797131015558175674
+      fx_barrel_blast_34: 7095191988172294456
+      fx_barrel_blast_35: -5954889473909566803
+      fx_barrel_blast_36: -1259946002719110532
+      fx_barrel_blast_37: -5004674486898547077
+      fx_barrel_blast_38: 1624555505229732648
+      fx_barrel_blast_4: 416455916050770386
+      fx_barrel_blast_5: 8997670527534699255
+      fx_barrel_blast_6: 117646619137686803
+      fx_barrel_blast_7: -7727851198650044231
+      fx_barrel_blast_8: -628507939628217634
+      fx_barrel_blast_9: -4830274564499040760
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

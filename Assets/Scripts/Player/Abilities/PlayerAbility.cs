@@ -219,14 +219,16 @@ public class PlayerAbility : MonoBehaviour
         Fill(border, -4f);
         border.SetAsFirstSibling();
 
-        // The ability picture
-        var picGo = new GameObject("Picture", typeof(RectTransform), typeof(Image));
-        picGo.transform.SetParent(frame, false);
-        Fill((RectTransform)picGo.transform, 10f);
-        var pic = picGo.GetComponent<Image>();
-        pic.sprite = art && art.hardySpikesIcon ? art.hardySpikesIcon : WhiteSprite;
-        pic.preserveAspect = true;
-        if (!art || !art.hardySpikesIcon) pic.color = new Color(0.5f, 0.2f, 0.85f);
+        // The ability picture (it has its own frame drawn in), or a plain purple square
+        if (!AbilityArt.Dress(frame, border, art ? art.hardySpikesIcon : null))
+        {
+            var picGo = new GameObject("Picture", typeof(RectTransform), typeof(Image));
+            picGo.transform.SetParent(frame, false);
+            Fill((RectTransform)picGo.transform, 10f);
+            var pic = picGo.GetComponent<Image>();
+            pic.sprite = WhiteSprite;
+            pic.color = new Color(0.5f, 0.2f, 0.85f);
+        }
 
         // Dark sweep that shrinks as it recharges
         RectTransform sweepRt = Panel("Cooldown", frame, new Color(0f, 0f, 0f, 0.7f));

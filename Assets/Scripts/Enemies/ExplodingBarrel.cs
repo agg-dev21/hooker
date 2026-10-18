@@ -62,8 +62,19 @@ public class ExplodingBarrel : MonoBehaviour
             }
         }
 
-        // Simple blast: big orange flash, then gone
         foreach (Collider2D c in GetComponents<Collider2D>()) c.enabled = false;
+
+        // The blast drawing, standing on the ground under the barrel
+        GroundFxArt fx = GroundFxArt.Current;
+        if (fx && fx.HasBarrelBlast)
+        {
+            float bottom = sr ? sr.bounds.min.y : transform.position.y;
+            GroundFxArt.Play(fx.barrelBlastFrames, new Vector2(transform.position.x, bottom), radius * 2f, fx.fps);
+            Destroy(gameObject);
+            return;
+        }
+
+        // No drawing: simple blast, a big orange flash, then gone
         if (sr) sr.color = boomColor;
         transform.localScale = Vector3.one * radius * 2f;
         Destroy(gameObject, boomShowTime);

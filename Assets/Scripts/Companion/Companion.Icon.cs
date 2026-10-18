@@ -28,9 +28,14 @@ public partial class Companion
         Fill(border, -4f);
         border.SetAsFirstSibling();
 
-        RectTransform pic = Panel("Picture", frame, S.color); // placeholder: her color
-        pic.anchorMin = pic.anchorMax = new Vector2(0.5f, 0.5f);
-        pic.sizeDelta = new Vector2(size * 0.3f, size * 0.55f);
+        // Her icon (it has its own frame drawn in), or a placeholder in her colour
+        AbilityArt art = AbilityArt.Current;
+        if (!AbilityArt.Dress(frame, border, art ? art.arielIcon : null))
+        {
+            RectTransform pic = Panel("Picture", frame, S.color);
+            pic.anchorMin = pic.anchorMax = new Vector2(0.5f, 0.5f);
+            pic.sizeDelta = new Vector2(size * 0.3f, size * 0.55f);
+        }
 
         RectTransform sweepRt = Panel("Cooldown", frame, new Color(0f, 0f, 0f, 0.7f));
         Fill(sweepRt, 0f);

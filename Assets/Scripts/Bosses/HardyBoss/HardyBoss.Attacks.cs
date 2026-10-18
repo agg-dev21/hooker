@@ -153,10 +153,15 @@ public partial class HardyBoss
 
         // Landing shockwave (AOE)
         HitCircle(to, landingRadius, landingDamage, landingKnockback, landingBurns);
-        GameObject wave = MakePiece("Shockwave", shockwaveColor, false);
-        wave.transform.position = new Vector3(to.x, groundY, 0f);
-        wave.transform.localScale = new Vector3(landingRadius * 2f, landingRadius, 1f);
-        StartCoroutine(RemoveAfter(wave, shockwaveShowTime));
+        GroundFxArt fx = GroundFxArt.Current;
+        if (fx && fx.HasHardySlam) GroundFxArt.Play(fx.hardySlamFrames, new Vector2(to.x, groundY), landingRadius * 2f, fx.fps); // the slam drawing
+        else
+        {
+            GameObject wave = MakePiece("Shockwave", shockwaveColor, false);
+            wave.transform.position = new Vector3(to.x, groundY, 0f);
+            wave.transform.localScale = new Vector3(landingRadius * 2f, landingRadius, 1f);
+            StartCoroutine(RemoveAfter(wave, shockwaveShowTime));
+        }
 
         // No roll: show the landing frame, then the attack is over
         if (!rollAfterLanding)
